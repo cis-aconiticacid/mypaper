@@ -3,15 +3,15 @@
 \caption{MetroPT-3 grouping intervention on one fixed real task multiset. For
 offline every-cycle iteration numbers $q_s$ within a window,
 $H_q=\operatorname{sd}(q_s)/\operatorname{mean}(q_s)$ and
-padding is $W\max_s q_s/\sum_s q_s-1$. Dynamic slots is the ratio of dynamic to
-static candidate-iteration slots. The displayed values aggregate over windows;
+padding is $W\max_s q_s/\sum_s q_s-1$. The dynamic-update ratio divides the
+dynamic update count by the fixed-width count. Values aggregate over windows;
 timing repeats stabilize each condition and are not independent datasets.}
 \label{tab:metropt-grouping}
 \scriptsize
 \setlength{\tabcolsep}{3pt}
 \begin{tabular}{@{}lcccc@{}}
 \toprule
-Grouping & $H_q$ & Padding & Dynamic slots & Fixed/dynamic \\
+Grouping & $H_q$ & Padding & Dynamic updates & Fixed/dynamic \\
 \midrule
 heterogeneous & 0.236 & 0.236 & 0.802 & 1.217$\times$ \\
 homogeneous & 0.127 & 0.110 & 0.892 & 1.105$\times$ \\

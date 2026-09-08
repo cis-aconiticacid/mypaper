@@ -2,11 +2,11 @@
 \centering
 \caption{Absolute OT-stage time (seconds) for the three packed-Triton workloads at the
 $10^{-3}$ operating point. Packer19 reports the median over 24 paired
-host--order--GPU units. ImageNet-32 reports solver-phase mean $\pm$ sample
+observations indexed by host, order, and GPU. ImageNet-32 reports solver-phase mean $\pm$ sample
 standard deviation over three paired training seeds. MetroPT-3 reports the
-median of the three registered worker-1 plan units. Packer19 has no reported
-fixed-width value because its registered fixed-width arm executed the compaction
-branch and is excluded. A dash marks an unavailable matched arm. These absolute
+median of the three worker-1 execution-order observations. The Packer19
+fixed-width arm executed the compaction branch and is excluded, so its value is
+unavailable. A dash marks an unavailable matched arm. These absolute
 summaries use the listed units; paired effects are reported separately.}
 \label{tab:absolute-ot-times}
 \small

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 
 import matplotlib as mpl
@@ -19,7 +20,12 @@ from matplotlib.lines import Line2D
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[3]
-WIDTH_ROOT = REPO / "studies/local_results/A100_WIDTH_COST_ENGINEERING_20260907T205000Z_73aec294"
+WIDTH_ROOT = Path(
+    os.environ.get(
+        "DRAINSINKHORN_WIDTH_ROOT",
+        REPO / "studies/local_results/A100_WIDTH_COST_ENGINEERING_20260907T205000Z_73aec294",
+    )
+)
 COMMON_WIDTHS = np.array([1, 2, 3, 4, 6, 8, 12, 16])
 STATIC_WIDTHS = (8, 16)
 STATIC_STYLES = {
@@ -94,7 +100,7 @@ def draw_width_panel(ax: plt.Axes, n: int, language: str) -> None:
     ax.grid(True, which="both", color="#b8b8b8", alpha=0.42, linewidth=0.45)
     ax.set_axisbelow(True)
     ax.set_title(f"$n={n:,},\\quad \\Delta={delta:.2f}$")
-    ax.set_xlabel("Survivor width $a$" if language == "en" else "存活宽度 $a$")
+    ax.set_xlabel("Active batch width $a$" if language == "en" else "存活宽度 $a$")
     if n == 1024:
         ax.set_ylabel(
             "Measured static-width speedup  $c(W,\\xi)/c(a,\\xi)$"

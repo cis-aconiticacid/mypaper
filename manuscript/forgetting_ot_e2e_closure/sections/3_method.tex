@@ -10,15 +10,14 @@ yet conventional fixed-width execution retains all $W$ lanes until the slowest
 problem finishes. Earlier completions therefore continue to occupy positions
 in later kernels.
 
-DrainSinkhorn targets this cross-problem padding. Its objective is to stop
-sending completed problems to later kernels while preserving, for every
-problem, the EOT objective, Sinkhorn update, stopping tolerance, two-marginal
-release rule, and downstream consumer. It changes which problems receive the
-next update; it does not introduce a new OT objective or stopping criterion.
+DrainSinkhorn stops sending completed problems to later kernels. It retains
+each problem's EOT objective, Sinkhorn update, stopping rule, backend, and
+downstream consumer; its execution layer changes which problems receive the
+next update.
 
 For problem $t$, let $n_t$ be the batched iteration of the first configured
 verification at which the problem passes. Before update $k$, the required
-survivor width is
+active batch width is
 \[
 A_k=\left|\{t:n_t\geq k\}\right|.
 \]
@@ -33,7 +32,7 @@ by one batched Sinkhorn cycle. Second, at the configured verification interval,
 it computes a cheap one-marginal screen for all active lanes. Third, it applies
 the backend's full two-marginal verifier only to screen-positive lanes. Fourth,
 it emits every verified output and compacts all corresponding per-problem
-state. The next update then runs on the narrower survivor batch. The
+state. The next update then runs on the smaller active batch. The
 verification interval is the number of batched iterations between consecutive
 screen-and-verify rounds.
 
@@ -64,8 +63,8 @@ compact all OT state}}
 \textbf{Narrower next kernel}\\[-1pt]
 $W_k\to W_{k+1}$}}
 \caption{DrainSinkhorn's execution loop. The one-marginal screen selects
-candidates for full verification but never authorizes release. A problem leaves
-the batch only after passing the two-marginal stopping rule, after which every
+candidates for full verification. A problem leaves the batch after passing the
+two-marginal stopping rule, after which every
 associated tensor is compacted before the next update.}
 \label{fig:active-loop}
 \end{figure*}
@@ -82,7 +81,7 @@ arithmetic,
 \label{eq:pack-commutes}
 \end{equation}
 Filtering the problem dimension therefore preserves the update applied to each
-survivor.
+remaining problem.
 
 For one problem, a Sinkhorn cycle is
 \begin{equation}
@@ -102,8 +101,8 @@ this row-residual calculation across the active lanes. A problem is
 screen-positive when its value
 $\widehat r^{\mathrm{row}}_{t,k}\leq\tau_{\mathrm{screen}}$.
 
-Screen-positive status only triggers the full verifier. The implementation
-recomputes both marginals and releases a problem only when
+Screen-positive status triggers the full verifier. The implementation
+recomputes both marginals and releases a problem when
 \begin{equation}
 r_{t,k}=\max\!\left\{
 \|\pi_{t,k}\ones-a_t\|_1,
@@ -123,7 +122,7 @@ After a problem passes, DrainSinkhorn writes its output and compacts every
 per-problem object: source and target descriptors, marginals, dual potentials,
 centered shifts, log weights, and scratch buffers. Compaction must preserve the
 alignment of these objects so that Equation~\eqref{eq:pack-commutes} continues
-to apply to the survivors.
+to apply to the remaining problems.
 
 We separate three execution modes. \emph{Fixed-width} execution updates all
 $W$ lanes through the common final boundary. \emph{Logical masking} records
@@ -141,15 +140,14 @@ timing effects of screening, verification, and compaction.
 
 \subsection{Execution boundary and fallback}
 
-Formal comparisons fix the execution mode, initial width, verification
+The comparisons fix the execution mode, initial width, verification
 interval, proposal, tolerance, and fallback policy before timing. Iteration
 limits and non-finite states fail closed. The packed Triton implementation may
-hand a narrow dynamic-compaction tail to the matched single-problem solver when
-the survivor width falls below \texttt{min\_packed\_width}; the formal
+hand a small active batch to the matched single-problem solver when
+the width falls below \texttt{min\_packed\_width}; the
 MetroPT-3 and Packer19 configurations set this threshold to one.
 
-When one complete problem fits on an accelerator, windows are assigned to
-independent complete-device workers. Each device then has an independent update
-path and no per-update Sinkhorn collective. Row sharding remains a capacity
-path for one oversized problem, but it is not the scale-out path evaluated in
-the main experiments.
+When one problem fits on an accelerator, windows are assigned to independent
+workers, one per GPU. Each device then has an independent update
+path and no per-update Sinkhorn collective. The scale-out experiments use this
+configuration; row sharding is reserved for an oversized problem.

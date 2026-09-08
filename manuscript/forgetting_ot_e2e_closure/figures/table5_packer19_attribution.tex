@@ -1,7 +1,7 @@
 \begin{table}[!t]
 \centering
 \caption{Packer19 single-variable attribution under one frozen input and
-release contract. Every row reports OT-stage time from a paired comparison
+stopping rule. Every row reports OT-stage time from a paired comparison
 after subtracting consumer time,
 so the component effects share one measurement boundary.}
 \label{tab:packer19-components}
@@ -16,7 +16,7 @@ Change & Matched contrast & Ratio and evidence \\
 \midrule
 Batched verification & serial / batched verifier & 1.133$\times$; 24/24 wins \\
 Current-marginal screen & verifier only / preliminary screen & 1.105$\times$; 24/24 wins \\
-Logical freeze & fixed / logical mask & 1.000$\times$; 95\% CI [0.9998, 1.0003] \\
+Logical masking & fixed / logical mask & 1.000$\times$; 95\% CI [0.9998, 1.0003] \\
 Dynamic compaction & logical mask / dynamic compaction & \CPackerCompactionOTSpeedup{}; 95\% CI \CPackerCompactionOTRange{} \\
 \bottomrule
 \end{tabular}

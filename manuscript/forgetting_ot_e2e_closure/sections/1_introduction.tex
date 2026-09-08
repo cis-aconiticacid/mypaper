@@ -15,8 +15,8 @@ iterations. A static batch runs until the problem requiring the most iterations
 finishes: completed problems continue to occupy state, verification bandwidth,
 and kernel lanes. A logical
 mask freezes their state but does not shrink the tensor seen by a fused kernel.
-The unused rectangle between the iteration number at which each problem passes
-and the largest such number is therefore a distinct source of OT work.
+The updates between each problem's completion and the end of the batch are
+wasted OT work.
 
 We introduce \policy{}, an execution layer that removes this padding. It starts
 from standard batched execution of independent Sinkhorn problems and removes a
@@ -27,7 +27,7 @@ pass the subsequent two-marginal verifier are removed from potentials, marginals
 support descriptors, and scratch buffers. The next backend update runs at the
 width of the unfinished set.
 
-This design separates inner-kernel acceleration from cross-problem execution.
+This design separates kernel optimization from batch execution.
 The inner backend determines the cost of one stabilized update; \policy{}
 changes the number and width of updates executed across a batch. We implement
 the execution layer with a packed Triton kernel, OTT-JAX, and PyKeOps. The packed
@@ -37,24 +37,20 @@ mechanisms.
 
 For problem $t$, let $n_t$ be the batched-iteration number of the first
 configured verification round at which it passes the two-marginal verifier.
-Fixed-width execution consumes $Wn_{\max}$ problem-update slots and execution
-with dynamic compaction consumes exactly $\sum_t n_t$. This task-independent
-identity depends only on the observed iteration numbers. A probabilistic form
-sharpens the condition: the
-expected removable work is positive precisely when a window has positive
-probability of containing both completed and unfinished lanes before some
-batched iteration. Removable slots are only the opportunity. If
+Fixed-width execution performs $Wn_{\max}$ problem updates, whereas dynamic
+compaction performs exactly $\sum_t n_t$. This identity depends only on the
+observed iteration numbers. Removable work exists whenever a batch contains
+both completed and unfinished problems before an update. If
 $c_k(a,\xi_k)$ denotes the measured cost of update $k$ at width $a$, the
 wall-clock saving is
 $\sum_k[c_k(W,\xi_k)-c_k(A_k,\xi_k)]$ minus incremental control overhead.
-The survivor curve and the backend width-cost curve are therefore the two
-quantities that determine realized acceleration.
+The completion depths and width-dependent update times therefore determine the
+runtime benefit.
 
-GPU width cost can be quantized by scheduling waves rather than proportional
-to the number of problems. The packed Triton update launches a width-dependent
-number of thread blocks; reducing $A_k$ saves time when the surviving grid moves
-to a lower cost level. The solver's verifier supplies the survivor trajectory,
-and a measured width sweep supplies the hardware conversion curve.
+GPU update time can change at scheduling-wave boundaries rather than in
+proportion to the number of problems. The packed Triton update launches a
+width-dependent number of thread blocks; reducing $A_k$ saves time when the
+grid requires fewer waves. We measure this relation with a width sweep.
 
 The contribution is evaluated from conventional fixed-width batched execution:
 DrainSinkhorn adds stopping-rule-triggered release and dynamic compaction while
@@ -70,22 +66,16 @@ Our contributions are:
   standard fixed-width batching and the selected solver's stopping rule, we
   dynamically remove completed problems from all per-problem state. Each
   subsequent kernel executes at a width of the unfinished set.
-  \item \textbf{Opportunity and conversion accounting.} A survival-curve
-  identity counts removed problem-update slots. An exact matched-path time
-  decomposition maps the survivor widths through the backend width-cost curve
-  and subtracts incremental control overhead. This separates the instance-side
-  opportunity from its hardware conversion.
-  \item \textbf{Causal component evidence.} Matched controls separate
+  \item \textbf{Hardware-aware performance model.} An update-count identity
+  measures removed work. A matched runtime decomposition uses measured update
+  time at each active width and includes control overhead.
+  \item \textbf{Component analysis.} Matched controls separate
   batched verification, Sinkhorn-specific screening, logical masking, and dynamic compaction. Grouping experiments that hold total iteration counts fixed and
-  direct width-cost measurements identify the two conditions under which
-  dynamic compaction pays.
-  \item \textbf{Backend and endpoint evidence.} MetroPT-3, Packer19, and
+  width sweeps identify when dynamic compaction reduces runtime.
+  \item \textbf{Evaluation across backends and tasks.} MetroPT-3, Packer19, and
   ImageNet-32 evaluate the packed Triton path; OTT-JAX and PyKeOps test transfer
   on ImageNet-32 and A2D2. The resulting paths improve over the specified
-  references using the same backend on the tested workloads. Numerical behavior is reported through parity,
-  residual, and finite-precision stress tests, while complete consumers test
-  application-visible output and training quality.
+  references using the same backend on the tested workloads. Parity, residual,
+  finite-precision, consumer-output, and training-quality tests check the
+  resulting outputs.
 \end{enumerate}
-
-Fast kernels make an update cheaper. Dynamic compaction removes updates that
-would otherwise be issued only to already completed problems.

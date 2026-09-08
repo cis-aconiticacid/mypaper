@@ -1,7 +1,7 @@
 \begin{table}[t]
 \centering
-\caption{MetroPT-3 fixed-per-worker execution on eight complete-device workers across
-two hosts. Times aggregate the complete consumer endpoint. Slots count
+\caption{MetroPT-3 fixed-work execution on eight GPU workers across
+two hosts. Times cover the pipeline endpoint. Counts report
 problem updates across workers; energy uses the same endpoint.}
 \label{tab:metropt-eight-worker}
 \scriptsize
@@ -9,10 +9,10 @@ problem updates across workers; energy uses the same endpoint.}
 \resizebox{\columnwidth}{!}{%
 \begin{tabular}{@{}lrrrrr@{}}
 \toprule
-Route & Fixed (s) & Dynamic (s) & Slots fixed/dynamic & Time & Energy \\
+Input & Fixed (s) & Dynamic (s) & Updates fixed/dynamic & Time & Energy \\
 \midrule
-Route 2 & 12.523 & 4.026 & 4736 / 1276 & 3.110$\times$ & 3.437$\times$ \\
-Route 3 & 7.999 & 3.705 & 3008 / 1244 & 2.159$\times$ & 2.292$\times$ \\
+Higher workload & 12.523 & 4.026 & 4736 / 1276 & 3.110$\times$ & 3.437$\times$ \\
+Lower workload & 7.999 & 3.705 & 3008 / 1244 & 2.159$\times$ & 2.292$\times$ \\
 \bottomrule
 \end{tabular}}
 \end{table}

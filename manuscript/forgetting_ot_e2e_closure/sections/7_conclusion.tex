@@ -3,34 +3,27 @@
 
 \policy{} removes padded OT work from batches whose problems require different
 numbers of iterations.
-It starts from standard fixed-width execution of independent Sinkhorn problems;
-the selected solver's stopping rule determines completion, and dynamic compaction narrows every subsequent per-problem kernel. The survival-curve
-identity counts the problem updates that disappear. The opportunity--conversion
-decomposition then maps survivor width through the measured backend cost curve
-and subtracts control overhead, giving the exact matched-path break-even
-condition.
+It starts from fixed-width execution of independent Sinkhorn problems. The
+solver's stopping rule determines completion, and dynamic compaction narrows
+each subsequent update. The hardware-aware performance model combines an
+update-count identity with measured kernel time at each active width. Its
+runtime decomposition includes control overhead and gives the matched-path
+break-even condition.
 
 Matched fixed-width/dynamic-compaction comparisons deliver
 \CMetroCorrectedEndpointSpeedup{} on the four-worker MetroPT-3 endpoint,
-$1.054\times$ on the ImageNet-32 training solver field, and $1.616$--$3.110\times$
-in the registered MetroPT scale cells. A non-cold setting that uses one
+$1.054\times$ for ImageNet-32 Sinkhorn time, and $1.616$--$3.110\times$
+in the MetroPT-3 scale-out study. A setting that uses one
 initialization for multiple problems gives
-$1.421\times$ with 30.62\% fewer problem-update slots. Independent OTT-JAX and
+$1.421\times$ with 30.62\% fewer problem updates. OTT-JAX and
 PyKeOps implementations remove completed problems through independent backends.
 
-Matched controls identify the mechanism. Batched verification and the
-Sinkhorn-specific screen reduce inspection cost; logical masking leaves the kernel width unchanged; dynamic compaction removes OT work. In the registered
-MetroPT and Packer19 endpoint windows, dynamic compaction also reduces measured GPU
-energy.
-Grouping while holding total iteration counts fixed shows that greater
-variation in the required iteration numbers within a window creates more
-removable padding. Direct A100 width sweeps show a wave-shaped conversion curve:
-small widths can share one cost level, while larger problems respond to the
-width reduction earlier.
-width reduction earlier. The reported applications pair speed with
-achieved residuals and consumer or training endpoints. Fast inner kernels make
-each update cheaper; DrainSinkhorn stops issuing
-those updates to completed problems.
+Matched controls separate verification, screening, logical masking, and dynamic
+compaction. In MetroPT-3 and Packer19, compaction also reduces measured GPU
+energy. The grouping test shows that variation in completion depth creates more
+removable updates. A100 width sweeps show stepwise kernel times from wave
+quantization. The application results report runtime together with residuals
+and consumer or training outputs.
 
 \paragraph{Reproducibility.}
 The release artifact records source and input identities, commands, software and

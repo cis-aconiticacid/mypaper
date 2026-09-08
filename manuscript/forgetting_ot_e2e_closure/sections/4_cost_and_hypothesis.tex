@@ -1,24 +1,25 @@
-\section{Survivor Geometry and Hardware Conversion}
+\section{Hardware-Aware Performance Model}
 \label{sec:cost-hypothesis}
 
-The executor observes when each problem first passes the verifier. Those
-iteration numbers define a survivor curve, which determines removable work.
-The backend width-cost curve then determines how much of that work reduction is
-converted into wall-clock saving.
+The model combines per-problem completion depths with measured update time at
+each active batch width. Completion depths determine how many updates can be
+removed; width-dependent kernel time determines the runtime reduction. This
+follows the standard use of accelerator performance models to relate workload
+shape and hardware execution cost \citep{yu2021habitat,nvidia2022gpuperformance}.
 
-\subsection{Counting removed problem-update slots}
+\subsection{Counting removed updates}
 
 For problem $t$, let $n_t$ be the batched-iteration number of the first
 configured verification round at which the problem passes the two-marginal
 verifier, and let
 \begin{equation}
 A_k=\bigl|\{t:n_t\geq k\}\bigr|
-\label{eq:survival-width}
+\label{eq:active-width}
 \end{equation}
-be the surviving width before packed update $k$. The measured verification
+be the active batch width before packed update $k$. Verification
 supplies both quantities.
 
-\begin{proposition}[Problem-update accounting]
+\begin{proposition}[Update-count identity]
 For a finite window of $W$ problems,
 \begin{equation}
 S_{\mathrm{active}}
@@ -26,14 +27,14 @@ S_{\mathrm{active}}
 =\sum_{t=1}^{W}n_t,
 \qquad
 S_{\mathrm{static}}=Wn_{\max}.
-\label{eq:slot-identity}
+\label{eq:update-count-identity}
 \end{equation}
 Hence dynamic compaction removes exactly
 \begin{equation}
 R=Wn_{\max}-\sum_{t=1}^{W}n_t
-\label{eq:removable-slots}
+\label{eq:removable-updates}
 \end{equation}
-problem-update slots relative to a fixed-width batch with the same final
+problem updates relative to a fixed-width batch with the same final
 boundary.
 \end{proposition}
 \begin{proof}
@@ -42,13 +43,13 @@ sums. Fixed-width execution keeps all $W$ lanes through $n_{\max}$.
 \end{proof}
 
 Logical masking changes which states update but not the width seen by
-the kernel, so it retains $Wn_{\max}$ slots. The area between the static
-rectangle and the survival curve is therefore the exact post-run work removed
+the kernel, so it retains $Wn_{\max}$ updates. The area between the static
+rectangle and the active-width trajectory is therefore the exact work removed
 by dynamic compaction. The verification interval is already reflected in the observed $n_t$;
 the first passing iteration on a denser verification schedule would define a different
 quantity.
 
-\begin{proposition}[Task-independent opportunity condition]
+\begin{proposition}[Condition for removable work]
 Let $(n_1,\ldots,n_W)$ be any random vector of finite iteration numbers.
 Then $\mathbb E[R]>0$ if and only if there exists a batched iteration $k$ such that
 \begin{equation}
@@ -59,7 +60,7 @@ Then $\mathbb E[R]>0$ if and only if there exists a batched iteration $k$ such t
 \begin{proof}
 $R$ is nonnegative and is zero exactly when every lane has the same iteration
 number. Different finite iteration numbers create a value of $k$ with both
-survivors and completed lanes, and the converse follows directly from the
+active and completed lanes, and the converse follows directly from the
 definition of $A_k$.
 \end{proof}
 
@@ -84,7 +85,7 @@ $H_{\mathrm{other}}$ covers remaining timed control work. Let $H_{\mathrm{fixed}
 be the corresponding fixed-width control cost and let $\Delta H$ denote active
 control cost minus $H_{\mathrm{fixed}}$.
 
-\begin{proposition}[Opportunity--conversion decomposition]
+\begin{proposition}[Runtime decomposition]
 For a matched fixed-width/dynamic-compaction execution with the same final verifier
 boundary and matched update states $\xi_k$,
 \begin{equation}
@@ -105,14 +106,13 @@ Write $T_{\mathrm{fixed}}=\sum_k c_k(W,\xi_k)+H_{\mathrm{fixed}}$,
 subtract Equation~\eqref{eq:time-accounting}, and collect the control terms.
 \end{proof}
 
-This decomposition exposes two gates. Variation among $n_t$ creates the
-survivor widths needed for positive removable work. The measured function
-$c_k(a,\xi_k)$ determines whether those width reductions cross a lower hardware
-cost level. If $c_k(A_k,\xi_k)=c_k(W,\xi_k)$ for every $k$, dynamic compaction removes
-problem-update slots but saves no update time; if the summed cost decrease
-exceeds $\Delta H$, it produces a net wall-clock gain.
+Variation among $n_t$ creates removable updates. The measured function
+$c_k(a,\xi_k)$ determines whether the smaller active widths reduce kernel time.
+If $c_k(A_k,\xi_k)=c_k(W,\xi_k)$ for every $k$, compaction removes updates but
+saves no update time. It reduces total runtime when the summed update-time
+reduction exceeds $\Delta H$.
 
-\subsection{Wave-shaped width cost}
+\subsection{Width-dependent kernel time}
 
 For the packed Triton update used in our implementation, the launch grid has
 \begin{equation}
@@ -120,7 +120,7 @@ B(a,n)=a\left\lceil\frac{n}{b_m}\right\rceil
 \label{eq:block-grid}
 \end{equation}
 thread blocks, where $b_m$ is the row tile size. GPU scheduling processes this
-grid in occupancy-dependent waves \citep{yu2021habitat,nvidia2024cuda}. A useful local model is therefore
+grid in occupancy-dependent waves \citep{nvidia2022gpuperformance,nvidia2024cuda}. The resulting model is
 \begin{equation}
 c(a;n,\xi)\approx g_{n,\xi}\!\left(
 \left\lceil\frac{B(a,n)}{Q_{\xi}}\right\rceil\right),
@@ -136,5 +136,5 @@ places the saturation width near $6.75$ for $n=1024$, $1.69$ for $n=4096$, and
 below one for $n=16384$. Direct primitive measurements locate the first large
 increase at widths $6\rightarrow7$ and $1\rightarrow2$ for the first two sizes;
 the $n=16384$ curve is responsive from width one. These measurements instantiate
-$c(a)$ for this backend and explain why equal slot reductions can have different
+$c(a)$ for this backend and explain why equal update-count reductions can have different
 wall-clock value across problem sizes.
