@@ -64,7 +64,8 @@ Each curve reports $g_W(a)=c(W,\xi)/c(a,\xi)$ relative to static width
 $W\in\{8,16\}$; all panels use the same axes, and shading propagates the
 per-width interquartile endpoints from 30 repeats. Panel titles report
 $\Delta=b_mN_{\mathrm{SM}}/n$, which determines scheduling-wave quantization.
-The $n=1024,W=8$ setting matches the ImageNet-32 training solver configuration;
+The $(n,W,\varepsilon)=(1024,8,0.03)$ setting matches the ImageNet-32 training
+solver configuration, which verifies every four updates at tolerance $10^{-3}$;
 the plotted measurements time only the packed update, not total training.}
 \label{fig:main-results-width}
 \end{figure*}
