@@ -32,7 +32,7 @@ Automatic batching tracks the program point of each member in a data-dependent
 program \citep{radul2020autobatching}. Orca schedules autoregressive inference
 one iteration at a time \citep{yu2022orca}. Outside OT, Ginkgo's batched CG
 provides a related execution precedent: each uniform independent linear system
-exits on its own residual test, and later iterations skip converged systems
+exits once its residual reaches the stopping tolerance, and later iterations skip converged systems
 inside the fused solver \citep{ginkgoBatched}. jaxipm redesigns IPOPT around heterogeneous iteration fusion and
 replacement of completed problems \citep{viljoen2026jaxipm}. Within OT, POT's \texttt{solve\_batch}
 parallelizes independent OT problems represented by batched cost matrices, and
@@ -43,7 +43,7 @@ removal of completed EOT problems while retaining online pairwise interactions
 instead of materializing one cost tensor per problem.
 
 DrainSinkhorn addresses the numerical structure of EOT batches. Alternating
-scaling permits a preliminary check using the current marginals; the
+scaling permits a preliminary screen using the current marginals; the
 two-marginal verifier is evaluated on problem outputs; dynamic compaction must preserve the
 batch-element
 correspondence of potentials, marginals, supports, and scratch state. Generic
@@ -51,7 +51,7 @@ masking leaves those EOT-specific state transformations and the width
 unchanged. \Cref{tab:prior-systems} compares the batched object, completion
 signal, and execution action of prior systems. Our OTT-JAX and PyKeOps variants
 remove completed problems, whereas the packed Triton realization also performs a
-preliminary check using the current marginals.
+preliminary screen using the current marginals.
 
 \paragraph{OT consumers.}
 OTT provides a broad transport API \citep{cuturi2022ott}. Multisample Flow

@@ -12,7 +12,7 @@ cost also depends on how long each problem remains in that batch.
 
 Different problems usually reach the stopping tolerance at different
 iterations. A static batch runs until the problem requiring the most iterations
-finishes: completed problems continue to occupy state, verifier-check bandwidth,
+finishes: completed problems continue to occupy state, verification bandwidth,
 and kernel lanes. A logical
 mask freezes their state but does not shrink the tensor seen by a fused kernel.
 The unused rectangle between the iteration number at which each problem passes
@@ -20,7 +20,7 @@ and the largest such number is therefore a distinct source of OT work.
 
 We introduce \policy{}, an execution layer that removes this padding. It starts
 from standard batched execution of independent Sinkhorn problems and removes a
-problem after it passes the stopping check used by the selected solver. A
+problem after it passes verification used by the selected solver. A
 full alternating cycle makes the newly updated marginal current in exact
 arithmetic, so the other marginal provides a cheap batched screen. Lanes that
 pass the subsequent two-marginal verifier are removed from potentials, marginals,
@@ -31,12 +31,12 @@ This design separates inner-kernel acceleration from cross-problem execution.
 The inner backend determines the cost of one stabilized update; \policy{}
 changes the number and width of updates executed across a batch. We implement
 the execution layer with a packed Triton kernel, OTT-JAX, and PyKeOps. The packed
-Triton path additionally uses the current marginal in a preliminary check; the
+Triton path additionally uses the current marginal in a preliminary screen; the
 OTT-JAX and PyKeOps paths remove completed problems with independent backend
 mechanisms.
 
 For problem $t$, let $n_t$ be the batched-iteration number of the first
-configured verifier check at which it passes the two-marginal verifier.
+configured verification round at which it passes the two-marginal verifier.
 Fixed-width execution consumes $Wn_{\max}$ problem-update slots and execution
 with dynamic compaction consumes exactly $\sum_t n_t$. This task-independent
 identity depends only on the observed iteration numbers. A probabilistic form
@@ -76,7 +76,7 @@ Our contributions are:
   and subtracts incremental control overhead. This separates the instance-side
   opportunity from its hardware conversion.
   \item \textbf{Causal component evidence.} Matched controls separate
-  batched checking, Sinkhorn-specific screening, logical masking, and dynamic compaction. Grouping experiments that hold total iteration counts fixed and
+  batched verification, Sinkhorn-specific screening, logical masking, and dynamic compaction. Grouping experiments that hold total iteration counts fixed and
   direct width-cost measurements identify the two conditions under which
   dynamic compaction pays.
   \item \textbf{Backend and endpoint evidence.} MetroPT-3, Packer19, and

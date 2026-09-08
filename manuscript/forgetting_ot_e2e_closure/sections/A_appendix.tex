@@ -31,7 +31,7 @@ unavailable rather than replaced by a power-limit estimate.
 
 \paragraph{C82 matched fixed/dynamic control.}
 C82 runs fixed-width and dynamic-compaction paths on the same MetroPT-3 failure-3 input,
-cold proposal, regularization, tolerance, verifier-check schedule,
+cold proposal, regularization, tolerance, verification schedule,
 two-marginal verifier, packed backend, and fixed consumer. The experimental
 variable is whether verifier-approved lanes are dynamically removed from later
 kernels. One host supplies four independent complete-device A100 workers, with
@@ -49,7 +49,7 @@ $0.00346756$.
 
 \paragraph{C66 two-host matched control.}
 Within the matched C66 contrast, fixed-width and dynamic-compaction execution use the same inputs, cold proposal,
-regularization, tolerance, verifier-check schedule, two-marginal verifier,
+regularization, tolerance, verification schedule, two-marginal verifier,
 packed backend, and
 fixed consumer; stopping-rule-triggered release and dynamic compaction are the controlled
 difference. Three order-balanced plan seeds are reused across four GPU
@@ -82,8 +82,8 @@ campaign's $10^{-6}$ tight reference.}
 \end{figure}
 
 \paragraph{Execution-mode protocol.}
-The formal campaigns fix representation, width, execution mode, check interval,
-stopping tolerance, checking path, tail-handoff threshold, and fail-closed
+The formal campaigns fix representation, width, execution mode, verification interval,
+stopping tolerance, verification path, tail-handoff threshold, and fail-closed
 policy before timing. The width and grouping interventions map conditions for
 selecting fixed-width execution or dynamic compaction.
 
@@ -101,23 +101,23 @@ the packed-update component of the measured width-cost curve in
 
 \paragraph{Independent backend realizations.}
 The OTT-JAX and PyKeOps paths remove completed problems through their native
-backend mechanisms. OTT-JAX executes fixed 20-update phases, checks at phase
+backend mechanisms. OTT-JAX executes fixed 20-update phases, verifies at phase
 boundaries, removes passing lanes, and rebuckets survivors; native
 \texttt{vmap} and a matched fixed-phase static path provide its controls. The
 PyKeOps paths use one
 batched independent-problem matrix-free operator, a fixed geometric
-verifier-check schedule, the two-marginal verifier, and removal of
+verification schedule, the two-marginal verifier, and removal of
 passing problem state.
 Sequential and static-padded PyKeOps paths use the same symbolic backend. The
-shared principle is per-problem release followed by dynamic removal; checking
+shared principle is per-problem release followed by dynamic removal; verifying
 and packing mechanisms remain backend-specific. All cross-backend
 rows in \cref{tab:ot-cross-backend} report their achieved two-marginal residual.
 
 \subsection{Independent backend implementations}
 
-\input{figures/table9_cross_backend_results}
+\input{figures/table7_cross_backend_results.tex}
 
-\input{figures/table10_workload_configurations}
+\input{figures/table8_workload_configurations.tex}
 
 \section{Deployment and Operating Boundaries}
 
@@ -133,8 +133,8 @@ two-host eight-worker results as distinct scaling studies. Peak memory remains
 local to each worker.
 
 \subsection{Supplementary attribution and evidence boundaries}
-\input{figures/table2_absolute_ot_times}
-\input{figures/table3_attribution_map}
+\input{figures/table9_absolute_ot_times.tex}
+\input{figures/table10_attribution_map.tex}
 \input{figures/table11_imagenet_solver_pairs}
 \input{figures/table12_packer19_phase_costs}
 

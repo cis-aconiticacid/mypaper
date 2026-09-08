@@ -9,13 +9,13 @@ converted into wall-clock saving.
 \subsection{Counting removed problem-update slots}
 
 For problem $t$, let $n_t$ be the batched-iteration number of the first
-configured verifier check at which the problem passes the two-marginal
+configured verification round at which the problem passes the two-marginal
 verifier, and let
 \begin{equation}
 A_k=\bigl|\{t:n_t\geq k\}\bigr|
 \label{eq:survival-width}
 \end{equation}
-be the surviving width before packed update $k$. The measured stopping check
+be the surviving width before packed update $k$. The measured verification
 supplies both quantities.
 
 \begin{proposition}[Problem-update accounting]
@@ -44,8 +44,8 @@ sums. Fixed-width execution keeps all $W$ lanes through $n_{\max}$.
 Logical masking changes which states update but not the width seen by
 the kernel, so it retains $Wn_{\max}$ slots. The area between the static
 rectangle and the survival curve is therefore the exact post-run work removed
-by dynamic compaction. The check interval is already reflected in the observed $n_t$;
-the first passing iteration on a denser check schedule would define a different
+by dynamic compaction. The verification interval is already reflected in the observed $n_t$;
+the first passing iteration on a denser verification schedule would define a different
 quantity.
 
 \begin{proposition}[Task-independent opportunity condition]
@@ -75,7 +75,7 @@ backend state held fixed by the comparison. Then
 \begin{equation}
 \begin{split}
 T_{\mathrm{active}}={}&\sum_k c_k(A_k,\xi_k)
-+H_{\mathrm{screen}}+H_{\mathrm{check}}\\
++H_{\mathrm{screen}}+H_{\mathrm{verification}}\\
 &+H_{\mathrm{compact}}+H_{\mathrm{other}},
 \end{split}
 \label{eq:time-accounting}

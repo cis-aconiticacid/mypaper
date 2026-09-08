@@ -4,7 +4,7 @@ We present \policy{}, an execution layer for batched entropic optimal transport
 that dynamically removes completed problems and narrows subsequent updates.
 It starts from standard batched execution of independent Sinkhorn problems.
 After an alternating scaling cycle, one marginal is current by construction;
-a batched check of the other marginal filters the problems that require the
+a batched screening of the other marginal filters the problems that require the
 two-marginal verifier. Problems that pass that existing
 release rule are removed from every per-problem tensor, while unfinished
 problems continue.

@@ -18,14 +18,9 @@ OTT-JAX \texttt{vmap} \citep{cuturi2022ott}
 & Per-solve stopping or a shared iteration budget
 & Fixed-width vectorized execution
 & Solver error function \\
-jaxipm \citep{viljoen2026jaxipm}
-& Independent nonlinear programs
-& Heterogeneous iteration fusion
-& Replaces completed problems to sustain throughput
-& Nonlinear-program convergence checks \\
 \policy{}
 & Positive EOT problems with compatible batched state
-& A preliminary check using the current marginals, followed by the two-marginal verifier
+& A preliminary screen using the current marginals, followed by the two-marginal verifier
 & Removes passing lanes from potentials, supports, marginals, and scratch buffers
 & Current row and column residual tolerance \\
 \bottomrule

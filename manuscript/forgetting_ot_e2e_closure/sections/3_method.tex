@@ -5,15 +5,14 @@
 Standard batched execution applies $W$ independent Sinkhorn maps in parallel
 and retains a width $W$ until the problem requiring the most iterations
 completes. DrainSinkhorn starts from this fixed-width layout. For problem $t$,
-let $n_t$ be the batched-iteration number of the first configured verifier
-check at which the problem passes the two-marginal verifier. DrainSinkhorn then writes its
+let $n_t$ be the batched-iteration number of the first configured verification at which the problem passes the two-marginal verifier. DrainSinkhorn then writes its
 output and dynamically compacts all per-problem state. Batched update $k$
 therefore executes at survivor width
 \[
 A_k=\left|\{t:n_t\geq k\}\right|.
 \]
-The check interval is the number of batched iterations between consecutive
-verifier checks.
+The verification interval is the number of batched iterations between consecutive
+verifications .
 Logical masking records completion at width $W$; dynamic-compaction execution runs
   subsequent kernels at survivor width $A_k$. A fixed-width/dynamic-compaction comparison
 measures the net effect of release and dynamic width reduction. LM/DC holds the
@@ -33,7 +32,7 @@ arithmetic, its defining algebraic property is
 \label{eq:pack-commutes}
 \end{equation}
 Thus the batched kernel preserves the EOT objective and per-instance Sinkhorn
-map while changing their execution layout. After a stopping check, DrainSinkhorn
+map while changing their execution layout. After a verification, DrainSinkhorn
 filters the problem-batch dimension and applies
 Equation~\eqref{eq:pack-commutes} to the survivors.
 
@@ -52,7 +51,7 @@ v^{k+1}\odot(K^\top u^{k+1})=b.
 The column marginal is current by construction; the row marginal
 $u^{k+1}\odot(Kv^{k+1})$ can remain outside tolerance. DrainSinkhorn evaluates
 that row residual for all active problems in one batched operation and sends
-only precheck-positive problems to the two-marginal verifier.
+only screen-positive problems to the two-marginal verifier.
 
 \begin{figure*}[t]
 \centering
@@ -63,12 +62,12 @@ $u\leftarrow a/(Kv)$\\
 $v\leftarrow b/(K^\top u)$}}
 \hspace{2pt}$\rightarrow$\hspace{2pt}
 \fbox{\parbox{.13\textwidth}{\centering
-\textbf{One-marginal precheck}\\[-1pt]
+\textbf{One-marginal screen}\\[-1pt]
 batch row residuals\\
 updated column identity}}
 \hspace{2pt}$\rightarrow$\hspace{2pt}
 \fbox{\parbox{.13\textwidth}{\centering
-\textbf{Configured check}\\[-1pt]
+\textbf{verification}\\[-1pt]
 current row and column\\
 stopping tolerance}}
 \hspace{2pt}$\rightarrow$\hspace{2pt}
@@ -80,7 +79,7 @@ compact all OT state}}
 \fbox{\parbox{.11\textwidth}{\centering
 \textbf{Narrower next kernel}\\[-1pt]
 $W_k\to W_{k+1}$}}
-\caption{DrainSinkhorn's execution loop. The preliminary check using the current
+\caption{DrainSinkhorn's execution loop. The preliminary screen using the current
 marginals avoids many full plan evaluations. Problems that pass the
 two-marginal verifier leave every
 per-problem tensor; the next batched update processes only the survivors.}
@@ -89,11 +88,11 @@ per-problem tensor; the next batched update processes only the survivors.}
 
 \subsection{Screen, verify, and compact}
 
-Let $\widehat r^{\mathrm{row}}_{t,k}$ be the batched precheck value. A problem is
-precheck-positive when
+Let $\widehat r^{\mathrm{row}}_{t,k}$ be the batched screen value. A problem is
+screen-positive when
 $\widehat r^{\mathrm{row}}_{t,k}\leq\tau_{\mathrm{screen}}$; otherwise it
-continues without materializing the more expensive plan-level check. For a
-precheck-positive problem, the implementation recomputes both marginals and applies
+continues without materializing the more expensive two-marginal verification. For a
+screen-positive problem, the implementation recomputes both marginals and applies
 the configured stopping rule
 \begin{equation}
 r_{t,k}=\max\!\left\{
@@ -102,16 +101,17 @@ r_{t,k}=\max\!\left\{
 \right\}\leq\tau_{\mathrm{stop}}.
 \label{eq:release-contract}
 \end{equation}
-A rejected problem remains active for a later verifier check. A false-positive
-precheck invokes the two-marginal verifier unnecessarily; a false-negative
-precheck delays removal. We measure these effects by replaying the screened
-results and checking each with the verifier in \cref{sec:experiments}.
+A rejected problem remains active for a later verification. A false-positive
+screening invokes the two-marginal verifier unnecessarily; a false-negative
+screening delays removal. We measure these effects by replaying the screened
+results and screening delays removal. We measure these effects by replaying the screened
+results and evaluate each with the verifier in \cref{sec:experiments}. \cref{sec:experiments}.
 
 For each passing problem, DrainSinkhorn writes the output and compacts every
 per-problem object: source and target descriptors, marginals, dual potentials,
 centered shifts, log weights, and scratch buffers. The next batched update sees
 only surviving problems. The logical-mask
-control uses the same update, preliminary check, two-marginal verifier,
+control uses the same update, preliminary screen, two-marginal verifier,
 tolerance, and observed
 completion times. It freezes a passing problem's potentials but retains that
 problem in the batch tensor, so subsequent kernels still execute at the
@@ -125,12 +125,12 @@ application endpoints characterize its implementation behavior.
 
 \paragraph{Stopping-rule-preserving release.}
 A problem is removed only after passing the same two-marginal verifier used by
-the selected backend. The preliminary check using the current marginals decides
-only whether to invoke that check; it does not authorize removal. DrainSinkhorn
+the selected backend. The preliminary screen using the current marginals decides
+only whether to invoke that verification; it does not authorize removal. DrainSinkhorn
 therefore preserves the backend's configured release authority while changing
 how unfinished problems are
 scheduled and stored. The timed packed Triton path applies this rule in the precision
-supported by that backend. Independent FP64 replays serve as verification references
+supported by that backend. Independent FP64 replays serve as evaluation references
 for finite-precision decision behavior.
 
 \subsection{Execution modes and fallback}
@@ -142,7 +142,7 @@ freezes completed states without narrowing the kernel. Dynamic compaction
 removes passing problems. Width determines whether a batched kernel is
 efficient, and the numbers of iterations needed by the problems in the batched
 window determine how much width dynamic compaction can remove. Formal
-campaigns fix execution mode, width, check interval, and
+campaigns fix execution mode, width, verification interval, and
 fallback before timing. Formal campaigns use fail-closed convergence handling:
 iteration-limit and non-finite-state events raise an error. The packed Triton
 implementation optionally hands a dynamic-compaction tail to the matched

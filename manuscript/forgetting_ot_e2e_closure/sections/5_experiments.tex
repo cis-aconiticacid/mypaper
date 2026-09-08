@@ -6,7 +6,7 @@ measured directly or reconstructed by subtracting the paired consumer time from
 the encompassing recorded interval. For reconstructed rows, consumer time is
 subtracted within each paired timing unit before ratios, intervals, or bootstrap
 summaries are formed. Matched component comparisons hold inputs, proposal,
-tolerance, verifier-check schedule, two-marginal verifier, and consumer fixed.
+tolerance, verification schedule, two-marginal verifier, and consumer fixed.
 Complete-path comparisons use the same packed or vectorized backend in both
 arms. When stopping
 controllers produce different achieved residuals, the achieved residuals and
@@ -40,7 +40,7 @@ per-width interquartile endpoints from 30 repeats. Panel titles report
 $\Delta=b_mN_{\mathrm{SM}}/n$, which determines scheduling-wave quantization.}
 \label{fig:main-results-width}
 \end{figure*}
-\input{figures/table_main_results_by_width}
+\input{figures/table2_main_results_by_width.tex}
 
 \subsection{Matched release and dynamic compaction}
 
@@ -51,7 +51,7 @@ complete-device workers. Dynamic compaction gives
 problem-update slots fall from \CMetroSlotsStatic{} to \CMetroSlotsActive{}.
 All three predeclared execution plans favor dynamic-compaction execution, with a
 descriptive range of \CMetroCorrectedEndpointRange{}. The two arms each invoke 16
-verifier candidates, verify 16 candidates, and launch 32 plan-application
+verifier candidates, evaluate 16 candidates, and launch 32 plan-application
 kernels per repeat. The corresponding four-GPU energy ratio is
 \CMetroCorrectedEnergyFactor{}.
 
@@ -66,7 +66,7 @@ slots as shown in \cref{tab:c67-global8}. Separate one-worker support-size cells
 that pass the frozen gates on both hosts give $2.316\times$ at $n=8192$ and
 $1.616\times$ at $n=32768$.
 
-\input{figures/table4_eight_gpu_decomposition}
+\input{figures/table3_eight_gpu_decomposition.tex}
 
 In C63, each training step uses a real ImageNet-32 PCA500 feature coupling.
 Table~\ref{tab:absolute-ot-times} reports the four solver-phase times. Paired
@@ -81,7 +81,7 @@ non-cold setting: across 40 controlled overlapping-support windows, compacted
 execution is $1.421\times$ faster,
 reduces slots by 30.62\%, and wins every paired window.
 
-\input{figures/table5_imagenet_quality}
+\input{figures/table4_imagenet_quality.tex}
 
 The numerical quality results use the same three paired training seeds at NFE
 4, 8, and 16. The full per-seed measurements and analysis artifacts are
@@ -142,7 +142,7 @@ two-marginal verifier and residual tolerance. Panel (a) shows the LM/DC speedup 
 the five tolerances. Whiskers are the equal-host
 stratified bootstrap 95\% intervals for LM/DC. Panel (b) shows maximum actual residual
 and maximum consumer TV on a logarithmic scale. Each point summarizes 24
-paired units; consumer TV checks differences in outputs against the tight
+paired units; consumer TV measures differences in outputs against the tight
 reference.}
 \label{fig:packer-stopping-metrics}
 \end{figure*}
@@ -175,18 +175,18 @@ produce 24 paired host--order--GPU units. Each unit uses warmup-excluded repeat
 medians, the same input, packed-kernel source tree, $10^{-3}$ stopping tolerance, and transition
 consumer.
 
-\input{figures/table7_packer19_attribution}
+\input{figures/table6_grouping_intervention.tex}
 
-\paragraph{Checking and screening.}
+\paragraph{Verifier and screen ablation}
 The controls expose distinct work. Batched evaluation of the two-marginal
-verifier and the preliminary check using the current marginals reduce OT-stage
+verifier and the preliminary screen using the current marginals reduce OT-stage
 time under matched paths. Each C80 ratio subtracts its paired consumer time
 before forming the contrast.
 
-We replay all \CPackerShadowNegatives{} precheck-negative events and evaluate
+We replay all \CPackerShadowNegatives{} screen-negative events and evaluate
 each with the two-marginal verifier, finding
 \CPackerShadowMissedReady{} already-releasable lanes. The maximum difference
-between the preliminary check and verifier row residual is
+between the preliminary screen and verifier row residual is
 \CPackerScreenDiscrepancy{}. Every emitted plan passes the two-marginal
 verifier at $10^{-3}$.
 
@@ -212,7 +212,7 @@ matched fixed-width/dynamic-compaction ratio grows from
 \CMThreeHeterogeneousRetirementSpeedup{} and 1.235--1.271$\times$ on random
 layouts.
 
-\input{figures/table8_grouping_intervention}
+\input{figures/table5_packer19_attribution.tex}
 
 \paragraph{Independent finite-precision stress test.}
 C10 measures decision behavior on 84 near-threshold problems and 16 runtime
