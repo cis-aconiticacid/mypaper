@@ -46,9 +46,9 @@ ratios. The plan identifiers freeze execution order and are not independent
 MetroPT samples. All 48 worker-level repeats converge; the maximum row and
 column $L_1$ residuals are $9.476650\times10^{-4}$ and
 $1.283915\times10^{-6}$. Both arms attain failure-window ROC AUC $1.0$ under
-the frozen consumer, whose labels are not used by the solver. The largest
-paired transport-cost and barycentric-shift differences are $0.02792263$ and
-$0.00346756$.
+the frozen consumer. The solver receives sensor inputs without failure labels.
+The largest paired transport-cost and barycentric-shift differences are
+$0.02792263$ and $0.00346756$.
 
 \paragraph{Two-host MetroPT-3 matched control.}
 Within this matched contrast, fixed-width and dynamic-compaction execution use the same inputs, cold proposal,
@@ -147,8 +147,8 @@ dynamic compaction; its three fixed-width/dynamic-compaction ratios are $1.156$,
 and $1.079$. Fixed-width/dynamic-compaction update counts are $64/52$, $64/56$, and $64/56$.
 The measurements cover coupling preparation.
 The OTT-JAX study uses one frozen ImageNet-32 input and ten timing repeats per tolerance;
-the phase size is chosen on a disjoint warmup bank. Its $0.995\times$ result
-at $10^{-2}$ is retained alongside the positive matched-phase results.
+the phase size is chosen on a disjoint warmup bank. Its ratio at $10^{-2}$ is
+$0.995\times$.
 
 The MetroPT-3 eight-worker results aggregate the downstream-consumer endpoint
 at fixed work per worker. Fixed/dynamic seconds are $12.523/4.026$ for the
@@ -166,5 +166,4 @@ anchor, proposal, correction and verification costs.
 The MetroPT-3 grouping ratios describe one fixed 32-problem multiset; oracle
 iteration numbers $q_t$ define the grouping intervention. The fixed multiset
 fixes $\sum_t q_t$, while grouping changes $\sum_w W q_{\max,w}$ across windows.
-The ratios report the resulting relative-runtime effect; absolute arm times
-under each grouping would separate movement of the fixed-width and dynamic-compaction paths.
+The ratios report the resulting relative-runtime effect.

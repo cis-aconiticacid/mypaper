@@ -6,8 +6,7 @@
 We evaluate four named tasks: (1) \textbf{MetroPT-3} industrial sensor streams,
 (2) \textbf{ImageNet-32} flow-matching training, (3) \textbf{Packer19}
 single-cell trajectory inference, and (4) \textbf{A2D2} LiDAR point-cloud
-matching. We use these names throughout the paper and appendix; experiment
-tracking codes do not appear in the manuscript.
+matching.
 
 \paragraph{Timing levels.}
 We report three nested measurement scopes. \textbf{$E_1$ (Sinkhorn time)} ends
@@ -50,9 +49,8 @@ safety from scaling across independent GPU workers.
 
 \subsection{Application-level results and backend transfer}
 
-Table~\ref{tab:main-results-by-width} summarizes the matched
-comparisons by initial width. The rows retain their own timing scopes and
-statistical units; they are not pooled across tasks or endpoints.
+Table~\ref{tab:main-results-by-width} summarizes the matched comparisons by
+initial width.
 
 \input{figures/table2_main_results_by_width.tex}
 
@@ -62,9 +60,8 @@ per GPU. Dynamic compaction gives \CMetroCorrectedEndpointSpeedup{} on the
 pipeline endpoint while the number of problem updates falls from
 \CMetroSlotsStatic{} to \CMetroSlotsActive{}.
 All three prespecified execution orders favor dynamic compaction, with a
-descriptive range of \CMetroCorrectedEndpointRange{}. The two arms each invoke 16
-verifier candidates, evaluate 16 candidates, and launch 32 plan-application
-kernels per repeat. The corresponding four-GPU energy ratio is
+descriptive range of \CMetroCorrectedEndpointRange{}. The corresponding
+four-GPU energy ratio is
 \CMetroCorrectedEnergyFactor{}.
 
 A separate two-host MetroPT-3 study gives a fixed-width/dynamic-compaction ratio
@@ -180,8 +177,7 @@ time before forming the contrast. To test whether screening delays a release,
 we replay all \CPackerShadowNegatives{} screen-negative events with the full
 two-marginal verifier. The replay finds \CPackerShadowMissedReady{}
 already-releasable lanes; the maximum screen--verifier row-residual difference
-is \CPackerScreenDiscrepancy{}. Every emitted plan passes the two-marginal
-verifier at $10^{-3}$.
+is \CPackerScreenDiscrepancy{}.
 
 \paragraph{Physical compaction.}
 Logical masking leaves the packed kernel at width eight and has no measurable
@@ -190,8 +186,8 @@ updates and yields \CPackerCompactionOTSpeedup{} OT-stage acceleration with
 interval \CPackerCompactionOTRange{}; all 24 paired units favor compaction.
 Across the paired-observation medians, endpoint energy falls from 879.9 to
 688.1 J, while peak allocated memory rises from 80.8 to 106.9 MiB because of
-the compacted buffers. All endpoint quality checks pass. Phase
-costs are reported separately in \cref{tab:phase-costs}.
+the compacted buffers. Phase costs are reported separately in
+\cref{tab:phase-costs}.
 
 \paragraph{Stopping-tolerance sweep.}
 The two-host stopping study repeats the LM/DC comparison at $10^{-4}$,
