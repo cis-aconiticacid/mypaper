@@ -1,18 +1,31 @@
 \section{DrainSinkhorn}
 \label{sec:method}
 
-\paragraph{Dynamic compaction from a fixed-width batch.}
-Standard batched execution applies $W$ independent Sinkhorn maps in parallel
-and retains a width $W$ until the problem requiring the most iterations
-completes. DrainSinkhorn starts from this fixed-width layout. For problem $t$,
-let $n_t$ be the batched-iteration number of the first configured verification at which the problem passes the two-marginal verifier. DrainSinkhorn then writes its
-output and dynamically compacts all per-problem state. Batched update $k$
+\subsection{Problem and objective}
+
+Consider $W$ independent entropic optimal-transport (EOT) problems executed by
+one batched Sinkhorn backend. Standard fixed-width batching applies the same
+per-problem Sinkhorn map in parallel but retains all $W$ lanes until the
+slowest problem satisfies the configured stopping rule. When completion depths
+differ, already-finished lanes therefore remain in later batched kernels. Our
+objective is to remove this padding without changing any problem's EOT
+objective, Sinkhorn update, stopping tolerance, two-marginal release rule, or
+downstream consumer.
+
+\subsection{Method overview}
+
+DrainSinkhorn begins from the same fixed-width batch and repeatedly performs a
+batched update, a preliminary one-marginal screen, the configured two-marginal
+verification for screen-positive lanes, and physical compaction of every lane
+that passes. For problem $t$, let $n_t$ be the batched-iteration number of the
+first configured verification at which the problem passes. DrainSinkhorn then
+writes its output and removes all of its per-problem state. Batched update $k$
 therefore executes at survivor width
 \[
 A_k=\left|\{t:n_t\geq k\}\right|.
 \]
-The verification interval is the number of batched iterations between consecutive
-verifications .
+The verification interval is the number of batched iterations between
+consecutive verifications.
 Logical masking records completion at width $W$; dynamic-compaction execution runs
   subsequent kernels at survivor width $A_k$. A fixed-width/dynamic-compaction comparison
 measures the net effect of release and dynamic width reduction. LM/DC holds the
@@ -102,10 +115,10 @@ r_{t,k}=\max\!\left\{
 \label{eq:release-contract}
 \end{equation}
 A rejected problem remains active for a later verification. A false-positive
-screening invokes the two-marginal verifier unnecessarily; a false-negative
-screening delays removal. We measure these effects by replaying the screened
-results and screening delays removal. We measure these effects by replaying the screened
-results and evaluate each with the verifier in \cref{sec:experiments}. \cref{sec:experiments}.
+screen invokes the two-marginal verifier unnecessarily, whereas a false-negative
+screen delays removal. We measure both effects by replaying the screen outcomes
+and evaluating every replayed candidate with the verifier in
+\cref{sec:experiments}.
 
 For each passing problem, DrainSinkhorn writes the output and compacts every
 per-problem object: source and target descriptors, marginals, dual potentials,
@@ -147,8 +160,8 @@ fallback before timing. Formal campaigns use fail-closed convergence handling:
 iteration-limit and non-finite-state events raise an error. The packed Triton
 implementation optionally hands a dynamic-compaction tail to the matched
 single-problem solver when survivor width falls below a preconfigured
-\texttt{min\_packed\_width}. The C66 and Packer19 formal configurations set this
-threshold to one.
+\texttt{min\_packed\_width}. The formal MetroPT-3 and Packer19 configurations
+set this threshold to one.
 
 When a complete problem fits on one accelerator, different windows are sent to
 independent complete-device workers, giving each device an independent update

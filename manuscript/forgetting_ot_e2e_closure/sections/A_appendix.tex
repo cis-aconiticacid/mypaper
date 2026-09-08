@@ -1,6 +1,6 @@
 \section{Measurement Contracts and Additional Detail}
 
-\subsection{C63 seed provenance}
+\subsection{ImageNet-32 seed provenance}
 The quality evaluation uses the same three paired training seeds,
 20260891, 20260892, and 20260893, throughout the reported NFE values.
 The full per-seed measurements and analysis artifacts are available in the
@@ -11,14 +11,16 @@ public GitHub repository at
 E1 terminates at the measured coupling output or potentials after the
 two-marginal verifier passes. E2 includes
 the fixed downstream consumer. E3 includes training, generation, or task
-evaluation. C82, C66, and C80 record E2 endpoints, and C63 records an E3 training
-endpoint. The main-text C82 ratio uses its registered E2 endpoint directly.
-C66 and C80 subtract each unit's paired consumer time before ratio formation and
-bootstrap, while C63 uses the recorded solver field. EXP-PACKER19 records E1
-directly for every stopping-controller and execution-mode cell. The unchanged
-consumer or model time in E2/E3 dilutes the corresponding OT-stage gain.
-The C63 fixed-width/dynamic-compaction ratio reported as an internal training
-ablation is computed from the complete fixed-update E3 interval.
+evaluation. The MetroPT-3 and Packer19 pipeline studies record $E_2$ endpoints,
+whereas ImageNet-32 records an $E_3$ training endpoint. The primary MetroPT-3
+ratio uses its registered $E_2$ endpoint directly. The two-host MetroPT-3 and
+Packer19 component studies subtract each unit's paired consumer time before
+ratio formation and bootstrap, while ImageNet-32 uses the recorded solver
+field. The Packer19 stopping study records $E_1$ directly for every
+stopping-controller and execution-mode cell. Unchanged consumer or model time
+in $E_2$ or $E_3$ dilutes the corresponding OT-stage gain. The ImageNet-32
+fixed-width/dynamic-compaction ratio reported as a training ablation is
+computed from the complete fixed-update $E_3$ interval.
 
 \paragraph{GPU-energy interval.}
 GPU energy is the change in the A100 NVML cumulative total-energy counter from
@@ -29,8 +31,8 @@ solver/proposal and consumer work and excludes compilation, warm-up, and the
 prepared-input transfer component. Unsupported counters are recorded as
 unavailable rather than replaced by a power-limit estimate.
 
-\paragraph{C82 matched fixed/dynamic control.}
-C82 runs fixed-width and dynamic-compaction paths on the same MetroPT-3 failure-3 input,
+\paragraph{Primary MetroPT-3 matched fixed/dynamic control.}
+This study runs fixed-width and dynamic-compaction paths on the same MetroPT-3 failure-3 input,
 cold proposal, regularization, tolerance, verification schedule,
 two-marginal verifier, packed backend, and fixed consumer. The experimental
 variable is whether verifier-approved lanes are dynamically removed from later
@@ -47,21 +49,21 @@ the frozen consumer, whose labels are not used by the solver. The largest
 paired transport-cost and barycentric-shift differences are $0.02792263$ and
 $0.00346756$.
 
-\paragraph{C66 two-host matched control.}
-Within the matched C66 contrast, fixed-width and dynamic-compaction execution use the same inputs, cold proposal,
+\paragraph{Two-host MetroPT-3 matched control.}
+Within this matched contrast, fixed-width and dynamic-compaction execution use the same inputs, cold proposal,
 regularization, tolerance, verification schedule, two-marginal verifier,
 packed backend, and
 fixed consumer; stopping-rule-triggered release and dynamic compaction are the controlled
 difference. Three order-balanced plan seeds are reused across four GPU
 placements on each of two hosts. GPU placements and timing repeats stabilize end-to-end measurement;
 the registered endpoint ratio includes unchanged non-OT consumer time. The
-main-text C66 OT-stage ratio subtracts the paired consumer time within each
+main-text MetroPT-3 OT-stage ratio subtracts the paired consumer time within each
 host--plan unit. The host--plan combinations are paired timing units for this
 frozen workload; placements and repeats are timing replicas rather than
 independent MetroPT workloads. A reanalysis of the six valid host--plan units reports a
 stratified bootstrap interval.
 
-\paragraph{EXP-PACKER19 provenance.}
+\paragraph{Packer19 stopping-study provenance.}
 The stopping--execution protocol has SHA-256
 \nolinkurl{c010bcf9b3e276c8269514324cc8ed4bc2fc5958c362c7b880e3946dee75075b}
 and is bound to source commit
@@ -125,7 +127,7 @@ rows in \cref{tab:ot-cross-backend} report their achieved two-marginal residual.
 When one problem fits on one accelerator, complete-device workers process
 different windows and require no Sinkhorn collective. Partitioning the matrix by rows supplies a
 capacity path for an oversized single problem. Complete-device execution is the
-throughput path used by C67. On one host, increasing from one to four workers
+throughput path used by the MetroPT-3 scale-out study. On one host, increasing from one to four workers
 yields $3.965$--$3.979\times$ fixed-per-worker throughput scaling on two
 held-out MetroPT routes. The two-host, eight-worker fixed-per-worker run reports
 endpoint comparisons at that worker count. We report the one-to-four and
@@ -138,15 +140,16 @@ local to each worker.
 \input{figures/table11_imagenet_solver_pairs}
 \input{figures/table12_packer19_phase_costs}
 
-C62 holds the packed Triton adapter, input and numerical contract fixed and changes
+The ImageNet-32 coupling-preparation diagnostic holds the packed Triton adapter,
+input, and numerical contract fixed and changes
 dynamic compaction; its three fixed-width/dynamic-compaction ratios are $1.156$, $1.082$,
 and $1.079$. Fixed-width/dynamic-compaction slots are $64/52$, $64/56$, and $64/56$.
 The measurements cover coupling preparation.
-C55 uses one frozen ImageNet-32 input and ten timing repeats per tolerance;
+The OTT-JAX study uses one frozen ImageNet-32 input and ten timing repeats per tolerance;
 the phase size is chosen on a disjoint warmup bank. Its $0.995\times$ result
 at $10^{-2}$ is retained alongside the positive matched-phase results.
 
-C67's global eight-worker results aggregate the complete consumer endpoint
+The MetroPT-3 global eight-worker results aggregate the complete consumer endpoint
 at fixed work per worker. Fixed/dynamic seconds are $12.523/4.026$ on route 2
 and $7.999/3.705$ on route 3, with slots $4736/1276$ and $3008/1244$.
 The reported support-size speedups comprise the route-3 cells at $n=8192$ and
@@ -154,13 +157,12 @@ $32768$ that pass the frozen gates on both hosts. Continuous transport-cost and
 barycentric-shift differences are diagnostics under the registered binary
 consumer endpoint.
 
-C33's non-cold result uses a constructed 90\%-overlap target stream over real
+The ImageNet-32 shared-anchor result uses a constructed 90\%-overlap target stream over real
 ImageNet features. Its canonical reverse-order warm replay excludes
 compile, cache load and process startup, while retaining descriptor, transfer,
 anchor, proposal, correction and verification costs.
-M3's reported grouping ratios describe one fixed 32-problem multiset; oracle
+The MetroPT-3 grouping ratios describe one fixed 32-problem multiset; oracle
 iteration numbers $q_t$ define the grouping intervention. The fixed multiset
 fixes $\sum_t q_t$, while grouping changes $\sum_w W q_{\max,w}$ across windows.
 The ratios report the resulting relative-runtime effect; absolute arm times
 under each grouping would separate movement of the fixed-width and dynamic-compaction paths.
-

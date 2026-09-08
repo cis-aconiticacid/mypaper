@@ -1,30 +1,30 @@
 \begin{table*}[t]
 \centering
-\caption{Evidence map for the reported attribution contrasts. Ratios are numerator-path time/denominator-path time; values above one favor the denominator. GM denotes geometric mean. Timing scope and sample/replication units are listed by campaign. C33 is an older project-adapter study on controlled overlapping supports. Regularization is 0.03 for C62/C63 and 0.1 for the other rows. The source ledger retains the full campaign inventory and exclusions.}
+\caption{Evidence map for the reported attribution contrasts. Ratios are numerator-path time/denominator-path time; values above one favor the denominator. GM denotes geometric mean. Timing scope and sample/replication units are listed by study. The shared-anchor ImageNet-32 row is an older project-adapter study on controlled overlapping supports. Regularization is 0.03 for the PCA500 ImageNet-32 rows and 0.1 for the other rows. The source ledger retains the full study inventory and exclusions.}
 \label{tab:attribution-map}
 \scriptsize
 \setlength{\tabcolsep}{2pt}
-\begin{tabular}{@{}>{\raggedright\arraybackslash}p{.068\textwidth}>{\raggedright\arraybackslash}p{.14\textwidth}>{\raggedright\arraybackslash}p{.133\textwidth}>{\raggedright\arraybackslash}p{.070\textwidth}>{\raggedright\arraybackslash}p{.090\textwidth}>{\raggedright\arraybackslash}p{.095\textwidth}>{\raggedright\arraybackslash}p{.17\textwidth}>{\raggedright\arraybackslash}p{.15\textwidth}@{}}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{.115\textwidth}>{\raggedright\arraybackslash}p{.125\textwidth}>{\raggedright\arraybackslash}p{.121\textwidth}>{\raggedright\arraybackslash}p{.070\textwidth}>{\raggedright\arraybackslash}p{.090\textwidth}>{\raggedright\arraybackslash}p{.095\textwidth}>{\raggedright\arraybackslash}p{.16\textwidth}>{\raggedright\arraybackslash}p{.14\textwidth}@{}}
 \toprule
-Campaign & Backend / workload & $n,W;\tau$ & Proposal & Contrast & Ratio & Timing scope & Sample / replication \\
+Study & Backend / workload & $n,W;\tau$ & Proposal & Contrast & Ratio & Timing scope & Sample / replication \\
 \midrule
-C82 & packed Triton / MetroPT-3 & $16384,16;10^{-3}$ & cold & fixed/\allowbreak dynamic & 1.745535 & E2 four-worker makespan; slots $5696/3128=1.820972\times$ & plans 1.745273 / 1.745356 / 1.745975; 2 repeats \\
-C66 & packed Triton / MetroPT-3 & $16384,16;10^{-3}$ & cold & fixed/\allowbreak dynamic & 1.754 & OT stage; paired consumer subtracted & host--plan units \\
-C63 & packed Triton / ImageNet-32 & $1024,8;10^{-3}$ & cold & fixed/\allowbreak dynamic & 1.054 & solver field; supplementary GM & 3 training seeds \\
-C63 & packed Triton / ImageNet-32 & $1024,8;10^{-3}$ & cold & fixed/\allowbreak dynamic & 1.036 & complete fixed-update training & 3 training seeds \\
-C62 & packed Triton / ImageNet-32 & $1024,8;10^{-3}$ & cold & fixed/\allowbreak dynamic & 1.105 & coupling preparation & 3 problem-plan seeds \\
-C67 & packed Triton / MetroPT routes 2,3 & $16384,8;10^{-3}$ & cold & fixed/\allowbreak dynamic & 3.110 / 2.159 & 8-worker endpoint; fixed per worker & 2 routes; host/plan repeats \\
-C67 & packed Triton / MetroPT route 3 & $8192,16;10^{-3}$ & cold & fixed/\allowbreak dynamic & 2.316 & one-worker endpoint; equal-host GM & 2 hosts; 3 plans each \\
-C67 & packed Triton / MetroPT route 3 & $32768,16;10^{-3}$ & cold & fixed/\allowbreak dynamic & 1.616 & one-worker endpoint; equal-host GM & 2 hosts; 3 plans each \\
-C55 & OTT-JAX / ImageNet-32 & $4096,16;10^{-3}$ & fixed & fixed/\allowbreak dynamic & 1.581 & matched 20-update phases & one input; 10 repeats \\
-C55 & OTT-JAX / ImageNet-32 & $4096,16;3\!\times\!10^{-3}$ & fixed & fixed/\allowbreak dynamic & 1.556 & matched 10-update phases & one input; 10 repeats \\
-C55 & OTT-JAX / ImageNet-32 & $4096,16;5\!\times\!10^{-3}$ & fixed & fixed/\allowbreak dynamic & 1.366 & matched 10-update phases & one input; 10 repeats \\
-C55 & OTT-JAX / ImageNet-32 & $4096,16;10^{-2}$ & fixed & fixed/\allowbreak dynamic & 0.995 & matched 10-update phases & one input; 10 repeats \\
-C33 & packed Triton / ImageNet-32 & $4096,16;10^{-3}$ & shared anchor & fixed/\allowbreak dynamic & 1.421 & steady-state critical path & 40 controlled windows \\
-C80-LM & packed Triton / Packer19 & $16384,8;10^{-3}$ & cold & fixed/LM & 1.000 & OT stage; paired consumer subtracted & 24 host--order--GPU units \\
-C80-LM & packed Triton / Packer19 & $16384,8;10^{-3}$ & cold & LM/DC & 1.540 & OT stage; paired consumer subtracted & 24 host--order--GPU units \\
-EXP-P19 & packed Triton / Packer19 & $16384,8;10^{-4}$--$3\!\times\!10^{-3}$ & cold & LM/DC & 1.480--1.638 & direct OT stage; four tolerances & 24 paired units/tolerance \\
-EXP-P19 & packed Triton / Packer19 & $16384,8;10^{-2}$ & cold & LM/DC & 0.9995 & direct OT stage; synchronized release & 24 paired units/tolerance \\
+MetroPT-3 four-worker & packed Triton / MetroPT-3 & $16384,16;10^{-3}$ & cold & fixed/\allowbreak dynamic & 1.745535 & $E_2$ four-worker makespan; slots $5696/3128=1.820972\times$ & plans 1.745273 / 1.745356 / 1.745975; 2 repeats \\
+MetroPT-3 two-host & packed Triton / MetroPT-3 & $16384,16;10^{-3}$ & cold & fixed/\allowbreak dynamic & 1.754 & $E_1$; paired consumer subtracted & host--plan units \\
+ImageNet-32 solver & packed Triton / ImageNet-32 & $1024,8;10^{-3}$ & cold & fixed/\allowbreak dynamic & 1.054 & solver field; supplementary GM & 3 training seeds \\
+ImageNet-32 training & packed Triton / ImageNet-32 & $1024,8;10^{-3}$ & cold & fixed/\allowbreak dynamic & 1.036 & complete fixed-update training & 3 training seeds \\
+ImageNet-32 preparation & packed Triton / ImageNet-32 & $1024,8;10^{-3}$ & cold & fixed/\allowbreak dynamic & 1.105 & coupling preparation & 3 problem--plan seeds \\
+MetroPT-3 eight-worker & packed Triton / MetroPT routes 2,3 & $16384,8;10^{-3}$ & cold & fixed/\allowbreak dynamic & 3.110 / 2.159 & 8-worker endpoint; fixed per worker & 2 routes; host/plan repeats \\
+MetroPT-3 support size & packed Triton / MetroPT route 3 & $8192,16;10^{-3}$ & cold & fixed/\allowbreak dynamic & 2.316 & one-worker endpoint; equal-host GM & 2 hosts; 3 plans each \\
+MetroPT-3 support size & packed Triton / MetroPT route 3 & $32768,16;10^{-3}$ & cold & fixed/\allowbreak dynamic & 1.616 & one-worker endpoint; equal-host GM & 2 hosts; 3 plans each \\
+ImageNet-32 OTT-JAX & OTT-JAX / ImageNet-32 & $4096,16;10^{-3}$ & fixed & fixed/\allowbreak dynamic & 1.581 & matched 20-update phases & one input; 10 repeats \\
+ImageNet-32 OTT-JAX & OTT-JAX / ImageNet-32 & $4096,16;3\!\times\!10^{-3}$ & fixed & fixed/\allowbreak dynamic & 1.556 & matched 10-update phases & one input; 10 repeats \\
+ImageNet-32 OTT-JAX & OTT-JAX / ImageNet-32 & $4096,16;5\!\times\!10^{-3}$ & fixed & fixed/\allowbreak dynamic & 1.366 & matched 10-update phases & one input; 10 repeats \\
+ImageNet-32 OTT-JAX & OTT-JAX / ImageNet-32 & $4096,16;10^{-2}$ & fixed & fixed/\allowbreak dynamic & 0.995 & matched 10-update phases & one input; 10 repeats \\
+ImageNet-32 shared anchor & packed Triton / ImageNet-32 & $4096,16;10^{-3}$ & shared anchor & fixed/\allowbreak dynamic & 1.421 & steady-state critical path & 40 controlled windows \\
+Packer19 fixed/\allowbreak mask & packed Triton / Packer19 & $16384,8;10^{-3}$ & cold & fixed/LM & 1.000 & $E_1$; paired consumer subtracted & 24 host--order--GPU units \\
+Packer19 mask/\allowbreak compact & packed Triton / Packer19 & $16384,8;10^{-3}$ & cold & LM/DC & 1.540 & $E_1$; paired consumer subtracted & 24 host--order--GPU units \\
+Packer19 tolerance sweep & packed Triton / Packer19 & $16384,8;10^{-4}$--$3\!\times\!10^{-3}$ & cold & LM/DC & 1.480--1.638 & direct $E_1$; four tolerances & 24 paired units/tolerance \\
+Packer19 synchronized release & packed Triton / Packer19 & $16384,8;10^{-2}$ & cold & LM/DC & 0.9995 & direct $E_1$; synchronized release & 24 paired units/tolerance \\
 \bottomrule
 \end{tabular}
 \end{table*}
