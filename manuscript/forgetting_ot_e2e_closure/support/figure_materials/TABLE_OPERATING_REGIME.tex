@@ -1,0 +1,20 @@
+\begin{table}[t]
+\centering
+\caption{C35 real ImageNet-32 width sweep on the packed Triton path. Each width contains 40 paired frozen windows; speedup compares project execution that processes one problem at a time and initializes it with the projected previous state against the complete compacted path that uses one initialization for multiple problems
+with a paired 95\% interval. This contrast includes packing and proposal-path
+differences, not only retirement.}
+\label{tab:width-regime}
+\scriptsize
+\setlength{\tabcolsep}{3.2pt}
+\begin{tabular}{@{}rccc@{}}
+\toprule
+$W$ & Speedup [95\% CI] & Wins & Empirical regime \\
+\midrule
+1  & 0.992 [0.980, 1.008]$\times$ & 6/40  & width one \\
+2  & 1.073 [1.049, 1.097]$\times$ & 33/40 & transition \\
+4  & 1.229 [1.195, 1.264]$\times$ & 40/40 & positive path gain \\
+8  & 1.369 [1.327, 1.411]$\times$ & 40/40 & positive path gain \\
+16 & 1.621 [1.487, 1.797]$\times$ & 40/40 & positive path gain \\
+\bottomrule
+\end{tabular}
+\end{table}

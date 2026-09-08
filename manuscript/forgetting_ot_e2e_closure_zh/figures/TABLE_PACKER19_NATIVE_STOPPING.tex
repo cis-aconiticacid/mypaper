@@ -1,0 +1,21 @@
+\begin{table}[t]
+\centering
+\caption{Packer19 上公开 Flash 原生 potential-change threshold 到实际行、列残差最大值、消费者输出偏差和 E1 OT 时间的实测映射。原生 threshold 不是边缘残差容差。对于不大于 $3\times10^{-4}$ 的 threshold，部分 lane 达到登记的迭代上限；这些行是平台区的 replay 测量，而不是所有 lane 都触发原生停止规则的证据。}
+\label{tab:packer-native-stopping}
+\scriptsize
+\setlength{\tabcolsep}{2.8pt}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{}rrrr@{}}
+\toprule
+原生 threshold & 实际残差 & 最大 consumer TV & E1 时间（s） \\
+\midrule
+$10^{-2}$ & $9.01\times10^{-4}$ & $8.83\times10^{-4}$ & 6.812 \\
+$3\times10^{-3}$ & $1.93\times10^{-4}$ & $1.91\times10^{-4}$ & 11.403 \\
+$10^{-3}$ & $1.11\times10^{-5}$ & $2.08\times10^{-6}$ & 20.607 \\
+$3\times10^{-4}$ & $1.18\times10^{-6}$ & $4.96\times10^{-7}$ & 40.625 \\
+$10^{-4}$ & $1.18\times10^{-6}$ & $4.96\times10^{-7}$ & 43.251 \\
+$10^{-5}$ & $1.18\times10^{-6}$ & $4.96\times10^{-7}$ & 46.285 \\
+$10^{-6}$ & $1.18\times10^{-6}$ & $4.96\times10^{-7}$ & 46.281 \\
+\bottomrule
+\end{tabular}}
+\end{table}

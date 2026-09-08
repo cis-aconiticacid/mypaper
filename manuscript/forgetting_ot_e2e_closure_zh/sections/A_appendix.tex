@@ -1,0 +1,58 @@
+\section{测量合同与补充细节}
+
+\subsection{C63 seed provenance}
+质量评估在所报告的 NFE 下始终使用相同的三个配对训练 seed：20260891、20260892 和 20260893。完整逐 seed 测量值与分析文件已放在公开 GitHub 仓库中。
+
+\paragraph{测量层级。}
+E1 在双边际验证器通过之后，结束于实测 coupling 输出或势函数。E2 包含固定下游消费者。E3 包含训练、生成或任务评估。C82、C66 与 C80 记录 E2 端点，C63 记录 E3 训练端点。正文 C82 比率直接使用其登记的 E2 端点。C66 与 C80 在形成比率和 bootstrap 之前，先从每个单元中减去配对消费者时间；C63 使用记录的 solver 字段。EXP-PACKER19 为每个停止控制器和执行模式单元直接记录 E1。E2/E3 中不变的消费者或模型时间会稀释对应的 OT 阶段收益。C63 的固定宽度/动态压缩内部训练消融比率由完整 fixed-update E3 区间计算。
+
+\paragraph{GPU 能耗区间。}
+GPU 能耗取 A100 NVML 累计总能耗 counter 在已登记方法调用之前与最终 CUDA synchronization 之后的差值。Counter 以毫焦耳报告，分析将差值换算为焦耳。该 ready-arrays-to-consumer 区间包含 solver/proposal 与 consumer 工作，并排除编译、warm-up 和 prepared-input transfer 组件。不支持该 counter 时，记录为 unavailable，不使用功率上限估计替代。
+
+\paragraph{C82 匹配固定宽度/动态压缩对照。}
+C82 在相同的 MetroPT-3 failure-3 输入、冷启动 proposal、正则化、容差、验证检查时点、双边际验证器、packed backend 和固定消费者上运行固定宽度路径与动态压缩路径。实验变量是通过验证器的 lane 是否从后续 kernel 中动态移除。一台主机提供四个彼此独立的完整设备 A100 worker，不使用 worker 间 collective 或问题切分。对于每个 plan 和计时重复，端点取四个 worker 的 ready-arrays-to-consumer 最大时间。每个 plan 对两次计时重复取中位数，报告的 $1.745535\times$ 是三个 plan 比率的描述性几何均值。plan 标识只冻结执行顺序，不是独立 MetroPT 样本。48 个 worker-level repeat 全部收敛；最大行、列 $L_1$ 残差分别为 $9.476650\times10^{-4}$ 和 $1.283915\times10^{-6}$。在冻结消费者下，两臂的 failure-window ROC AUC 都为 $1.0$，求解器不使用标签。最大配对 transport-cost 与 barycentric-shift 差分别为 $0.02792263$ 和 $0.00346756$。
+
+\paragraph{C66 双主机匹配对照。}
+在 C66 的匹配对照中，固定宽度路径与动态压缩路径使用相同输入、冷启动 proposal、正则化、容差、验证检查时点、双边际验证器、packed backend 和固定消费者；根据停止规则释放问题与动态压缩是受控差异。三个顺序平衡的 plan 会在两台主机各自的四个 GPU placement 上复用。GPU placement 与 timing repeat 用于稳定端到端测量；登记的端点比率包含不变的非 OT 消费者时间。正文 C66 OT 阶段比率在每个 host--plan 单元内部减去配对消费者时间。host--plan 组合是该冻结 workload 的配对计时单元；placement 和 repeat 是 timing replica，而非独立 MetroPT workload。对六个有效 host--plan 单元的重分析报告分层 bootstrap 区间。
+
+\paragraph{EXP-PACKER19 来源。}
+停止--执行协议的 SHA-256 为 \nolinkurl{c010bcf9b3e276c8269514324cc8ed4bc2fc5958c362c7b880e3946dee75075b}，并绑定 source commit \nolinkurl{96de52b8ceff8fa3c0468bf45567e6b017483e73}。两台主机、每台四张 A100-SXM4-80GB GPU、三种冻结方法顺序和三次 timing repeat 产生 768 个正式单元。每个容差具有 24 个配对的 host--order--GPU 单元和 equal-host bootstrap 区间。Consumer TV 用于数值检查输出差异。
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{../forgetting_ot_e2e_closure/figures/PACKER19_PARETO.pdf}
+\caption{Packer19 随容差变化的 OT 速度--输出前沿，使用 dynamic-compaction 路径。每个点是在该残差容差下 24 个配对单元的 E1 OT 阶段时间中位数；consumer TV 相对本实验的 $10^{-6}$ 紧参考测量。}
+\label{fig:packer-pareto}
+\end{figure}
+
+\paragraph{执行模式协议。}
+正式实验在计时前固定 representation、width、execution mode、检查间隔、stopping tolerance、checking path、窄尾 handoff 阈值与 fail-closed 策略。宽度与分组干预映射选择固定宽度执行或动态压缩的条件。
+
+\paragraph{宽度成本诊断来源。}
+原语扫描使用一张具有 108 个 SM 的 NVIDIA A100-SXM4-80GB，driver 为 535.129.03，PyTorch 2.5.1 配 CUDA 12.4，Triton 3.1.0，source commit 为 \nolinkurl{73aec2941bfa1a5caa6a6bddf7aa83b734f9bb8b}。每次实测 \texttt{shifted\_step} 调用包含两个 packed Triton log-sum-exp kernel，并排除边缘 screen、双边际验证器、动态压缩与 \texttt{solve\_batch} 外层循环。Warm-up 后，width 在 30 次 repeat block 内随机化。$n=1024$ 扫描 width 1--8、10、12 与 16；$n=4096$ 和 $n=16384$ 扫描 1、2、3、4、6、8、12 与 16。该诊断提供式 \eqref{eq:time-difference} 中实测宽度成本曲线的 packed-update 组成部分。
+
+\paragraph{独立后端实现。}
+OTT-JAX 与 PyKeOps 路径通过各自原生后端机制移除已完成问题。OTT-JAX 执行固定的 20-update phase，在 phase boundary 检查，移除通过 lane，并对存活问题重新分桶；原生 \texttt{vmap} 和匹配的 fixed-phase static 路径作为对照。PyKeOps 路径使用一个独立问题批量 matrix-free operator、固定几何验证检查时点、双边际验证器，以及对通过问题状态的动态移除。Sequential 与 static-padded PyKeOps 路径使用相同 symbolic backend。共享原理是逐问题释放并动态移除已完成项；检查和 packing 机制仍由后端决定。\Cref{tab:ot-cross-backend} 中所有跨后端结果都报告实际达到的两侧边缘残差。
+
+\subsection{独立后端实现}
+
+\input{figures/TABLE_OT_CROSS_BACKEND}
+
+\input{figures/TABLE_WORKLOAD_CONFIGS}
+
+\section{部署与运行边界}
+
+\paragraph{完整设备执行与按行划分矩阵。}
+当一个问题能放入一个加速器时，完整设备 worker 处理不同窗口，不需要 Sinkhorn collective。按行划分矩阵为单个超大问题提供容量路径。完整设备执行是 C67 使用的 throughput 路径。在一台主机上，从一个 worker 增加到四个 worker，会在两条 held-out MetroPT route 上产生 $3.965$--$3.979\times$ fixed-per-worker throughput scaling。双主机八 worker fixed-per-worker 实验报告该 worker 数下的端点比较。本文把 one-to-four 与双主机八 worker 作为两个独立 scaling study 报告。峰值内存保持为每个 worker 的本地内存。
+
+\subsection{补充归因与证据边界}
+\input{figures/TABLE_ABSOLUTE_OT_TIMES}
+\input{figures/TABLE_ATTRIBUTION_MAP}
+\input{figures/TABLE_C63_SOLVER_PAIRS}
+\input{figures/TABLE_PHASE_COSTS}
+
+C62 固定 packed Triton adapter、输入和数值合同，只改变动态压缩；三个固定宽度/动态压缩比值为 $1.156$、$1.082$ 和 $1.079$。固定宽度/动态压缩 slots 分别为 $64/52$、$64/56$ 和 $64/56$。这些测量覆盖 coupling 准备。C55 在每个容差上使用一个冻结 ImageNet-32 输入和十次计时重复；phase size 在独立 warmup bank 上选择。$10^{-2}$ 时的 $0.995\times$ 与匹配 phase 的正结果一起保留。
+
+C67 的全局八 worker 结果在每个 worker 工作量固定的条件下汇总完整 consumer 端点。路线 2 的固定宽度/动态压缩秒数为 $12.523/4.026$，路线 3 为 $7.999/3.705$；实际执行 slots 分别为 $4736/1276$ 和 $3008/1244$。报告的 support-size 加速包括路线 3 上 $n=8192$ 与 $32768$ 两个在两台主机均通过冻结门的单元。连续 transport-cost 与 barycentric-shift 差异是在已登记二元 consumer 端点下报告的诊断量。
+
+C33 的非冷启动结果在真实 ImageNet 特征上使用构造的 90\% overlap target stream。其 canonical 反序 warm replay 排除 compile、cache load 和进程启动，同时保留 descriptor、传输、anchor、proposal、correction 和 verification 成本。M3 的分组比值描述一个固定的 32 问题集合；oracle 迭代编号 $q_t$ 定义分组干预。固定集合使 $\sum_t q_t$ 不变，分组则改变跨窗口的 $\sum_w W q_{\max,w}$。这些比率报告由此产生的相对运行时间效应；每种分组下的绝对实验臂时间可进一步分离固定宽度与压缩路径的变化。

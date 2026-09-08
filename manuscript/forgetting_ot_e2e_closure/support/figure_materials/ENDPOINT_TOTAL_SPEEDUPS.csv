@@ -1,0 +1,4 @@
+application,speedup,output_contract
+MetroPT-3 C82,1.745535,both arms AUC 1.0; 48/48 worker repeats converge
+Packer19 matched drain,1.224345,identical release decisions
+ImageNet-32 OT-FM,1.035560,all nine NFE checks pass; matched fixed/compacted E3

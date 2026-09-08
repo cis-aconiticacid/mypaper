@@ -1,0 +1,17 @@
+\begin{table*}[t]
+\centering
+\caption{OTT-JAX 与 PyKeOps 在真实数据上的独立实现。每个比率均为基线时间除以压缩路径时间；不确定性标签分别说明 timing-repeat range 或 observed-input range。}
+\label{tab:ot-cross-backend}
+\scriptsize
+\setlength{\tabcolsep}{3.0pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}llllll@{}}
+\toprule
+后端 & Workload & OT 阶段对照 & 加速比（不确定性） & 计时；单元 & 精度合同 \\
+\midrule
+OTT-JAX & ImageNet-32, $n=4096,W=16$ & native vmap / 每个固定阶段处理剩余问题 & \COTTNativeActiveSpeedup{} (repeat range \COTTNativeActiveRange{}) & direct E1; 6 timing repeats & max L1 $9.97\!\times\!10^{-4}$ \\
+PyKeOps & A2D2 LiDAR, $n=8192,W=8$ & sequential carry / active & \CKeopsLiDARActiveSpeedup{} (clip range \CKeopsLiDARActiveRange{}) & direct E1; 3 real clips & max L1 $9.97\!\times\!10^{-4}$ \\
+PyKeOps & ImageNet-32, $n=16384,W=4$ & sequential / active & \CKeopsImageNetActiveSpeedup{} (seed range \CKeopsImageNetActiveRange{}) & direct E1; 3 seeds & max L1 $8.93\!\times\!10^{-4}$ \\
+\bottomrule
+\end{tabular}}
+\end{table*}

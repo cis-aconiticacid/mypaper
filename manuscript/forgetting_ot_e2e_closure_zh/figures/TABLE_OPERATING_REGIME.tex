@@ -1,0 +1,18 @@
+\begin{table}[t]
+\centering
+\caption{项目 Flash 路径上的 C35 真实 ImageNet-32 宽度扫描。每个宽度含 40 个配对冻结窗口；加速比比较以前一状态的投影值初始化且逐问题执行的项目路径，与对多个问题使用同一初始化的完整动态压缩路径，并给出配对 95\% 区间。该对照包含 packing 与初始化路径差异，不仅是候选退休。}
+\label{tab:width-regime}
+\scriptsize
+\setlength{\tabcolsep}{3.2pt}
+\begin{tabular}{@{}rccc@{}}
+\toprule
+$W$ & 加速比 [95\% CI] & 胜出 & 经验区间 \\
+\midrule
+1  & 0.992 [0.980, 1.008]$\times$ & 6/40  & width one \\
+2  & 1.073 [1.049, 1.097]$\times$ & 33/40 & transition \\
+4  & 1.229 [1.195, 1.264]$\times$ & 40/40 & positive path gain \\
+8  & 1.369 [1.327, 1.411]$\times$ & 40/40 & positive path gain \\
+16 & 1.621 [1.487, 1.797]$\times$ & 40/40 & positive path gain \\
+\bottomrule
+\end{tabular}
+\end{table}

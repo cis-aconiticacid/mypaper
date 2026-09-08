@@ -1,0 +1,17 @@
+\begin{table*}[t]
+\centering
+\caption{Mechanism and backend evidence.  These results stop before a real downstream consumer and are not pooled with Table~\ref{tab:e2-main}.}
+\label{tab:e1-mechanism}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}llp{0.20\textwidth}p{0.19\textwidth}lp{0.28\textwidth}@{}}
+\toprule
+Campaign & Level & Real data/backend & Comparison & Speedup & Role \\
+\midrule
+C33 & E1 & real ImageNet-32 / project Flash adapter & complete-device active/static & 1.421$\times$ & retirement and complete-device deployment mechanism \\
+C45 & E1 & real ImageNet-32 / OTT-JAX & static/sequential prepared-to-verified & 1.282$\times$ & external-backend portability \\
+C55 & E1 & real ImageNet-32 / OTT-JAX & phase-active/static at tolerance 1e-3 & 1.581$\times$ & retirement boundary; degrades to 0.995x at tolerance 1e-2 \\
+C62 & E1 feature diagnostic & real ImageNet-32 PCA500 / public Flash & active/static & 1.105$\times$ & feature-space retirement diagnostic; static/W1 is reported separately \\
+\bottomrule
+\end{tabular}
+\end{table*}

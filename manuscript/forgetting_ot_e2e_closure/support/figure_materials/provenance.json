@@ -1,0 +1,210 @@
+{
+  "generated": [
+    "RESULT_MACROS.tex",
+    "TABLE_E1_MECHANISM.tex",
+    "TABLE_E2_MAIN.tex",
+    "fig1_execution_choices.tex",
+    "PACKER19_PARETO.csv",
+    "PACKER19_PARETO.pdf",
+    "plot_packer19_pareto.py",
+    "PACKER19_STOPPING_METRICS.csv",
+    "PACKER19_STOPPING_METRICS.pdf",
+    "plot_packer19_stopping_metrics.py",
+    "TABLE_PACKER19_NATIVE_STOPPING.tex",
+    "table2_absolute_ot_times.tex",
+    "table5_imagenet_quality.tex",
+    "TABLE_CURRENT_GENERATION.tex",
+    "table8_grouping_intervention.tex",
+    "TABLE_C67_HOST1_SCALING.tex",
+    "TABLE_C68_ADMISSION_NEGATIVE.tex",
+    "derive_paired_attribution.py",
+    "PAIRED_ATTRIBUTION.json",
+    "C63_SOLVER_ATTRIBUTION.csv",
+    "table3_attribution_map.tex",
+    "table11_imagenet_solver_pairs.tex",
+    "table12_packer19_phase_costs.tex",
+    "ENDPOINT_TOTAL_SPEEDUPS.csv",
+    "ENDPOINT_TOTAL_SPEEDUPS.pdf",
+    "plot_endpoint_total_speedups.py",
+    "OT_TOTAL_SPEEDUPS.csv",
+    "OT_TOTAL_SPEEDUPS.pdf",
+    "plot_ot_total_speedups.py"
+  ],
+  "inputs": {
+    "claim_map.json": {
+      "path": "/home/xwen/projects/forgetOT_c57_17e07d4_local/studies/figures/ICLR_ORAL_CLOSURE_20260827/claim_map.json",
+      "sha256": "a43a62d1ec9522857f2c7b984a7865ea407e9f0ddc8dae0f0b243045b62e819c"
+    },
+    "provenance.json": {
+      "path": "/home/xwen/projects/forgetOT_c57_17e07d4_local/studies/figures/ICLR_ORAL_CLOSURE_20260827/provenance.json",
+      "sha256": "cad809578401651d0c8982e02656cccab8b43cbde7babf060ca00c45c49bbcc7"
+    },
+    "summary.json": {
+      "path": "/home/xwen/projects/forgetOT_c57_17e07d4_local/studies/figures/ICLR_ORAL_CLOSURE_20260827/summary.json",
+      "sha256": "e633516b7c29fd53a98def163cb346c43eda51f75b7e6a441fe9f8a69650048f"
+    },
+    "table_c67_host1_scaling.csv": {
+      "path": "/home/xwen/projects/forgetOT_c57_17e07d4_local/studies/figures/ICLR_ORAL_CLOSURE_20260827/table_c67_host1_scaling.csv",
+      "sha256": "58e0ca2a90149755389e0618b92986d306a3fc00995039a90c86b8ea7094023e"
+    },
+    "table_c68_admission_negative.csv": {
+      "path": "/home/xwen/projects/forgetOT_c57_17e07d4_local/studies/figures/ICLR_ORAL_CLOSURE_20260827/table_c68_admission_negative.csv",
+      "sha256": "f47033a54426d6558f11c9ec64b5297a7a5db0a55578236111b04703e2f1f507"
+    },
+    "table_current_generation_formal.csv": {
+      "path": "/home/xwen/projects/forgetOT_c57_17e07d4_local/studies/figures/ICLR_ORAL_CLOSURE_20260827/table_current_generation_formal.csv",
+      "sha256": "fe0d67b8b9d1883f1f36d620e8792d0a99f9f9ed969ba48d8e61cb94e915bda9"
+    },
+    "table_m3_grouping_intervention.csv": {
+      "path": "/home/xwen/projects/forgetOT_c57_17e07d4_local/studies/figures/ICLR_ORAL_CLOSURE_20260827/table_m3_grouping_intervention.csv",
+      "sha256": "dffce91f7f71eb1cf3d2ec0b0387f63a9b0fd8441a2b012220fd6fc7726c5414"
+    },
+    "table_main_e2.csv": {
+      "path": "/home/xwen/projects/forgetOT_c57_17e07d4_local/studies/figures/ICLR_ORAL_CLOSURE_20260827/table_main_e2.csv",
+      "sha256": "01c8b31343337609e18fb4ebbe2d0b3d6c890b23aa6b198379ce410e005acfaf"
+    },
+    "table_mechanism_e1.csv": {
+      "path": "/home/xwen/projects/forgetOT_c57_17e07d4_local/studies/figures/ICLR_ORAL_CLOSURE_20260827/table_mechanism_e1.csv",
+      "sha256": "8a0921667c72b5fd766850b8627b977a07d1ee2b161d3abf8e40ed20e995df8e"
+    }
+  },
+  "local_overrides": {
+    "C80-LM": {
+      "reason": "supersedes the Packer19 static-active proxy with the direct logical-mask versus physical-compaction control",
+      "evidence_report": "knowledge/audits/C80_LM_TWO_HOST_FORMAL_RESULT_20260828_ZH.md",
+      "archive": "archive/transfer_packages/forgetot_C80_LM_todo_final_complete_20260828T184542Z.tar.zst",
+      "archive_sha256": "6ec80ee7b869e847f89ca477a645f8080abf20a4d832923e2ead356f050b14e6",
+      "analysis_archive_sha256": "7b67a21abc758e58f671081f3612fdccca8e6f3698207ab88714bf04096117c1",
+      "source_commit": "d264c7d6a5324d6bfec394364141977fef144383",
+      "analysis_commit": "793c08cd5bff13b7f854aba43864bf0065de738c",
+      "endpoint_ratio_lm_over_pc": 1.2243445474022865,
+      "ot_stage_ratio_lm_over_pc": 1.53966,
+      "endpoint_equal_host_bootstrap_ci95": [
+        1.2240157803086327,
+        1.2246823042735064
+      ],
+      "paired_timing_units": 24
+    },
+    "EXP-PACKER19": {
+      "reason": "formal two-host same-controller stopping-execution Pareto supersedes the earlier single-point Packer19 headline",
+      "analysis": "studies/campaigns/EXP-PACKER19_Stopping_Execution_Pareto/analysis/analysis.json",
+      "analysis_sha256": "2162381345c3306e554703118a7809a62202591fc905a7cf859e573c29361459",
+      "manifest": "studies/campaigns/EXP-PACKER19_Stopping_Execution_Pareto/manifest.json",
+      "manifest_sha256": "34168ba541e942d7b1c68d1406d18ee7fbe0aa5cc1f74f20871b4332b6b1a809",
+      "protocol_sha256": "c010bcf9b3e276c8269514324cc8ed4bc2fc5958c362c7b880e3946dee75075b",
+      "source_commit": "96de52b8ceff8fa3c0468bf45567e6b017483e73",
+      "formal_cells": 768,
+      "paired_units_per_tolerance": 24
+    },
+    "absolute-OT-time-and-C63-quality-tables": {
+      "reason": "adds source-bound absolute E1 times for the three Flash workloads and exposes the numerical C63 quality results",
+      "packer19_source": "studies/campaigns/EXP-PACKER19_Stopping_Execution_Pareto/analysis/block_b_absolute_metrics.csv",
+      "metropt_sources": [
+        "studies/campaigns/C81_sota_closure_20260831/tables/block_c_metropt_paired_units.csv",
+        "C66 worker-1 raw result solver_plus_proposal_seconds fields"
+      ],
+      "metropt_scope": "descriptive median of the three registered worker-1 plan units with public, fixed-width, and complete active E1 fields; the deployment ratio uses the separate six-unit two-physical-host C81-C reanalysis",
+      "imagenet_source": "studies/campaigns/C63_semantic_latent_OTFM_feature_training/analysis.json",
+      "imagenet_scope": "solver-phase mean and sample standard deviation over three paired seeds; the registered 2.34729x and 1.03556x internal ablations use the complete fixed-update E3 interval",
+      "dash_semantics": "not run in the registered campaign"
+    },
+    "evidence_scope_20260905": {
+      "manifest": "manuscript/forgetting_ot_e2e_closure/support/audits/EVIDENCE_SCOPE_REVISION.json",
+      "paired_analysis": {
+        "analysis_kind": "supplementary descriptive paired reanalysis; no new runs or confidence intervals",
+        "c63": {
+          "by_seed": [
+            {
+              "seed": 20260891,
+              "static_solver_seconds": 123.4287042170763,
+              "active_solver_seconds": 116.69896314293146,
+              "static_over_active": 1.0576675309951327
+            },
+            {
+              "seed": 20260892,
+              "static_solver_seconds": 124.23330034688115,
+              "active_solver_seconds": 115.93391591496766,
+              "static_over_active": 1.0715872000562865
+            },
+            {
+              "seed": 20260893,
+              "static_solver_seconds": 118.83977316133678,
+              "active_solver_seconds": 115.03638765588403,
+              "static_over_active": 1.0330624560015746
+            }
+          ],
+          "geometric_mean": 1.0539849819411262,
+          "observed_range": [
+            1.0330624560015746,
+            1.0715872000562865
+          ]
+        },
+        "sources": {
+          "studies\\campaigns\\C63_semantic_latent_OTFM_feature_training\\analysis.json": "6b24620b580d89fdadada61eedcd14d78a59e90a322154aafc0bc53d3793ea9e"
+        }
+      },
+      "scope": "local bilingual manuscript revision; no new GPU runs"
+    },
+    "anti_defensive_20260905": {
+      "scope": "Selective prose revision; experimental values and definitions retained; corresponding Chinese translation updated",
+      "base_commit": "615be07b"
+    },
+    "novelty_boundary_20260905": {
+      "ordinary_batching": "POT solve_batch and OTT-JAX vmap are cited as prior fixed-width multi-problem execution",
+      "two_marginal_check": "configured release rule, not a method contribution",
+      "paper_contribution": "physical active-batch compaction after the configured stopping rule",
+      "experiment_action": "removed EXP-PACKER19 static-derived paper values and stopped ordinary-batching rerun planning"
+    },
+    "C82_matched_endpoint": {
+      "reason": "current matched-only MetroPT-3 static/active endpoint evidence",
+      "analysis": "studies/campaigns/C82_MetroPT3_static_active_corrected/analysis.json",
+      "manifest": "studies/campaigns/C82_MetroPT3_static_active_corrected/manifest.json",
+      "source_commit": "048fd651ac239547d690b011a427fce6d3524a3a",
+      "endpoint": "ready_arrays_to_consumer_seconds",
+      "deployment": "single_host_four_independent_complete_on_device_workers",
+      "static_over_active": 1.7455347288506644,
+      "descriptive_plan_range": [
+        1.745273310245869,
+        1.7459752447408936
+      ],
+      "candidate_slots_static_active": [
+        5696,
+        3128
+      ],
+      "energy_static_over_active": 1.7794375588256872,
+      "excluded_comparisons": [
+        "public_flashsinkhorn_serial",
+        "official_cold"
+      ]
+    }
+  },
+  "local_artifact_hashes": {
+    "ENDPOINT_TOTAL_SPEEDUPS.csv": "284e84c1a32fecbe56f93c6dd148b68da9ed1cdfe602da34d58cf23cf4428d3c",
+    "ENDPOINT_TOTAL_SPEEDUPS.pdf": "cababa80243512d43bbaf2e5677d02a290cd94d69f3b5cb947f4824f8527c818",
+    "plot_endpoint_total_speedups.py": "b19c0a132ecd4a7cc5cc5e5481583c2c79e75f5470118376da3fe206a16cea56",
+    "OT_TOTAL_SPEEDUPS.csv": "104c89a1fcf4c5ef062bb28c0301829b5c0cf2d2033a0f85cd76262ac22d160b",
+    "OT_TOTAL_SPEEDUPS.pdf": "10f06a705bd5c075ae0f41042d25bbf2875979f38d0792460633339db1c3675a",
+    "plot_ot_total_speedups.py": "1e3c5627f6269ec30eb4977e422d55a14df21c5be6364acb2facfbfa0cb60828",
+    "PACKER19_PARETO.csv": "b19bc1c6a08683c84d6598f60308fb5eef291af7d63cc64cea306378f4c30d81",
+    "PACKER19_PARETO.pdf": "f2316abea1e13ef65a099111708b1f14b4f6e2099c67fdd68d8ab37886618bed",
+    "plot_packer19_pareto.py": "505d2c96ce1aaab760508b9bdb5422ded0d75f4bafd3ea101962f7d0aa551b7c",
+    "PACKER19_STOPPING_METRICS.csv": "3bbd5b34ecbce84e66ff1ae7743fc45615eaf267e1f6fc2ba4ebf471ebb854f4",
+    "PACKER19_STOPPING_METRICS.pdf": "d18bdf28aff4b3a93aa6384f7e5cd3fea2a983d3d7f464aafba0c04d11343d7b",
+    "plot_packer19_stopping_metrics.py": "0a1784865a10be702c674af5df31640a8828dfc6ab6558104a4d1d9337d3ff16",
+    "TABLE_PACKER19_NATIVE_STOPPING.tex": "44b4b4b053af04f81a505d91f0e778afb2f27ca980aae291d429295ca4e8fee1",
+    "table2_absolute_ot_times.tex": "ee651c7298cf47a373df6e84565d20e81b9a6a1d07dd60e5c8a36647edce7f58",
+    "table5_imagenet_quality.tex": "4d5806507aede870bf23d753b66481e371572f7826d5796a1e72704073749ba4",
+    "table9_cross_backend_results.tex": "2bffba649999c32e1ec88aafc1efc2b61101f778aef40a81c71d5a4145c07221",
+    "PAIRED_ATTRIBUTION.json": "836b56f7f3c7943738fb42f25a8231c26da47231c95f8a7f63d2ab450c7cfa9b",
+    "table12_packer19_phase_costs.tex": "eb7c30b53d163e06c0ed4610beacffe7df31607e8f5715f2b0728f45679fea0b",
+    "TABLE_OPERATING_REGIME.tex": "5bc7870d193858210329706bf29ab0d1ba06b29fc22b9dee6bf0d719a7fdbe96",
+    "derive_paired_attribution.py": "51e207971762afb5b2299b9f2bd60e8d1dd04ce5e74760426a07eaf8d1749f15",
+    "RESULT_MACROS.tex": "e0a9728081e4417a58e7d1b2085f2fa2a19179e6dadac7d878d03d3486185cd6",
+    "table10_workload_configurations.tex": "1bbe250d84d08d6a235cbc3e035b3a6638ba3cb2923b754d0bfc3934aaee1080",
+    "table3_attribution_map.tex": "17d50be9ffcd5117aa534d5902466af21ebc99af0b0a37fc8eb92ba63f4ce1f5",
+    "table11_imagenet_solver_pairs.tex": "2149a4279e848e46c6590a2d02f93cfe17d10ede4bb63345a0a455c3865b40c2",
+    "C63_SOLVER_ATTRIBUTION.csv": "b03a974815ddd9db22689109c55f1b3d9536a854f6096a903554f67ffe7b03a8"
+  },
+  "registry": "/home/xwen/projects/forgetOT_c57_17e07d4_local/studies/figures/ICLR_ORAL_CLOSURE_20260827",
+  "schema": "forgetot.paper-artifacts.v6"
+}

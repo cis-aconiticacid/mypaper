@@ -1,0 +1,22 @@
+\begin{table*}[t]
+\centering
+\caption{ImageNet-32 PCA500 feature-space quality after 50k training updates.
+Entries are three-seed means for matched fixed-width (Fixed) and dynamically
+compacted (Dynamic) execution. Lower is better for all three metrics. The
+same three paired training seeds are used throughout the quality evaluation;
+the full per-seed measurements and analysis artifacts are available in the
+public GitHub repository. These are feature-space metrics, not pixel-space
+FID.}
+\label{tab:imagenet-quality}
+\small
+\begin{tabular}{@{}c cc cc cc@{}}
+\toprule
+& \multicolumn{2}{c}{Curvature} & \multicolumn{2}{c}{Held-out FM MSE} & \multicolumn{2}{c}{Projected Fr\'echet} \\
+NFE & Fixed & Dynamic & Fixed & Dynamic & Fixed & Dynamic \\
+\midrule
+4  & 5.4524 & 5.4448 & 1.07854 & 1.07859 & 1.2967 & 1.2886 \\
+8  & 2.8388 & 2.8356 & 1.07854 & 1.07859 & 1.5286 & 1.5224 \\
+16 & 1.4546 & 1.4528 & 1.07854 & 1.07859 & 1.8182 & 1.8136 \\
+\bottomrule
+\end{tabular}
+\end{table*}

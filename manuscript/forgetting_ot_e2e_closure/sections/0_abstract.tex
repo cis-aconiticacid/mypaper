@@ -1,0 +1,35 @@
+Fast OT backends reduce the cost of one Sinkhorn update, but fixed-width
+batched execution still runs at full width until its slowest problem finishes.
+We present \policy{}, an execution layer for batched entropic optimal transport
+that dynamically removes completed problems and narrows subsequent updates.
+It starts from standard batched execution of independent Sinkhorn problems.
+After an alternating scaling cycle, one marginal is current by construction;
+a batched check of the other marginal filters the problems that require the
+two-marginal verifier. Problems that pass that existing
+release rule are removed from every per-problem tensor, while unfinished
+problems continue.
+
+The analysis separates opportunity from hardware conversion. For first-passing
+iteration numbers $n_1,\ldots,n_W$ and survivor width
+$A_k=|\{t:n_t\geq k\}|$, static execution spends $Wn_{\max}$ problem-update
+slots, whereas dynamic compaction spends exactly $\sum_k A_k=\sum_t n_t$.
+If $c_k(a,\xi_k)$ is the measured update cost at width $a$, the exact
+matched-path time difference is the width-cost saving
+$\sum_k[c_k(W,\xi_k)-c_k(A_k,\xi_k)]$ minus incremental control overhead.
+Depth heterogeneity therefore creates removable work, while the hardware
+width-cost curve determines how much of that work becomes wall-clock speedup.
+On the measured A100/Triton configuration, width sweeps expose a wave-shaped
+cost curve: for $n=1024$, widths one through six occupy one nearly flat region,
+whereas larger problems respond to width reduction much earlier.
+
+Matched fixed-width/dynamic-compaction comparisons give
+\CMetroCorrectedEndpointSpeedup{} on the four-worker MetroPT-3 endpoint,
+$1.054\times$ on the ImageNet-32 training solver field, and up to
+$3.110\times$ in the registered MetroPT scale-out cells. An OTT-JAX realization
+gives $1.366$--$1.581\times$ across three tolerances. When one initialization is
+used for multiple problems, matched packed-Triton dynamic compaction gives $1.421\times$ and
+removes 30.62\% of problem-update slots. Packer19 supplies the matched
+logical-mask control and a synchronized-depth boundary where the dynamic-compaction
+gain vanishes.
+Achieved residuals and registered application endpoints supply the
+implementation evidence; all reported consumer and training-quality checks pass.

@@ -1,0 +1,21 @@
+\begin{table}[t]
+\centering
+\caption{在一个冻结输入和 release contract 下，Packer19 的单变量归因。每行都报告扣除配对消费者后的 OT 阶段时间，因此各组件效应使用同一测量边界。}
+\label{tab:c80-attribution}
+\scriptsize
+\setlength{\tabcolsep}{2.6pt}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{}lllll@{}}
+\toprule
+改变 & 匹配对照 & 范围 & 比率 & 证据 \\
+\midrule
+批量验证检查 & serial / batched verifier & OT 阶段 & 1.133$\times$ & 24/24 胜出 \\
+当前边缘初步检查 & 仅验证器 / 先初步检查 & OT 阶段 & 1.105$\times$ & 24/24 胜出 \\
+逻辑冻结 & fixed / logical mask & OT 阶段 & 1.000$\times$ & 95\% CI [0.9998, 1.0003] \\
+动态压缩& logical mask / dynamic compaction & OT 阶段 & \CPackerCompactionOTSpeedup{} & 95\% CI \CPackerCompactionOTRange{} \\
+\bottomrule
+\end{tabular}}
+\vspace{2pt}
+
+{\scriptsize 批量验证检查与当前边缘初步检查两行均为 24/24 配对胜出；这两个对照没有登记独立的 E1 bootstrap 区间。}
+\end{table}

@@ -1,0 +1,26 @@
+\begin{table}[t]
+\centering
+\caption{Packer19 single-variable attribution under one frozen input and
+release contract. Every row reports OT-stage time from a paired comparison
+after subtracting consumer time,
+so the component effects share one measurement boundary.}
+\label{tab:c80-attribution}
+\scriptsize
+\setlength{\tabcolsep}{2.6pt}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{}lllll@{}}
+\toprule
+Change & Matched contrast & Scope & Ratio & Evidence \\
+\midrule
+Batched verifier checks & serial / batched verifier & OT stage & 1.133$\times$ & 24/24 wins \\
+Preliminary current-marginal check & verifier only / preliminary check & OT stage & 1.105$\times$ & 24/24 wins \\
+Logical freeze & fixed / logical mask & OT stage & 1.000$\times$ & 95\% CI [0.9998, 1.0003] \\
+Dynamic compaction & logical mask / dynamic compaction & OT stage & \CPackerCompactionOTSpeedup{} & 95\% CI \CPackerCompactionOTRange{} \\
+\bottomrule
+\end{tabular}}
+\vspace{2pt}
+
+{\scriptsize The batched verifier-check and preliminary current-marginal-check
+rows have 24/24 paired wins; no
+separate E1 bootstrap interval is registered for those two contrasts.}
+\end{table}

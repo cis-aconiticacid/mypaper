@@ -1,0 +1,12 @@
+\section{适用区间与组合方式}
+\label{sec:scope}
+
+\policy{} 适用于具有兼容批量表示及双边际验证器的批量正 EOT 问题。一个批次中的问题需要不同数量的迭代时会产生可移除工作；净加速取决于批宽与实测运行时间之间的关系，以及增量控制与状态移动成本（\cref{eq:active-gate}）。
+
+初始化同时影响总迭代次数及其在窗口内的差异。使用一个初始化处理多个问题的实验采用受控重叠的 ImageNet-32 support：active 执行使 slots 减少 30.62\%，包含 proposal 与传输成本的 steady-state 关键路径加速 $1.421\times$。特征训练实验对独立重采样的 OT-FM coupling 使用 cold proposal。
+
+执行器根据问题是否通过已配置停止规则来进行调度。分组干预利用离线 oracle 迭代编号，测量固定问题集合在不同分组下的执行效应。宽度成本扫描单独测量后端如何把每个存活宽度转换成更新时间。两者共同实例化式 \eqref{eq:time-difference} 中的两项；当完成深度估计可用时，预测分组可以使用相同的量。
+
+动态压缩以状态移动和 buffer 换取计算减少。匹配 logical-mask/dynamic-compaction 实验报告额外峰值分配 26.1 MiB，同时运行时间与端点能耗下降；\cref{tab:phase-costs} 报告其阶段成本。OTT-JAX 与 PyKeOps 通过后端特定的 rebucketing 和独立问题批量执行实现释放。
+
+校准后的宽度成本曲线对应指定设备、kernel 路径、问题形状与数值配置。Packed Triton 路径还会将窄尾切换到匹配的单问题求解器，因此其完整成本曲线包含这一路由边界。核算恒等式与式 \eqref{eq:time-difference} 适用于任意实测成本曲线；观测到的 A100 wave 位置适用于所报告的 Triton 配置。

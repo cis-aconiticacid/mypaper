@@ -1,0 +1,140 @@
+\section{Survivor Geometry and Hardware Conversion}
+\label{sec:cost-hypothesis}
+
+The executor observes when each problem first passes the verifier. Those
+iteration numbers define a survivor curve, which determines removable work.
+The backend width-cost curve then determines how much of that work reduction is
+converted into wall-clock saving.
+
+\subsection{Counting removed problem-update slots}
+
+For problem $t$, let $n_t$ be the batched-iteration number of the first
+configured verifier check at which the problem passes the two-marginal
+verifier, and let
+\begin{equation}
+A_k=\bigl|\{t:n_t\geq k\}\bigr|
+\label{eq:survival-width}
+\end{equation}
+be the surviving width before packed update $k$. The measured stopping check
+supplies both quantities.
+
+\begin{proposition}[Problem-update accounting]
+For a finite window of $W$ problems,
+\begin{equation}
+S_{\mathrm{active}}
+=\sum_{k=1}^{n_{\max}}A_k
+=\sum_{t=1}^{W}n_t,
+\qquad
+S_{\mathrm{static}}=Wn_{\max}.
+\label{eq:slot-identity}
+\end{equation}
+Hence dynamic compaction removes exactly
+\begin{equation}
+R=Wn_{\max}-\sum_{t=1}^{W}n_t
+\label{eq:removable-slots}
+\end{equation}
+problem-update slots relative to a fixed-width batch with the same final
+boundary.
+\end{proposition}
+\begin{proof}
+Use $n_t=\sum_{k\geq1}\mathbf 1\{n_t\geq k\}$ and exchange the two finite
+sums. Fixed-width execution keeps all $W$ lanes through $n_{\max}$.
+\end{proof}
+
+Logical masking changes which states update but not the width seen by
+the kernel, so it retains $Wn_{\max}$ slots. The area between the static
+rectangle and the survival curve is therefore the exact post-run work removed
+by dynamic compaction. The check interval is already reflected in the observed $n_t$;
+the first passing iteration on a denser check schedule would define a different
+quantity.
+
+\begin{proposition}[Task-independent opportunity condition]
+Let $(n_1,\ldots,n_W)$ be any random vector of finite iteration numbers.
+Then $\mathbb E[R]>0$ if and only if there exists a batched iteration $k$ such that
+\begin{equation}
+\Pr(0<A_k<W)>0.
+\label{eq:joint-iteration-condition}
+\end{equation}
+\end{proposition}
+\begin{proof}
+$R$ is nonnegative and is zero exactly when every lane has the same iteration
+number. Different finite iteration numbers create a value of $k$ with both
+survivors and completed lanes, and the converse follows directly from the
+definition of $A_k$.
+\end{proof}
+
+The condition depends on the joint distribution of iteration numbers inside a
+packed window. Perfectly synchronized lanes create no removable work even when
+the required iteration numbers vary across windows.
+
+\subsection{Exact wall-clock accounting for a measured backend}
+
+Let $c_k(a,\xi_k)$ be the cost of matched update $k$ at width $a$,
+where $\xi_k$ records support shape, data type, kernel configuration, and other
+backend state held fixed by the comparison. Then
+\begin{equation}
+\begin{split}
+T_{\mathrm{active}}={}&\sum_k c_k(A_k,\xi_k)
++H_{\mathrm{screen}}+H_{\mathrm{check}}\\
+&+H_{\mathrm{compact}}+H_{\mathrm{other}},
+\end{split}
+\label{eq:time-accounting}
+\end{equation}
+$H_{\mathrm{other}}$ covers remaining timed control work. Let $H_{\mathrm{fixed}}$
+be the corresponding fixed-width control cost and let $\Delta H$ denote active
+control cost minus $H_{\mathrm{fixed}}$.
+
+\begin{proposition}[Opportunity--conversion decomposition]
+For a matched fixed-width/dynamic-compaction execution with the same final verifier
+boundary and matched update states $\xi_k$,
+\begin{equation}
+T_{\mathrm{fixed}}-T_{\mathrm{active}}
+=\sum_{k=1}^{n_{\max}}
+\left[c_k(W,\xi_k)-c_k(A_k,\xi_k)\right]-\Delta H.
+\label{eq:time-difference}
+\end{equation}
+Consequently, dynamic compaction is faster exactly when
+\begin{equation}
+\sum_k\!\left[c_k(W,\xi_k)-c_k(A_k,\xi_k)\right]
+>\Delta H.
+\label{eq:active-gate}
+\end{equation}
+\end{proposition}
+\begin{proof}
+Write $T_{\mathrm{fixed}}=\sum_k c_k(W,\xi_k)+H_{\mathrm{fixed}}$,
+subtract Equation~\eqref{eq:time-accounting}, and collect the control terms.
+\end{proof}
+
+This decomposition exposes two gates. Variation among $n_t$ creates the
+survivor widths needed for positive removable work. The measured function
+$c_k(a,\xi_k)$ determines whether those width reductions cross a lower hardware
+cost level. If $c_k(A_k,\xi_k)=c_k(W,\xi_k)$ for every $k$, dynamic compaction removes
+problem-update slots but saves no update time; if the summed cost decrease
+exceeds $\Delta H$, it produces a net wall-clock gain.
+
+\subsection{Wave-shaped width cost}
+
+For the packed Triton update used in our implementation, the launch grid has
+\begin{equation}
+B(a,n)=a\left\lceil\frac{n}{b_m}\right\rceil
+\label{eq:block-grid}
+\end{equation}
+thread blocks, where $b_m$ is the row tile size. GPU scheduling processes this
+grid in occupancy-dependent waves \citep{yu2021habitat,nvidia2024cuda}. A useful local model is therefore
+\begin{equation}
+c(a;n,\xi)\approx g_{n,\xi}\!\left(
+\left\lceil\frac{B(a,n)}{Q_{\xi}}\right\rceil\right),
+\label{eq:wave-cost}
+\end{equation}
+where $Q_{\xi}$ is the measured resident block capacity of the kernel and
+$g_{n,\xi}$ maps wave count to time. Registers, shared memory, and kernel state
+enter through $Q_{\xi}$; the value is calibrated for the selected device and
+kernel configuration.
+
+On the measured A100/Triton configuration with $b_m=64$, the first-wave estimate
+places the saturation width near $6.75$ for $n=1024$, $1.69$ for $n=4096$, and
+below one for $n=16384$. Direct primitive measurements locate the first large
+increase at widths $6\rightarrow7$ and $1\rightarrow2$ for the first two sizes;
+the $n=16384$ curve is responsive from width one. These measurements instantiate
+$c(a)$ for this backend and explain why equal slot reductions can have different
+wall-clock value across problem sizes.

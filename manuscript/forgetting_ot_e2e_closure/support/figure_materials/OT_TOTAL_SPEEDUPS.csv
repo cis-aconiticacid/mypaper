@@ -1,0 +1,7 @@
+group,backend,workload,speedup,accuracy_contract
+flash,Flash,Packer19 LM/PC,1.539660,same release decisions at tau 1e-3
+flash,Flash,MetroPT-3,1.753803,matched fixed/compacted E1
+flash,Flash,ImageNet-32 PCA500,1.053985,matched fixed/compacted solver field
+transfer,PyKeOps,A2D2 LiDAR,3.174,max L1 9.97e-4
+transfer,OTT-JAX,ImageNet-32,1.544848,matched phase-static/phase-active
+transfer,PyKeOps,ImageNet-32,1.415,max L1 8.93e-4

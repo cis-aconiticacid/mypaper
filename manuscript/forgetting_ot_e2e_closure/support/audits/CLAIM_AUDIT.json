@@ -1,0 +1,376 @@
+{
+  "schema": "drainsinkhorn.claim-audit.v27",
+  "updated": "2026-09-07",
+  "paper_title": "DrainSinkhorn: Safe Elimination for Batched Entropic Optimal Transport",
+  "status": "c82_and_width_cost_spine_integrated",
+  "checks": {
+    "speedup_direction": "baseline_time / proposed_time",
+    "component_campaigns": [
+      "EXP-PACKER19",
+      "C80",
+      "C80-LM",
+      "C66",
+      "C21-clean",
+      "C08",
+      "C29",
+      "M3",
+      "C82"
+    ],
+    "deployment_campaigns": [
+      "EXP-PACKER19",
+      "C80-LM",
+      "C66",
+      "C63",
+      "C67",
+      "C82"
+    ],
+    "diagnostic_campaigns": [
+      "EXP-PACKER19-native-stopping",
+      "C51"
+    ],
+    "main_workloads": [
+      "Packer19",
+      "MetroPT-3",
+      "ImageNet-32 PCA500",
+      "A2D2 LiDAR"
+    ],
+    "stopping_protocol_reported": true,
+    "consumer_error_axis_used_for_accuracy_sweep": true,
+    "accuracy_sweep_status": "formal two-host EXP-PACKER19 stopping-execution Pareto with five residual tolerances and a separate seven-point native potential-threshold mapping",
+    "accuracy_sweep_claim_present_in_manuscript": true,
+    "local_tolerance_diagnostic_present": false,
+    "local_tolerance_diagnostic_scope": "superseded in the manuscript by EXP-PACKER19; C51 remains historical evidence only",
+    "local_tolerance_cross_campaign_rule": "EXP-PACKER19 consumer TV is computed within one campaign against its tight reference; no C51 values are combined with it",
+    "local_tolerance_provenance": "EXP-PACKER19 protocol sha256 c010bcf9b3e276c8269514324cc8ed4bc2fc5958c362c7b880e3946dee75075b; source commit 96de52b8ceff8fa3c0468bf45567e6b017483e73",
+    "accuracy_target_relaxation_disclosed": true,
+    "accuracy_contract_provenance": "archive/outdated_current_surface/20260906/root/todo_final.md at git commit 8b6cc50, committed before formal timing",
+    "accuracy_contract_interpretation": "project-defined consumer-output stability bound, not an external biological performance requirement",
+    "component_and_deployment_ratios_separated": true,
+    "method_hierarchy": "DrainSinkhorn starts from standard fixed-width multi-problem Sinkhorn execution and the selected solver stopping rule. Its method contribution is dynamic compaction: after a problem passes that rule, all per-problem state is compacted and later updates run at survivor width A_k=|{t:ell_t>=k}|.",
+    "safe_definition": "stopping-rule-preserving release: a problem is removed only after passing the same configured two-marginal stopping check used by the selected backend; the one-marginal precheck only controls whether that existing check is invoked; the timed packed Triton path uses backend-supported precision",
+    "component_ablation_interpretation": "Matched fixed-width versus dynamic-compaction and logical-mask versus dynamic-compaction comparisons test the method contribution. Sequential versus fixed-width results measure conventional batching and are excluded from current-paper performance claims. EXP-PACKER19 static-derived ablations are ineligible and have been removed from the paper.",
+    "attribution_levels": {
+      "ordinary_batching_context": "project sequential per-problem versus fixed-width batched execution; prior capability excluded from current-paper performance claims",
+      "dynamic_compaction": "matched fixed-width or logical-mask execution versus dynamic compaction after the configured stopping rule"
+    },
+    "c63_internal_decomposition": "on real ImageNet-32 PCA500 training, the complete fixed-update E3 interval gives 1.03556x for fixed-width/dynamic-compaction, with observed three-seed range 1.02982--1.04311x; the separately recorded solver-field matched ratio is 1.053985x and remains a different timing scope",
+    "absolute_ot_time_table": {
+      "location": "figures/table2_absolute_ot_times.tex",
+      "dash_semantics": "path not run in the registered campaign; not zero and not failure",
+      "Packer19_seconds_median_24_units": {
+        "static": 1.296496,
+        "logical_mask": 2.038468,
+        "complete_drainsinkhorn": 1.298557,
+        "static_semantics": "invalid as fixed-width control; the measured arm physically compacted after first-passage releases and is omitted from the paper table",
+        "paper_fixed_width_display": null
+      },
+      "MetroPT_worker1_three_plan_median_seconds": {
+        "static": 14.838692,
+        "logical_mask": null,
+        "complete_drainsinkhorn": 8.462495
+      },
+      "MetroPT_scope": "C66 descriptive worker-1 three-plan median for matched fixed-width and complete active E1 fields",
+      "ImageNet32_solver_seconds_mean_3_seeds": {
+        "static": 122.167259,
+        "logical_mask": null,
+        "complete_drainsinkhorn": 115.889756
+      }
+    },
+    "c63_quality_table": {
+      "location": "figures/table5_imagenet_quality.tex",
+      "scope": "real ImageNet-32 PCA500 feature-space quality after 50k updates; three-seed means; not pixel-space FID",
+      "quality_gate": "9/9 descriptive geometric-mean ratio gates pass at NFE 4/8/16; no confidence bounds or type-I error control",
+      "paired_evidence": "open_source/DrainSinkhorn/results/c63_quality/quality_gates.json",
+      "metrics": [
+        "curvature_mean",
+        "heldout_strict_coupling_fm_mse",
+        "random_projection_frechet_diagonal"
+      ]
+    },
+    "component_table_timing_scope": "all C80 and C80-LM rows use paired-consumer-subtracted OT-stage time",
+    "component_uncertainty": {
+      "batched_audit": "24/24 paired wins; no E1 bootstrap interval registered",
+      "row_screen": "24/24 paired wins; no E1 bootstrap interval registered",
+      "logical_mask": "95% CI [0.999805, 1.000334]",
+      "physical_compaction": "95% CI [1.538936, 1.540371]"
+    },
+    "algebraic_claim_scope": "standard fixed-width batching applies the original independent per-instance Sinkhorn update in ideal arithmetic; the updated-marginal identity is also standard ideal-arithmetic algebra; neither is claimed as a new method",
+    "numerical_claim_scope": "the paper makes no new floating-point convergence or production-correctness theorem; it reports parity, achieved residuals, shadow replay, finite-precision stress tests, and application endpoints",
+    "fp64_stress_test_scope": "C10 is an independent numerical stress test: FP64 is a replay or audit reference, and the outward-bound plus FP64-escalation configuration is evaluated only within C10; neither FP64 replay nor escalation is included in the public-Flash timed application paths",
+    "width_cost_role": "the exact matched-path time difference maps verifier-derived survivor widths through a measured backend width-cost curve and subtracts incremental control overhead",
+    "width_cost_diagnostic_scope": "single-A100 primitive diagnostic for the packed Triton shifted_step at source commit 73aec2941bfa1a5caa6a6bddf7aa83b734f9bb8b; excludes screen, two-marginal verifier, compaction, and solve_batch outer loop",
+    "width_cost_diagnostic_source": "studies/local_results/A100_WIDTH_COST_ENGINEERING_20260907T205000Z_73aec294/REPORT_ZH.md",
+    "headline_result_layer": "matched fixed-width/dynamic-compaction and logical-mask/dynamic-compaction execution",
+    "end_to_end_dilution_disclosed": true,
+    "end_to_end_scope": "includes unchanged non-OT consumer, model, data, and training time; this dilutes the measured OT-stage gain",
+    "cross_backend_ot_table": "figures/table9_cross_backend_results.tex",
+    "inner_backends": [
+      "packed Triton",
+      "OTT-JAX",
+      "PyKeOps"
+    ],
+    "packed_triton_role": "compatible inner backend; no public serial performance ratio is used in the current paper",
+    "cross_backend_realization_scope": "OTT-JAX and PyKeOps validate backend-specific active-batch compaction; they do not reuse the Flash one-marginal precheck or Triton compaction kernel",
+    "cross_backend_adaptation_claim": "Packed Triton, OTT-JAX, and PyKeOps results show that active-batch compaction can be realized across the tested backend families; each performance statement remains within its registered backend and timing scope.",
+    "cross_backend_optimization_headroom": "further backend co-design can optimize fused phase execution, active-state layout, dynamic compaction, memory reuse, and backend-specific scheduling beyond the evaluated lightweight adapters",
+    "ot_stage_measurement_protocol": {
+      "Packer19": "direct E1 in EXP-PACKER19; 24 paired host-order-GPU units per tolerance with equal-host bootstrap; C81-B independently replicates the same-controller result at 1e-3",
+      "ImageNet-32_PCA500_packed_Triton": "solver field extracted from E3 training record",
+      "OTT-JAX_and_PyKeOps": "direct E1 timing",
+      "MetroPT-3_C82": "direct E2 ready-arrays-to-consumer makespan; one host, four complete-device workers, three order plans, two timing repeats",
+      "MetroPT-3_C66": "C66 E2 endpoint minus paired consumer within each valid host-plan unit; C81-C is a read-only six-unit stratified-bootstrap reanalysis with no new run"
+    },
+    "statistical_unit_boundary": "timing repeats and GPU placements stabilize timing and are not independent workload samples",
+    "mode_selection_contract": "formal campaigns freeze mode and audit settings before timing; H_select=0 in formal timing; M3 is operating-regime evidence, not a validated online router",
+    "scale_out_contract": "C67 promotes one-to-four single-host fixed-per-worker throughput scaling of 3.965--3.979x; the separate two-host eight-worker endpoint is not joined into a one-to-eight scaling curve",
+    "rendered_pdf_visually_checked": true,
+    "c63_internal_component_decomposition_reported": true,
+    "evidence_sources": {
+      "paper_results": "open_source/DrainSinkhorn/results/paper_results.json",
+      "canonical_ledger": "knowledge/documents/EXPERIMENT_DESIGN_RESULT_LEDGER_ZH.md",
+      "accuracy_contract": "knowledge/audits/DRAINSINKHORN_ACCURACY_CONTRACT_AND_SPEEDUP_AUDIT_20260828_ZH.md",
+      "C66": "knowledge/audits/C66_METRO_TRUE_TWO_PHYSICAL_HOST_RESULT_20260828_ZH.md",
+      "C80": "knowledge/audits/C80_PACKER19_TWO_HOST_RESULT_20260828_ZH.md",
+      "C80-LM": "knowledge/audits/C80_LM_TWO_HOST_FORMAL_RESULT_20260828_ZH.md",
+      "EXP-PACKER19": "studies/campaigns/EXP-PACKER19_Stopping_Execution_Pareto/analysis/analysis.json",
+      "C81-B/C": "studies/campaigns/C81_sota_closure_20260831/manifest.json",
+      "C51": "studies/raw_results/server_runs/20260825_packer19_relaxed_flash_09a83d9/formal_analysis.json",
+      "C63": "studies/campaigns/C63_semantic_latent_OTFM_feature_training/analysis.json",
+      "C35": "knowledge/audits/C35_WIDTH_SWEEP_POSTREVIEW_AUDIT_20260827.json",
+      "C21-clean": "knowledge/notes/research/OTT_PHASE_ACTIVE_WIDTH_BOUNDARY_20260816.md",
+      "C08": "studies/reports/A2D2_LIDAR_REPEATED_EOT_RESULTS_20260808.md",
+      "C29": "studies/reports/IMAGENET32_KEOPS_PACKED_RESULTS_20260808.md",
+      "C82": "studies/campaigns/C82_MetroPT3_static_active_corrected/analysis.json"
+    },
+    "macro_values": {
+      "C80StaticBatchedAuditOTSpeedup": 1.133485,
+      "C80StaticRowScreenOTSpeedup": 1.105455,
+      "CPackerLogicalMaskRatio": 1.000069,
+      "CPackerCompactionOTSpeedup": 1.53966,
+      "CMetroRetirementOTSpeedup": 1.753803,
+      "CMetroEnergyFactor": 1.783,
+      "CPackerCompactionRange": [
+        1.480063,
+        1.637581
+      ],
+      "CPackerNeutralCompaction": 0.999485,
+      "CFeatureTrainingActiveOverStatic": 1.03556,
+      "CFeatureTrainingActiveOverStaticRange": [
+        1.02982,
+        1.04311
+      ],
+      "CFeatureTrainingNonOTSeconds": 66.0,
+      "COTTNativeActiveSpeedup": 2.599704,
+      "COTTStaticActiveSpeedup": 1.544848,
+      "CKeopsLiDARActiveSpeedup": 3.174,
+      "CKeopsImageNetActiveSpeedup": 1.415,
+      "C35Width16DrainSpeedup": 1.621,
+      "CMThreeHomogeneousRetirementSpeedup": 1.105,
+      "CMThreeHeterogeneousRetirementSpeedup": 1.217,
+      "CMetroCorrectedEndpointSpeedup": 1.7455347288506644,
+      "CMetroCorrectedEndpointRange": [
+        1.745273310245869,
+        1.7459752447408936
+      ],
+      "CMetroCorrectedEnergyFactor": 1.7794375588256872
+    },
+    "exp_packer19_static_control_status": "invalid: fixed_width with static_verify_first_passage falls through to dynamic compaction",
+    "exp_packer19_static_derived_claims_eligible": false,
+    "exp_packer19_current_paper_contrasts": [
+      "logical_mask/dynamic_compaction"
+    ],
+    "ordinary_batching_evidence_status": {
+      "status_rule": "Ordinary multi-problem batching is prior capability in POT solve_batch and OTT-JAX vmap. Sequential/fixed-width performance ratios are excluded from the current paper; INVALID_CONTROL remains ineligible.",
+      "C62_imagenet_width_one_over_static": {
+        "status": "VALID_POSITIVE_EXCLUDED_FROM_CURRENT_PAPER",
+        "effect": "2.830636x fixed-width over project sequential per-problem execution on the coupling-preparation endpoint",
+        "source": "studies/campaigns/C62_semantic_latent_OTFM_four_arm/README.md:35"
+      },
+      "C63_imagenet_width_one_over_static": {
+        "status": "VALID_POSITIVE_EXCLUDED_FROM_CURRENT_PAPER",
+        "effect": "2.347290x fixed-width over project sequential per-problem execution on the complete fixed-update E3 interval",
+        "source": "studies/campaigns/C63_semantic_latent_OTFM_feature_training/README.md:27"
+      },
+      "C80_packer19_width_one_over_row_static": {
+        "status": "NOT_ISOLATED",
+        "effect": "0.907393x with 0/24 wins is valid for the two measured paths, but W1 runs eight width-one dynamic-compaction solves while RS runs one width-8 fixed-width solve; the difference is not attributable to ordinary batching alone",
+        "controlled": "cold proposal, batched marginal audit, row-only screen, initial audit off, buffer reuse off, check interval, tolerance, input, and endpoint",
+        "not_controlled": "solver invocation structure, physical candidate width, and retirement mode",
+        "sources": [
+          "studies/code/analyze_c80_eight_path_attribution.py:32",
+          "studies/code/analyze_c80_eight_path_attribution.py:50",
+          "studies/code/packer19_flash_consumer_e2e.py:321",
+          "operations/tools/run_c80_eight_path_attribution.sh:90"
+        ]
+      },
+      "EXP_PACKER19_static_derived": {
+        "status": "INVALID_CONTROL",
+        "affected": [
+          "width-one/static",
+          "static/logical-mask",
+          "static/dynamic-compaction",
+          "packing range",
+          "static/PC neutrality"
+        ],
+        "paper_action": "removed from the abstract, figures, experiment narrative, scope, and conclusion; no ordinary-batching rerun is planned; original campaign records remain for provenance",
+        "source": "knowledge/audits/SOURCE_BOUND_REVIEW_RECHECK_FINAL_20260905_ZH.md:14"
+      },
+      "C66_C81C_metropt_public_project_decomposition": {
+        "status": "EXCLUDED_FROM_CURRENT_PAPER",
+        "effect": "public/project execution paths do not isolate active-batch compaction and are not current paper evidence",
+        "source": "knowledge/documents/EXPERIMENT_DESIGN_RESULT_LEDGER_ZH.md:99"
+      },
+      "C80_metropt_timing": {
+        "status": "CORRECTNESS_FAIL_EXCLUDED",
+        "effect": "consumer parity 0.03794765 exceeded the frozen 0.005 gate; no timing effect is eligible",
+        "source": "knowledge/documents/EXPERIMENT_DESIGN_RESULT_LEDGER_ZH.md:846"
+      },
+      "C81A_POT_absolute_comparison": {
+        "status": "DESIGN_UNFAIR_EXCLUDED",
+        "effect": "retained only as an experiment-design lesson; ineligible for ordinary-batching, SOTA, or method-quality conclusions",
+        "source": "studies/campaigns/C81_sota_closure_20260831/reports/BLOCK_A_COMMON_BACKEND_RESULT.md"
+      },
+      "external_precedent": {
+        "POT": "https://pythonot.github.io/master/_modules/ot/batch/_linear.html#solve_batch",
+        "OTT_JAX": "https://ott-jax.readthedocs.io/tutorials/linear/000_One_Sinkhorn.html"
+      },
+      "new_experiment_decision": "No new experiment will be run to establish ordinary batching as a contribution."
+    },
+    "exp_packer19_static_claims_removed_from_paper": true,
+    "ordinary_batching_new_experiments_planned": false,
+    "deployment_comparison_scope": "The current paper reports matched fixed-width/dynamic-compaction and logical-mask/dynamic-compaction contrasts within each backend and timing scope.",
+    "deployment_reference_rationale": "C82 excludes public and official serial arms; its baseline is the matched local fixed-width path.",
+    "deployment_evidence": "C82 directly measures the matched MetroPT-3 E2 endpoint; C66 independently supplies matched two-host E1/E2 evidence.",
+    "c82_metropt_matched_endpoint": {
+      "campaign": "C82",
+      "contrast": "local_cold_static / local_cold_active",
+      "endpoint": "ready_arrays_to_consumer_seconds",
+      "deployment": "single host; four independent complete-device A100 workers; no NCCL; no problem sharding",
+      "aggregation": "maximum across four workers per repeat; median of two repeats per plan; descriptive geometric mean across three order plans",
+      "static_over_active": 1.7455347288506644,
+      "descriptive_plan_range": [
+        1.745273310245869,
+        1.7459752447408936
+      ],
+      "active_plan_wins": "3/3",
+      "candidate_slots": {
+        "static": 5696,
+        "active": 3128
+      },
+      "energy_static_over_active": 1.7794375588256872,
+      "verifier_counts_per_repeat_both_arms": {
+        "candidates": 16,
+        "verified": 16,
+        "plan_apply_kernels": 32
+      },
+      "correctness": {
+        "converged_worker_repeats": "48/48",
+        "maximum_row_l1": 0.0009476650157012045,
+        "maximum_column_l1": 1.2839154805988073e-06,
+        "failure_window_roc_auc_both_arms": 1.0,
+        "labels_used_by_solver": false,
+        "maximum_static_active_transport_cost_delta": 0.027922630310058594,
+        "maximum_static_active_barycentric_shift_delta": 0.003467559814453125
+      },
+      "statistical_boundary": "plan identifiers freeze order; timing repeats and workers are not independent workload samples; range is descriptive, not a confidence interval",
+      "excluded_comparisons": [
+        "public_flashsinkhorn_serial",
+        "official_cold"
+      ],
+      "source": "studies/campaigns/C82_MetroPT3_static_active_corrected/analysis.json"
+    }
+  },
+  "errors": [
+    "EXP-PACKER19 FW/static control physically compacted after first-passage releases; all static-derived Packer19 claims are ineligible."
+  ],
+  "evidence_scope_revision": {
+    "revision": "2026-09-05 evidence-scope revision",
+    "source_checkpoint": "1939b250b7d3379d6be411f22f948632e165c5bc",
+    "sources": {
+      "knowledge/documents/EXPERIMENT_DESIGN_RESULT_LEDGER_ZH.md": "496cedf7dfa609163a8f8f70ae4cd0ed786808d974b246672e7aaf9b6d1f584c",
+      "knowledge/audits/C35_WIDTH_SWEEP_POSTREVIEW_AUDIT_20260827.json": "b0cb3d73caf30fb87643ad8237f53457bdd978fe8c8e5a3dedc45e9f566cf1a8",
+      "studies/reports/C62_SEMANTIC_LATENT_OTFM_FOUR_ARM_RESULTS_20260827_ZH.md": "032da1b39ad52a849e50384d1017bab90b0757145b48b7adc747dea7f999e727",
+      "studies/reports/OTT_IMAGENET_RELAXED_PHASE_ACTIVE_RESULTS_20260825_ZH.md": "ed0f221c447cdd5e674185445c2e4f52b0aac5966608a01e186132a47bc4869c",
+      "studies/reports/IMAGENET32_INDEPENDENT_8GPU_FLASH_POLICY_GATE_20260824_ZH.md": "38535bc0a34343a6520929896d8172e08256bd197e6b6fe4dd69178376b9fe4c",
+      "knowledge/audits/C67_GLOBAL8_TWO_HOST_RESULT_20260828_ZH.md": "0b42693666f7eae635bf8ea5233a7a6744887fe8eaac5cf2a65f41da6f70b91a",
+      "knowledge/audits/C67_SUPPORT_SCALE_HOST2_RESULT_20260828_ZH.md": "2031a81a01c86b2afc8e37cbbf4c53e77373dd7e6fa8764b00ec81b2ba0c5147",
+      "knowledge/audits/C80_LM_TWO_HOST_FORMAL_RESULT_20260828_ZH.md": "5cb982f20e3c4f2f6c150724dd8d6478b0717f29117817f45b33c7414d7c859d"
+    },
+    "new_analysis": "figures/PAIRED_ATTRIBUTION.json",
+    "boundaries": [
+      "C35 is projected-carry width-one versus complete active packed, not static/active.",
+      "C33 is a controlled overlapping-support historical project-adapter study, not independent OT-FM training.",
+      "C55 matched phase sweep includes 0.995; ten repeats on one input are not independent workload samples.",
+      "C67 results retain fixed-per-worker/one-worker endpoint scope and failed calibration/consumer exclusions.",
+      "C80-LM phase medians are not a decomposition of EXP-PACKER19 timings.",
+      "No new server measurements, population CI, equivalence test, or predictive scheduler claimed.",
+      "M3 summary lacks locally source-bound absolute arm times/width trajectories for a new survival plot; no values reconstructed from ratios.",
+      "EXP-PACKER19 static-derived ratios are removed from the paper; no ordinary-batching rerun is planned."
+    ]
+  },
+  "supplementary_paired_attribution": {
+    "analysis_kind": "supplementary descriptive paired reanalysis; no new runs or confidence intervals",
+    "c63": {
+      "by_seed": [
+        {
+          "seed": 20260891,
+          "static_solver_seconds": 123.4287042170763,
+          "active_solver_seconds": 116.69896314293146,
+          "static_over_active": 1.0576675309951327
+        },
+        {
+          "seed": 20260892,
+          "static_solver_seconds": 124.23330034688115,
+          "active_solver_seconds": 115.93391591496766,
+          "static_over_active": 1.0715872000562865
+        },
+        {
+          "seed": 20260893,
+          "static_solver_seconds": 118.83977316133678,
+          "active_solver_seconds": 115.03638765588403,
+          "static_over_active": 1.0330624560015746
+        }
+      ],
+      "geometric_mean": 1.0539849819411262,
+      "observed_range": [
+        1.0330624560015746,
+        1.0715872000562865
+      ]
+    },
+    "sources": {
+      "studies\\campaigns\\C63_semantic_latent_OTFM_feature_training\\analysis.json": "6b24620b580d89fdadada61eedcd14d78a59e90a322154aafc0bc53d3793ea9e"
+    },
+    "packer19_static_control_valid": false,
+    "packer19_static_derived_ratios_eligible": false,
+    "packer19_static_claims_removed_from_paper": true,
+    "packer19_static_invalidation_source": "knowledge/audits/SOURCE_BOUND_REVIEW_RECHECK_FINAL_20260905_ZH.md"
+  },
+  "blocking_findings": [
+    {
+      "id": "EXP-PACKER19-FW-COMPACTS",
+      "status": "paper_claims_removed_code_fix_pending",
+      "finding": "The registered fw/static_packed arm enabled static_verify_first_passage and then fell through an independent logical-mask if/else into the dynamic-compaction branch.",
+      "invalid_claims": [
+        "EXP-PACKER19 width-one/static",
+        "EXP-PACKER19 static/logical-mask",
+        "EXP-PACKER19 static/dynamic-compaction",
+        "Packer19 packing range derived from the fw arm",
+        "Packer19 static/PC neutrality derived from the fw arm"
+      ],
+      "unaffected_claims": [
+        "EXP-PACKER19 public-same-controller/dynamic-compaction",
+        "EXP-PACKER19 logical-mask/dynamic-compaction",
+        "C80-LM logical-mask/dynamic-compaction",
+        "C66 MetroPT static/active",
+        "C63 solver-field static/active",
+        "C82 MetroPT static/active E2 endpoint"
+      ],
+      "sources": [
+        "algorithm/src/sinkhorn_ops/flash_packed.py:1293",
+        "studies/code/packer19_flash_consumer_e2e.py:683",
+        "studies/code/analyze_packer19_stopping_execution_pareto.py:477",
+        "knowledge/audits/SOURCE_BOUND_REVIEW_RECHECK_FINAL_20260905_ZH.md"
+      ]
+    }
+  ]
+}

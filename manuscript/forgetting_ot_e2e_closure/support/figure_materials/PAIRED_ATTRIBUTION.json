@@ -1,0 +1,33 @@
+{
+  "analysis_kind": "supplementary descriptive paired reanalysis; no new runs or confidence intervals",
+  "c63": {
+    "by_seed": [
+      {
+        "seed": 20260891,
+        "static_solver_seconds": 123.4287042170763,
+        "active_solver_seconds": 116.69896314293146,
+        "static_over_active": 1.0576675309951327
+      },
+      {
+        "seed": 20260892,
+        "static_solver_seconds": 124.23330034688115,
+        "active_solver_seconds": 115.93391591496766,
+        "static_over_active": 1.0715872000562865
+      },
+      {
+        "seed": 20260893,
+        "static_solver_seconds": 118.83977316133678,
+        "active_solver_seconds": 115.03638765588403,
+        "static_over_active": 1.0330624560015746
+      }
+    ],
+    "geometric_mean": 1.0539849819411262,
+    "observed_range": [
+      1.0330624560015746,
+      1.0715872000562865
+    ]
+  },
+  "sources": {
+    "studies\\campaigns\\C63_semantic_latent_OTFM_feature_training\\analysis.json": "6b24620b580d89fdadada61eedcd14d78a59e90a322154aafc0bc53d3793ea9e"
+  }
+}

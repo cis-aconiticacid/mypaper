@@ -1,0 +1,157 @@
+\section{DrainSinkhorn}
+\label{sec:method}
+
+\paragraph{Dynamic compaction from a fixed-width batch.}
+Standard batched execution applies $W$ independent Sinkhorn maps in parallel
+and retains a width $W$ until the problem requiring the most iterations
+completes. DrainSinkhorn starts from this fixed-width layout. For problem $t$,
+let $n_t$ be the batched-iteration number of the first configured verifier
+check at which the problem passes the two-marginal verifier. DrainSinkhorn then writes its
+output and dynamically compacts all per-problem state. Batched update $k$
+therefore executes at survivor width
+\[
+A_k=\left|\{t:n_t\geq k\}\right|.
+\]
+The check interval is the number of batched iterations between consecutive
+verifier checks.
+Logical masking records completion at width $W$; dynamic-compaction execution runs
+  subsequent kernels at survivor width $A_k$. A fixed-width/dynamic-compaction comparison
+measures the net effect of release and dynamic width reduction. LM/DC holds the
+  release decisions fixed to isolate dynamic width reduction. The experiments
+  report width and grouping interventions separately.
+
+\subsection{Standard batched Sinkhorn execution}
+
+Let $F_t$ denote one full Sinkhorn cycle for problem $t$, including that
+problem's marginals, kernel operator, and numerical representation. Standard
+batching adds a leading problem-batch dimension but no cross-problem reduction.
+In ideal
+arithmetic, its defining algebraic property is
+\begin{equation}
+\widetilde F\!\left(\operatorname{pack}(z_1,\ldots,z_W)\right)
+=\operatorname{pack}\!\left(F_1(z_1),\ldots,F_W(z_W)\right).
+\label{eq:pack-commutes}
+\end{equation}
+Thus the batched kernel preserves the EOT objective and per-instance Sinkhorn
+map while changing their execution layout. After a stopping check, DrainSinkhorn
+filters the problem-batch dimension and applies
+Equation~\eqref{eq:pack-commutes} to the survivors.
+
+For one problem, a Sinkhorn cycle performs
+\begin{equation}
+u^{k+1}=a\oslash(Kv^k),\qquad
+v^{k+1}=b\oslash(K^\top u^{k+1}),
+\label{eq:sinkhorn-cycle}
+\end{equation}
+where $\oslash$ denotes elementwise division. Immediately after the second
+leg, exact arithmetic gives
+\begin{equation}
+v^{k+1}\odot(K^\top u^{k+1})=b.
+\label{eq:updated-marginal}
+\end{equation}
+The column marginal is current by construction; the row marginal
+$u^{k+1}\odot(Kv^{k+1})$ can remain outside tolerance. DrainSinkhorn evaluates
+that row residual for all active problems in one batched operation and sends
+only precheck-positive problems to the two-marginal verifier.
+
+\begin{figure*}[t]
+\centering
+\setlength{\fboxsep}{6pt}
+\fbox{\parbox{.13\textwidth}{\centering
+\textbf{Batched update}\\[-1pt]
+$u\leftarrow a/(Kv)$\\
+$v\leftarrow b/(K^\top u)$}}
+\hspace{2pt}$\rightarrow$\hspace{2pt}
+\fbox{\parbox{.13\textwidth}{\centering
+\textbf{One-marginal precheck}\\[-1pt]
+batch row residuals\\
+updated column identity}}
+\hspace{2pt}$\rightarrow$\hspace{2pt}
+\fbox{\parbox{.13\textwidth}{\centering
+\textbf{Configured check}\\[-1pt]
+current row and column\\
+stopping tolerance}}
+\hspace{2pt}$\rightarrow$\hspace{2pt}
+\fbox{\parbox{.13\textwidth}{\centering
+\textbf{Release and compact}\\[-1pt]
+emit passing problems\\
+compact all OT state}}
+\hspace{2pt}$\rightarrow$\hspace{2pt}
+\fbox{\parbox{.11\textwidth}{\centering
+\textbf{Narrower next kernel}\\[-1pt]
+$W_k\to W_{k+1}$}}
+\caption{DrainSinkhorn's execution loop. The preliminary check using the current
+marginals avoids many full plan evaluations. Problems that pass the
+two-marginal verifier leave every
+per-problem tensor; the next batched update processes only the survivors.}
+\label{fig:active-loop}
+\end{figure*}
+
+\subsection{Screen, verify, and compact}
+
+Let $\widehat r^{\mathrm{row}}_{t,k}$ be the batched precheck value. A problem is
+precheck-positive when
+$\widehat r^{\mathrm{row}}_{t,k}\leq\tau_{\mathrm{screen}}$; otherwise it
+continues without materializing the more expensive plan-level check. For a
+precheck-positive problem, the implementation recomputes both marginals and applies
+the configured stopping rule
+\begin{equation}
+r_{t,k}=\max\!\left\{
+\|\pi_{t,k}\ones-a_t\|_1,
+\|\pi_{t,k}^\top\ones-b_t\|_1
+\right\}\leq\tau_{\mathrm{stop}}.
+\label{eq:release-contract}
+\end{equation}
+A rejected problem remains active for a later verifier check. A false-positive
+precheck invokes the two-marginal verifier unnecessarily; a false-negative
+precheck delays removal. We measure these effects by replaying the screened
+results and checking each with the verifier in \cref{sec:experiments}.
+
+For each passing problem, DrainSinkhorn writes the output and compacts every
+per-problem object: source and target descriptors, marginals, dual potentials,
+centered shifts, log weights, and scratch buffers. The next batched update sees
+only surviving problems. The logical-mask
+control uses the same update, preliminary check, two-marginal verifier,
+tolerance, and observed
+completion times. It freezes a passing problem's potentials but retains that
+problem in the batch tensor, so subsequent kernels still execute at the
+original width. Logical masking versus dynamic compaction therefore isolates
+the work removed by reducing the batch width.
+
+Equation~\eqref{eq:pack-commutes} and
+Equation~\eqref{eq:updated-marginal} define the ideal-arithmetic transformation.
+Fixed-work parity, achieved residuals, near-threshold stress tests, and
+application endpoints characterize its implementation behavior.
+
+\paragraph{Stopping-rule-preserving release.}
+A problem is removed only after passing the same two-marginal verifier used by
+the selected backend. The preliminary check using the current marginals decides
+only whether to invoke that check; it does not authorize removal. DrainSinkhorn
+therefore preserves the backend's configured release authority while changing
+how unfinished problems are
+scheduled and stored. The timed packed Triton path applies this rule in the precision
+supported by that backend. Independent FP64 replays serve as verification references
+for finite-precision decision behavior.
+
+\subsection{Execution modes and fallback}
+
+The implementation exposes three batch execution modes. Fixed-width batching
+updates every problem until a common final boundary. Logical masking records
+per-problem completion and
+freezes completed states without narrowing the kernel. Dynamic compaction
+removes passing problems. Width determines whether a batched kernel is
+efficient, and the numbers of iterations needed by the problems in the batched
+window determine how much width dynamic compaction can remove. Formal
+campaigns fix execution mode, width, check interval, and
+fallback before timing. Formal campaigns use fail-closed convergence handling:
+iteration-limit and non-finite-state events raise an error. The packed Triton
+implementation optionally hands a dynamic-compaction tail to the matched
+single-problem solver when survivor width falls below a preconfigured
+\texttt{min\_packed\_width}. The C66 and Packer19 formal configurations set this
+threshold to one.
+
+When a complete problem fits on one accelerator, different windows are sent to
+independent complete-device workers, giving each device an independent update
+path and avoiding per-update collectives. Row sharding remains a capacity path
+for a single oversized problem; the main scale-out path assigns complete
+problems to independent devices.

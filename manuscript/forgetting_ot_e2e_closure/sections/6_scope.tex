@@ -1,0 +1,37 @@
+\section{Operating Regime and Composition}
+\label{sec:scope}
+
+\policy{} applies to batched positive EOT problems with compatible batched
+representations and a two-marginal verifier. Different numbers of iterations
+within a batch create removable work; net acceleration depends on runtime as a
+function of batch width and on incremental control and state-movement costs
+(\cref{eq:active-gate}).
+
+Initialization shapes both the total iteration count and its variation within
+a window. The study that uses one initialization for multiple problems uses
+controlled overlapping ImageNet-32
+supports: dynamic-compaction execution reduces slots by 30.62\% and accelerates the
+steady-state critical path by $1.421\times$, including proposal and transfer
+costs. The feature-training study uses cold proposals for independently
+resampled OT-FM couplings.
+
+The executor schedules problems from completion under the configured stopping
+rule. The grouping intervention measures the effect of grouping a fixed problem
+multiset using offline oracle iteration numbers. The width-cost sweep separately
+measures how the backend converts each survivor width into update time. Together
+they instantiate the two terms in \cref{eq:time-difference}; predictive grouping
+can use the same quantities when estimates of completion depth are available.
+
+Dynamic compaction trades computation for state movement and buffers.
+The matched logical-mask/dynamic-compaction study reports 26.1 MiB of additional peak
+allocation alongside lower time and endpoint energy; \cref{tab:phase-costs}
+reports its phase costs. OTT-JAX and PyKeOps
+realize release through backend-specific rebucketing and batched
+independent-problem execution.
+
+The calibrated width-cost curve belongs to a specified device, kernel path,
+problem shape, and numerical configuration. The packed Triton path also
+switches narrow tails to its matched single-problem solver, so its complete
+cost curve includes that routing boundary. The accounting identities and
+\cref{eq:time-difference} apply to any measured cost curve; the observed A100
+wave locations apply to the reported Triton configuration.

@@ -1,0 +1,18 @@
+\begin{table}[t]
+\centering
+\caption{对同一固定真实任务 multiset 的 M3 分组干预。对于窗口内的离线逐循环迭代编号 $q_s$，$H_q=\operatorname{sd}(q_s)/\operatorname{mean}(q_s)$，padding 为 $W\max_s q_s/\sum_s q_s-1$。Dynamic slot 是动态压缩相对固定宽度的候选迭代槽位比。表中数值对窗口汇总；timing repeat 用于稳定每种条件，并非独立数据集。}
+\label{tab:m3-grouping}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+分组 & $H_q$ & Padding & Dynamic slot & 固定/动态 \\
+\midrule
+heterogeneous & 0.236 & 0.236 & 0.802 & 1.217$\times$ \\
+homogeneous & 0.127 & 0.110 & 0.892 & 1.105$\times$ \\
+random 1 & 0.254 & 0.293 & 0.776 & 1.258$\times$ \\
+random 2 & 0.264 & 0.270 & 0.789 & 1.235$\times$ \\
+random 3 & 0.260 & 0.279 & 0.764 & 1.271$\times$ \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,0 +1,30 @@
+{
+  "revision": "2026-09-05 evidence-scope revision",
+  "source_checkpoint": "1939b250b7d3379d6be411f22f948632e165c5bc",
+  "sources": {
+    "knowledge/documents/EXPERIMENT_DESIGN_RESULT_LEDGER_ZH.md": "496cedf7dfa609163a8f8f70ae4cd0ed786808d974b246672e7aaf9b6d1f584c",
+    "knowledge/audits/C35_WIDTH_SWEEP_POSTREVIEW_AUDIT_20260827.json": "b0cb3d73caf30fb87643ad8237f53457bdd978fe8c8e5a3dedc45e9f566cf1a8",
+    "studies/reports/C62_SEMANTIC_LATENT_OTFM_FOUR_ARM_RESULTS_20260827_ZH.md": "032da1b39ad52a849e50384d1017bab90b0757145b48b7adc747dea7f999e727",
+    "studies/reports/OTT_IMAGENET_RELAXED_PHASE_ACTIVE_RESULTS_20260825_ZH.md": "ed0f221c447cdd5e674185445c2e4f52b0aac5966608a01e186132a47bc4869c",
+    "studies/reports/IMAGENET32_INDEPENDENT_8GPU_FLASH_POLICY_GATE_20260824_ZH.md": "38535bc0a34343a6520929896d8172e08256bd197e6b6fe4dd69178376b9fe4c",
+    "knowledge/audits/C67_GLOBAL8_TWO_HOST_RESULT_20260828_ZH.md": "0b42693666f7eae635bf8ea5233a7a6744887fe8eaac5cf2a65f41da6f70b91a",
+    "knowledge/audits/C67_SUPPORT_SCALE_HOST2_RESULT_20260828_ZH.md": "2031a81a01c86b2afc8e37cbbf4c53e77373dd7e6fa8764b00ec81b2ba0c5147",
+    "knowledge/audits/C80_LM_TWO_HOST_FORMAL_RESULT_20260828_ZH.md": "5cb982f20e3c4f2f6c150724dd8d6478b0717f29117817f45b33c7414d7c859d"
+  },
+  "new_analysis": "figures/PAIRED_ATTRIBUTION.json",
+  "boundaries": [
+    "C35 is projected-carry width-one versus complete active packed, not static/active.",
+    "C33 is a controlled overlapping-support historical project-adapter study, not independent OT-FM training.",
+    "C55 matched phase sweep includes 0.995; ten repeats on one input are not independent workload samples.",
+    "C67 results retain fixed-per-worker/one-worker endpoint scope and failed calibration/consumer exclusions.",
+    "C80-LM phase medians are not a decomposition of EXP-PACKER19 timings.",
+    "No new server measurements, population CI, equivalence test, or predictive scheduler claimed.",
+    "M3 summary lacks locally source-bound absolute arm times/width trajectories for a new survival plot; no values reconstructed from ratios.",
+    "EXP-PACKER19 static-derived ratios are removed from the paper; no ordinary-batching rerun is planned."
+  ],
+  "novelty_boundary": {
+    "ordinary_batching": "prior capability in POT solve_batch and OTT-JAX vmap; existing sequential/fixed-width results are implementation context",
+    "two_marginal_check": "selected solver release rule, not a method contribution",
+    "paper_contribution": "physical active-batch compaction after the configured stopping rule"
+  }
+}

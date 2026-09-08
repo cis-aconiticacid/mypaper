@@ -1,0 +1,59 @@
+{
+  "source": "/home/xwen/gpu-results/c66_packer_postprocess_ece4b90_20260827T152415Z/C66_COMPANION_TELEMETRY.json",
+  "source_sha256": "efecc99dceff167b33bae88f2bd3555599c64590cf3eda6a6e215717999109bc",
+  "schema": "forgetot_c66_companion_telemetry_v1",
+  "status": "pass",
+  "workload": "packer19",
+  "workload_label": "Packer19",
+  "arms": {
+    "official": {
+      "label": "Official",
+      "endpoint_wall_seconds_p50": 45.199785213917494,
+      "gpu_energy_joules_p50": 11815.872500000001,
+      "mean_gpu_power_watts_p50": 261.250461287505,
+      "candidate_slots_p50": null
+    },
+    "ls": {
+      "label": "LS",
+      "endpoint_wall_seconds_p50": 4.515691827982664,
+      "gpu_energy_joules_p50": 1050.2514999999999,
+      "mean_gpu_power_watts_p50": 232.4335462201201,
+      "candidate_slots_p50": 256.0
+    },
+    "la": {
+      "label": "LA",
+      "endpoint_wall_seconds_p50": 3.5530047081410885,
+      "gpu_energy_joules_p50": 781.5854999999999,
+      "mean_gpu_power_watts_p50": 220.11442417418772,
+      "candidate_slots_p50": 156.0
+    },
+    "cs": {
+      "label": "CS",
+      "endpoint_wall_seconds_p50": 3.8966830614954233,
+      "gpu_energy_joules_p50": 923.922,
+      "mean_gpu_power_watts_p50": 237.61915344502296,
+      "candidate_slots_p50": 256.0
+    },
+    "ca": {
+      "label": "CA",
+      "endpoint_wall_seconds_p50": 3.1802343875169754,
+      "gpu_energy_joules_p50": 721.3589999999999,
+      "mean_gpu_power_watts_p50": 227.12200019078708,
+      "candidate_slots_p50": 156.0
+    }
+  },
+  "gaps": [
+    "official: candidate_slots unavailable (no observations).",
+    "official: active_width_trace unavailable (no observations).",
+    "official: production_release_depth unavailable (static arm exposes only a common release boundary; independent D_s profile is absent).",
+    "official: D_s unavailable (requires an independent full-width every-cycle first-passage profile sidecar); no D_s distribution plotted.",
+    "ls: active_width_trace unavailable (no observations).",
+    "ls: production_release_depth unavailable (static arm exposes only a common release boundary; independent D_s profile is absent).",
+    "ls: D_s unavailable (requires an independent full-width every-cycle first-passage profile sidecar); no D_s distribution plotted.",
+    "la: D_s unavailable (requires an independent full-width every-cycle first-passage profile sidecar); no D_s distribution plotted.",
+    "cs: active_width_trace unavailable (no observations).",
+    "cs: production_release_depth unavailable (static arm exposes only a common release boundary; independent D_s profile is absent).",
+    "cs: D_s unavailable (requires an independent full-width every-cycle first-passage profile sidecar); no D_s distribution plotted.",
+    "ca: D_s unavailable (requires an independent full-width every-cycle first-passage profile sidecar); no D_s distribution plotted."
+  ]
+}

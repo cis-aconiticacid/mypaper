@@ -1,0 +1,166 @@
+\section{Measurement Contracts and Additional Detail}
+
+\subsection{C63 seed provenance}
+The quality evaluation uses the same three paired training seeds,
+20260891, 20260892, and 20260893, throughout the reported NFE values.
+The full per-seed measurements and analysis artifacts are available in the
+public GitHub repository at
+\url{https://github.com/cis-aconiticacid/DrainSinkhorn}.
+
+\paragraph{Measurement levels.}
+E1 terminates at the measured coupling output or potentials after the
+two-marginal verifier passes. E2 includes
+the fixed downstream consumer. E3 includes training, generation, or task
+evaluation. C82, C66, and C80 record E2 endpoints, and C63 records an E3 training
+endpoint. The main-text C82 ratio uses its registered E2 endpoint directly.
+C66 and C80 subtract each unit's paired consumer time before ratio formation and
+bootstrap, while C63 uses the recorded solver field. EXP-PACKER19 records E1
+directly for every stopping-controller and execution-mode cell. The unchanged
+consumer or model time in E2/E3 dilutes the corresponding OT-stage gain.
+The C63 fixed-width/dynamic-compaction ratio reported as an internal training
+ablation is computed from the complete fixed-update E3 interval.
+
+\paragraph{GPU-energy interval.}
+GPU energy is the change in the A100 NVML cumulative total-energy counter from
+immediately before the registered method call to after the final CUDA
+synchronization. The counter reports millijoules and the analysis converts the
+difference to joules. This ready-arrays-to-consumer interval includes
+solver/proposal and consumer work and excludes compilation, warm-up, and the
+prepared-input transfer component. Unsupported counters are recorded as
+unavailable rather than replaced by a power-limit estimate.
+
+\paragraph{C82 matched fixed/dynamic control.}
+C82 runs fixed-width and dynamic-compaction paths on the same MetroPT-3 failure-3 input,
+cold proposal, regularization, tolerance, verifier-check schedule,
+two-marginal verifier, packed backend, and fixed consumer. The experimental
+variable is whether verifier-approved lanes are dynamically removed from later
+kernels. One host supplies four independent complete-device A100 workers, with
+no inter-worker collective or problem sharding. For each plan and timing repeat,
+the endpoint is the maximum ready-arrays-to-consumer time across the four
+workers. Each plan is summarized by the median of two timing repeats, and the
+reported $1.745535\times$ is the descriptive geometric mean of the three plan
+ratios. The plan identifiers freeze execution order and are not independent
+MetroPT samples. All 48 worker-level repeats converge; the maximum row and
+column $L_1$ residuals are $9.476650\times10^{-4}$ and
+$1.283915\times10^{-6}$. Both arms attain failure-window ROC AUC $1.0$ under
+the frozen consumer, whose labels are not used by the solver. The largest
+paired transport-cost and barycentric-shift differences are $0.02792263$ and
+$0.00346756$.
+
+\paragraph{C66 two-host matched control.}
+Within the matched C66 contrast, fixed-width and dynamic-compaction execution use the same inputs, cold proposal,
+regularization, tolerance, verifier-check schedule, two-marginal verifier,
+packed backend, and
+fixed consumer; stopping-rule-triggered release and dynamic compaction are the controlled
+difference. Three order-balanced plan seeds are reused across four GPU
+placements on each of two hosts. GPU placements and timing repeats stabilize end-to-end measurement;
+the registered endpoint ratio includes unchanged non-OT consumer time. The
+main-text C66 OT-stage ratio subtracts the paired consumer time within each
+host--plan unit. The host--plan combinations are paired timing units for this
+frozen workload; placements and repeats are timing replicas rather than
+independent MetroPT workloads. A reanalysis of the six valid host--plan units reports a
+stratified bootstrap interval.
+
+\paragraph{EXP-PACKER19 provenance.}
+The stopping--execution protocol has SHA-256
+\nolinkurl{c010bcf9b3e276c8269514324cc8ed4bc2fc5958c362c7b880e3946dee75075b}
+and is bound to source commit
+\nolinkurl{96de52b8ceff8fa3c0468bf45567e6b017483e73}. Two hosts, four
+A100-SXM4-80GB GPUs per host, three frozen method orders, and three timing
+repeats produce 768 formal cells. Each tolerance has 24 paired
+host--order--GPU units and an equal-host bootstrap interval. Consumer TV
+numerically checks differences in outputs.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/PACKER19_PARETO.pdf}
+\caption{Tolerance-dependent Packer19 OT speed--output frontier for the
+dynamic-compaction path. Each point is the median E1 OT-stage time over 24
+paired units at that residual tolerance; consumer TV is measured against the
+campaign's $10^{-6}$ tight reference.}
+\label{fig:packer-pareto}
+\end{figure}
+
+\paragraph{Execution-mode protocol.}
+The formal campaigns fix representation, width, execution mode, check interval,
+stopping tolerance, checking path, tail-handoff threshold, and fail-closed
+policy before timing. The width and grouping interventions map conditions for
+selecting fixed-width execution or dynamic compaction.
+
+\paragraph{Width-cost diagnostic provenance.}
+The primitive sweep uses one NVIDIA A100-SXM4-80GB with 108 SMs, driver
+535.129.03, PyTorch 2.5.1 with CUDA 12.4, Triton 3.1.0, and source commit
+\nolinkurl{73aec2941bfa1a5caa6a6bddf7aa83b734f9bb8b}. Each measured call to
+\texttt{shifted\_step} contains two packed Triton log-sum-exp kernels and excludes
+the marginal screen, two-marginal verifier, dynamic compaction, and outer
+\texttt{solve\_batch} loop. Widths are randomized within 30-repeat blocks after
+warm-up. The $n=1024$ sweep covers widths 1--8, 10, 12, and 16; the $n=4096$ and
+$n=16384$ sweeps cover 1, 2, 3, 4, 6, 8, 12, and 16. This diagnostic supplies
+the packed-update component of the measured width-cost curve in
+\cref{eq:time-difference}.
+
+\paragraph{Independent backend realizations.}
+The OTT-JAX and PyKeOps paths remove completed problems through their native
+backend mechanisms. OTT-JAX executes fixed 20-update phases, checks at phase
+boundaries, removes passing lanes, and rebuckets survivors; native
+\texttt{vmap} and a matched fixed-phase static path provide its controls. The
+PyKeOps paths use one
+batched independent-problem matrix-free operator, a fixed geometric
+verifier-check schedule, the two-marginal verifier, and removal of
+passing problem state.
+Sequential and static-padded PyKeOps paths use the same symbolic backend. The
+shared principle is per-problem release followed by dynamic removal; checking
+and packing mechanisms remain backend-specific. All cross-backend
+rows in \cref{tab:ot-cross-backend} report their achieved two-marginal residual.
+
+\subsection{Independent backend implementations}
+
+\input{figures/table9_cross_backend_results}
+
+\input{figures/table10_workload_configurations}
+
+\section{Deployment and Operating Boundaries}
+
+\paragraph{Complete-device execution and partitioning the matrix by rows.}
+When one problem fits on one accelerator, complete-device workers process
+different windows and require no Sinkhorn collective. Partitioning the matrix by rows supplies a
+capacity path for an oversized single problem. Complete-device execution is the
+throughput path used by C67. On one host, increasing from one to four workers
+yields $3.965$--$3.979\times$ fixed-per-worker throughput scaling on two
+held-out MetroPT routes. The two-host, eight-worker fixed-per-worker run reports
+endpoint comparisons at that worker count. We report the one-to-four and
+two-host eight-worker results as distinct scaling studies. Peak memory remains
+local to each worker.
+
+\subsection{Supplementary attribution and evidence boundaries}
+\input{figures/table2_absolute_ot_times}
+\input{figures/table3_attribution_map}
+\input{figures/table11_imagenet_solver_pairs}
+\input{figures/table12_packer19_phase_costs}
+
+C62 holds the packed Triton adapter, input and numerical contract fixed and changes
+dynamic compaction; its three fixed-width/dynamic-compaction ratios are $1.156$, $1.082$,
+and $1.079$. Fixed-width/dynamic-compaction slots are $64/52$, $64/56$, and $64/56$.
+The measurements cover coupling preparation.
+C55 uses one frozen ImageNet-32 input and ten timing repeats per tolerance;
+the phase size is chosen on a disjoint warmup bank. Its $0.995\times$ result
+at $10^{-2}$ is retained alongside the positive matched-phase results.
+
+C67's global eight-worker results aggregate the complete consumer endpoint
+at fixed work per worker. Fixed/dynamic seconds are $12.523/4.026$ on route 2
+and $7.999/3.705$ on route 3, with slots $4736/1276$ and $3008/1244$.
+The reported support-size speedups comprise the route-3 cells at $n=8192$ and
+$32768$ that pass the frozen gates on both hosts. Continuous transport-cost and
+barycentric-shift differences are diagnostics under the registered binary
+consumer endpoint.
+
+C33's non-cold result uses a constructed 90\%-overlap target stream over real
+ImageNet features. Its canonical reverse-order warm replay excludes
+compile, cache load and process startup, while retaining descriptor, transfer,
+anchor, proposal, correction and verification costs.
+M3's reported grouping ratios describe one fixed 32-problem multiset; oracle
+iteration numbers $q_t$ define the grouping intervention. The fixed multiset
+fixes $\sum_t q_t$, while grouping changes $\sum_w W q_{\max,w}$ across windows.
+The ratios report the resulting relative-runtime effect; absolute arm times
+under each grouping would separate movement of the fixed-width and dynamic-compaction paths.
+

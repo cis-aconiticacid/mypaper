@@ -1,0 +1,13 @@
+w,campaign,label_en,label_zh,workload,n,contrast,ratio,low,high,interval_type,timing_scope,source
+8,C63,C63 ImageNet solver,C63 ImageNet 求解器,ImageNet-32,1024,fixed/DC,1.053985,1.033062,1.071587,observed_range,solver field; 3 training seeds,manuscript/forgetting_ot_e2e_closure/support/figure_materials/C63_SOLVER_ATTRIBUTION.csv
+8,C62,C62 ImageNet coupling,C62 ImageNet coupling,ImageNet-32,1024,fixed/DC,1.104925,1.078777,1.156041,observed_range,coupling preparation; 3 problem-plan seeds,studies/campaigns/C62_semantic_latent_OTFM_four_arm/manifest.json
+8,C80-LM,C80-LM Packer OT,C80-LM Packer OT,Packer19,16384,LM/DC,1.539660,1.538936,1.540371,ci95,consumer-subtracted OT stage; 24 paired units,knowledge/audits/DRAINSINKHORN_ACCURACY_CONTRACT_AND_SPEEDUP_AUDIT_20260828_ZH.md
+8,EXP-P19,EXP-P19 Packer tau=1e-3,EXP-P19 Packer tau=1e-3,Packer19,16384,LM/DC,1.571264,1.570087,1.572571,ci95,direct OT stage; 24 paired units,manuscript/forgetting_ot_e2e_closure/support/figure_materials/PACKER19_STOPPING_METRICS.csv
+8,C67-F3,C67 Metro F3 (8 workers),C67 Metro F3（8 workers）,MetroPT-3,16384,fixed/DC,2.158711,,,none,eight-worker complete endpoint; fixed per worker,knowledge/audits/C67_GLOBAL8_TWO_HOST_RESULT_20260828_ZH.md
+8,C67-F2,C67 Metro F2 (8 workers),C67 Metro F2（8 workers）,MetroPT-3,16384,fixed/DC,3.110343,,,none,eight-worker complete endpoint; fixed per worker,knowledge/audits/C67_GLOBAL8_TWO_HOST_RESULT_20260828_ZH.md
+16,C33,C33 ImageNet warm stream,C33 ImageNet warm stream,ImageNet-32,4096,fixed/DC,1.420656,,,none,complete-device steady-state critical path; 40 windows,studies/campaigns/C33_ImageNet32_independent_8GPU_Flash_policy_gate/manifest.json
+16,C55,C55 OTT ImageNet tau=1e-3,C55 OTT ImageNet tau=1e-3,ImageNet-32,4096,fixed/DC,1.581000,,,none,matched 20-update phases; 10 repeats,studies/campaigns/C55_OTTJAX_ImageNet32_relaxed_phase_active/manifest.json
+16,C67-32k,C67 Metro n=32k,C67 Metro n=32k,MetroPT-3,32768,fixed/DC,1.615637,,,none,one-worker endpoint; equal-host geometric mean,studies/campaigns/C67_MetroPT3_fully_matched_scaling/manifest.json
+16,C66,C66 Metro E2,C66 Metro E2,MetroPT-3,16384,fixed/DC,1.744723,1.743410,1.746706,ci95,two-host ready-arrays-to-consumer endpoint,studies/campaigns/C66_release_fair_Flash_generation_matrix/manifest.json
+16,C82,C82 Metro E2,C82 Metro E2,MetroPT-3,16384,fixed/DC,1.745535,1.745273,1.745975,observed_range,four-worker makespan; 3 registered plans,studies/campaigns/C82_MetroPT3_static_active_corrected/analysis.json
+16,C67-8k,C67 Metro n=8k,C67 Metro n=8k,MetroPT-3,8192,fixed/DC,2.315976,,,none,one-worker endpoint; equal-host geometric mean,studies/campaigns/C67_MetroPT3_fully_matched_scaling/manifest.json

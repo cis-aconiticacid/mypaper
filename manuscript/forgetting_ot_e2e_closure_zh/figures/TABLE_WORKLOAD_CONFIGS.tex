@@ -1,0 +1,18 @@
+\begin{table}[t]
+\centering
+\caption{主要正式 workload 配置。各行均使用冷启动，以及检查当前两侧边缘残差的验证器。}
+\label{tab:workload-configs}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}p{.16\columnwidth}p{.76\columnwidth}@{}}
+\toprule
+实验 & 端点、数值配置与统计单元 \\
+\midrule
+C82 & MetroPT-3 预测性维护 (E2)；$(n,W,\varepsilon)=(16{,}384,16,.1)$；检查间隔 4；$\tau=10^{-3}$；一台主机、四个完整设备 worker、三个顺序 plan、两次计时重复。 \\
+C66 & MetroPT-3 预测性维护 (E2)；$(n,W,\varepsilon)=(16{,}384,16,.1)$；检查间隔 4；$\tau=10^{-3}$；两台主机、三个 plan。 \\
+C80/LM & Packer19 scRNA 转移 (E2)；$(16{,}384,8,.1)$；检查间隔 4；$\tau=10^{-3}$；24 个配对单元。 \\
+EXP-P19 & Packer19 同控制器 Pareto (E1)；$(16{,}384,8,.1)$；检查间隔 4；$\tau=10^{-4}\text{--}10^{-2}$；每个容差 24 个配对单元。 \\
+C63 & ImageNet-32 PCA500 OT-FM (E3)；$(1{,}024,8,.03)$；检查间隔 4；$\tau=10^{-3}$；三个配对 seed。 \\
+\bottomrule
+\end{tabular}
+\end{table}

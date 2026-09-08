@@ -1,0 +1,27 @@
+\begin{table}[t]
+\centering
+\caption{Measured mapping from the public Flash native potential-change
+threshold to the achieved maximum of the row and column residuals,
+consumer-output deviation, and E1 OT
+time on Packer19. The native threshold is not a marginal-residual tolerance.
+For thresholds at most $3\times10^{-4}$, some lanes reach the registered
+iteration cap; those rows are plateau replay measurements rather than evidence
+that every lane triggered the native stopping rule.}
+\label{tab:packer-native-stopping}
+\scriptsize
+\setlength{\tabcolsep}{2.8pt}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{}rrrr@{}}
+\toprule
+Native threshold & Actual residual & Max consumer TV & E1 time (s) \\
+\midrule
+$10^{-2}$ & $9.01\times10^{-4}$ & $8.83\times10^{-4}$ & 6.812 \\
+$3\times10^{-3}$ & $1.93\times10^{-4}$ & $1.91\times10^{-4}$ & 11.403 \\
+$10^{-3}$ & $1.11\times10^{-5}$ & $2.08\times10^{-6}$ & 20.607 \\
+$3\times10^{-4}$ & $1.18\times10^{-6}$ & $4.96\times10^{-7}$ & 40.625 \\
+$10^{-4}$ & $1.18\times10^{-6}$ & $4.96\times10^{-7}$ & 43.251 \\
+$10^{-5}$ & $1.18\times10^{-6}$ & $4.96\times10^{-7}$ & 46.285 \\
+$10^{-6}$ & $1.18\times10^{-6}$ & $4.96\times10^{-7}$ & 46.281 \\
+\bottomrule
+\end{tabular}}
+\end{table}
