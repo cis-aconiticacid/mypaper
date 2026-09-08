@@ -92,7 +92,7 @@ dynamic-compaction execution.
 The MetroPT-3 scale-out study extends the same complete-device design to eight
 independent workers on two hosts. Its two fixed-per-worker endpoint cells give
 $3.110\times$ and $2.159\times$ matched fixed-width/dynamic-compaction
-speedups while reducing slots as shown in \cref{tab:c67-global8}. Separate
+speedups while reducing slots as shown in \cref{tab:metropt-eight-worker}. Separate
 one-worker support-size cells that pass the frozen gates on both hosts give
 $2.316\times$ at $n=8192$ and $1.616\times$ at $n=32768$.
 
@@ -101,7 +101,7 @@ $2.316\times$ at $n=8192$ and $1.616\times$ at $n=32768$.
 In the ImageNet-32 training study, each step uses a real PCA500 feature coupling.
 Table~\ref{tab:absolute-ot-times} reports the four solver-phase times. Paired
 solver-field fixed-width/dynamic-compaction is $1.054\times$ (observed seed range
-$1.033$--$1.072\times$; \cref{tab:c63-solver-pairs}). On the complete fixed-update
+$1.033$--$1.072\times$; \cref{tab:imagenet-solver-pairs}). On the complete fixed-update
 training interval, fixed-width/dynamic-compaction is
 \CFeatureTrainingActiveOverStatic{} (range
 \CFeatureTrainingActiveOverStaticRange{}). A separate ImageNet-32 diagnostic
@@ -185,13 +185,13 @@ all eight problems first pass at update 8, so there is no removable padding
 and LM/DC is neutral at \CPackerNeutralCompaction{} (95\% CI
 \CPackerNeutralCompactionCI{}). These contrasts characterize Packer19's
 complete and logical-mask paths; phase costs are reported separately in
-\cref{tab:c80-attribution,tab:phase-costs}.
+\cref{tab:packer19-components,tab:phase-costs}.
 
 The single-variable tests use the same Packer19 transition workload on two
 hosts, each with four A100-SXM4-80GB GPUs. Three frozen method orders produce
 24 paired host--order--GPU units. Each unit uses warmup-excluded repeat medians,
 the same input, packed-kernel source tree, $10^{-3}$ stopping tolerance, and
-transition consumer. As shown in Table~\ref{tab:c80-attribution}, each row
+transition consumer. As shown in Table~\ref{tab:packer19-components}, each row
 changes one execution component under this shared measurement boundary.
 
 \input{figures/table5_packer19_attribution.tex}
@@ -227,7 +227,7 @@ define the grouping, while verifier-derived iteration numbers $n_t$ measure
 executed work. Oracle homogeneous grouping minimizes variation in the required
 iteration numbers within each window. Heterogeneous and random groupings
 increase the area between the static rectangle and the survival curve defined
-by $n_t$. As shown in Table~\ref{tab:m3-grouping}, the matched
+by $n_t$. As shown in Table~\ref{tab:metropt-grouping}, the matched
 fixed-width/dynamic-compaction ratio grows from
 \CMThreeHomogeneousRetirementSpeedup{} to
 \CMThreeHeterogeneousRetirementSpeedup{} and 1.235--1.271$\times$ on random
@@ -254,4 +254,4 @@ endpoint passes its registered output or quality check. The MetroPT-3 scale-out
 study assigns complete windows to independent GPU workers. Four workers achieve
 3.965--3.979$\times$ fixed-per-worker throughput scaling on held-out MetroPT
 routes, with no Sinkhorn collective between workers; the eight-worker matched
-endpoint decomposition appears in \cref{tab:c67-global8}.
+endpoint decomposition appears in \cref{tab:metropt-eight-worker}.
