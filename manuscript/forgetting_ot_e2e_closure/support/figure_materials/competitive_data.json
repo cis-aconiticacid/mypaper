@@ -15,7 +15,9 @@
     "studies/local_results/FLASH_COMPACTION_SCHEDULER_METROPT3_20260908_A100/raw_results.json": "5f548107ba6481bd89d35ef2200a990b15f020036604588244a65e50bde942f8",
     "studies/campaigns/EXP_KeOps_Check_Interval_20260908/analysis/summary.json": "ff28010321a388d856515119e17a253bd733a94fd8413f9f1cf14fd00dd6ed68",
     "studies/raw_results/server_runs/20260808_p4_finite_precision_8gpu_multinode/analysis.json": "14c466ff64dedd2c0b8959506bf846a16fd5d69cd068e6bd78e209088f887485",
-    "studies/campaigns/C63_semantic_latent_OTFM_feature_training/analysis.json": "c94e2e4d6c140e0b7eda1c6a460c196871b152ea0daf8e36e294448d249ba085"
+    "studies/campaigns/C63_semantic_latent_OTFM_feature_training/analysis.json": "c94e2e4d6c140e0b7eda1c6a460c196871b152ea0daf8e36e294448d249ba085",
+    "studies/campaigns/C82_MetroPT3_static_active_corrected/analysis.json": "deec4228a56a40b533a4d72f833694d2dc0a68fb593a04885cc2fddfd8ecbb54",
+    "archive/inspections/C80_LM_20260828/analysis_extracted/c80_lm_analysis_793c08c_20260828T1825Z/absolute_metrics.csv": "559b504dc6f65576c0e494ea7b7531f877b9ae0d3f90912db4e6377ec7329d95"
   },
   "cells": [
     {
@@ -1247,6 +1249,28 @@
       "steps": 50000
     }
   ],
+  "endpoint_times_seconds": {
+    "metro_pipeline": {
+      "baseline": 14.946086171890096,
+      "dc": 8.562468523173553
+    },
+    "packer_solver": {
+      "baseline": 2.0309400456026196,
+      "dc": 1.319566486403346
+    },
+    "packer_pipeline": {
+      "baseline": 3.886587589047849,
+      "dc": 3.176219846121967
+    },
+    "imagenet_solver": {
+      "baseline": 122.14396172855886,
+      "dc": 115.88776293909437
+    },
+    "imagenet_training": {
+      "baseline": 188.360928905154,
+      "dc": 181.89265881186486
+    }
+  },
   "guarded_stress": {
     "aggregate": {
       "guard_attack_cases": 16,

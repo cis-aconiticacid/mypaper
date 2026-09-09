@@ -8,12 +8,25 @@ The primary MetroPT-3 endpoint is the maximum pipeline time across four independ
 
 The two-host MetroPT-3 comparison uses three order-balanced plans on each host, with four GPU placements per host. Its six host/plan combinations are paired timing units for a fixed workload; placements and repeats stabilize timing. The $E_2$ ratio is $1.74\times$, with a stratified bootstrap interval of $[74.3,74.7]\%$ for the relative timing ratio increase, $100(S-1)$. Subtracting each unit's paired consumer time gives the $E_1$ ratio \CMetroRetirementOTSpeedup{}. The primary four-worker and two-host comparisons use their own endpoints and observations.
 
-Ratios are displayed to three significant digits. For narrow timing intervals, we report $100(S-1)$ in percent to retain their resolution: the Packer19 component intervals are $[53.9,54.0]\%$ for $E_1$ and $[22.4,22.5]\%$ for $E_2$. The logical-mask comparison has interval $[-0.019,0.033]\%$; the simultaneous-completion stopping case has interval $[-0.134,0.0320]\%$. These bootstrap intervals describe timing variation for the fixed inputs and host/order/GPU units. Across-seed training variation is reported separately as sample standard deviation.
+For narrow timing intervals, we report $100(S-1)$ in percent: the Packer19 component intervals are $[53.9,54.0]\%$ for $E_1$ and $[22.4,22.5]\%$ for $E_2$. The logical-mask comparison has interval $[-0.019,0.033]\%$; the simultaneous-completion stopping case has interval $[-0.134,0.032]\%$. These bootstrap intervals describe timing variation for the fixed inputs and host/order/GPU units. Across-seed training variation is reported separately as sample standard deviation.
 
 GPU energy is the change in the A100 NVML cumulative energy counter between the start of the method call and the final CUDA synchronization. The counter reports millijoules, converted to joules. This interval starts with prepared arrays and includes solver, initialization, and consumer work; compilation, warm-up, and prepared-input transfer occur before it. Unsupported counters are recorded as unavailable.
 
 \subsection{Training and output measurements}
 \label{sec:training-output-details}
+
+\paragraph{Trajectory and distribution metrics.}
+For $N=1024$ generated samples, Euler integration uses $z_{i,k+1}=z_{i,k}+v_\theta(z_{i,k},k/K)/K$, with $K\in\{4,8,16\}$ function evaluations. The reported Curvature is the discrete velocity-change statistic
+\[
+\frac{1}{N(K-1)}\sum_{i=1}^{N}\sum_{k=1}^{K-1}
+\left\|v_\theta(z_{i,k},k/K)-v_\theta(z_{i,k-1},(k-1)/K)\right\|_2.
+\]
+It averages over samples and consecutive steps without dividing by the time increment, so its scale depends on $K$.
+Projected Fr\'echet uses a common Gaussian matrix $P\in\mathbb R^{500\times64}$ with entries $\mathcal N(0,1/500)$. For 1024 generated endpoints and 1024 draws with replacement from the evaluation feature rows, let $\mu_g,\mu_r$ and $s_g,s_r$ denote projected coordinate means and sample standard deviations. The reported diagonal statistic is $\|\mu_g-\mu_r\|_2^2+\|s_g-s_r\|_2^2$. Projection randomness is seeded identically for compared methods. FM MSE averages squared velocity error over coordinates and held-out coupling pairs at uniformly sampled interpolation times.
+
+\paragraph{Input construction.}
+The ImageNet-32 cache-building pipeline starts from flattened RGB pixels mapped to $[-1,1]$. It centers a deterministic prefix of its training cache, fits 500 components with randomized PCA, and rescales projected features by a single training-cache RMS. The later feature-row split preserves this fitted representation. The build and split procedures are \texttt{studies/code/prepare\_imagenet32\_pca\_cache.py} and \texttt{studies/code/split\_frozen\_feature\_cache.py}.
+The primary MetroPT-3 input has 15 sensor channels and a common source containing the first 16384 observations; target windows are centered around the published June 2020 failure episode. The preparation code standardizes analogue channels from the pre-March calibration segment and preserves digital channels. The Packer19 component input uses eight adjacent pairs from the first nine supports of a temporally ordered cell sequence, each with 16384 cells and a 4096-cell stride. Thus adjacent supports overlap by 75\%. Its preprocessing uses library-size normalization, log1p, variable-gene selection, a 64-dimensional truncated SVD, and coordinate standardization. Preparation is implemented in \texttt{studies/code/prepare\_metropt3\_pdm.py} and \texttt{studies/code/prepare\_packer19\_temporal\_eot.py}.
 
 For MetroPT-3 and Packer19, the cost scale is the median over pairwise squared distances between the first 2048 points of each support in the first source--target pair, or all points for smaller supports. ImageNet-32 uses the first 512 points per support in the first pair of its pre-training calibration batch. Distances for these scale estimates are computed in FP64. The resulting scale is shared by the compared methods within a run.
 
@@ -25,18 +38,18 @@ ImageNet-32 uses paired seeds 20260891, 20260892, and 20260893 throughout traini
 
 For the same three seeds, complete fixed-width training takes 190, 192, and 184 s, versus 184, 184, and 179 s with compaction. Paired savings computed before rounding are 6.20, 7.91, and 5.33 s. Each run makes 6250 training-window solve calls at width eight, producing 50,000 couplings for 50,000 optimizer updates. Each coupling supplies one update with 256 sampled pairs; a new batch of eight couplings precedes the next eight updates. These counts exclude warm-up and evaluation solves.
 
-All 48 worker-level primary MetroPT-3 repeats converge. The solver receives sensor inputs without failure labels. Maximum paired differences in transport cost and barycentric shift are $0.0279$ and $0.00347$ under the fixed failure-window consumer.
+All 48 worker-level primary MetroPT-3 repeats converge. The solver receives sensor inputs without failure labels. Maximum paired differences in transport cost and barycentric shift are $2.79\times10^{-2}$ and $3.47\times10^{-3}$ under the fixed failure-window consumer.
 
 The Packer19 tolerance study uses two hosts, four GPUs per host, three method orders, and three timing repeats. Each tolerance has 24 paired observations indexed by host, order, and GPU, with an equal-host bootstrap interval. Consumer TV compares outputs to the $10^{-6}$ reference. Absolute OT-stage medians at $10^{-3}$ are 2.04 s for logical masking and 1.30 s for compaction in this stopping study. The component study's phase medians in \cref{tab:phase-costs} are summarized independently and belong to its own LM/DC comparison.
 
 \input{figures/FIG-phases.tex}
 
-In \cref{tab:phase-costs}, ``Batched verification'' is the batched marginal audit, implemented as the row-only screen in these two arms. ``Verifier'' is the separate upstream two-marginal plan-apply check on selected candidates. ``Correction'' covers Sinkhorn updates, and the last column records state freezing or physical selection. Each column is summarized independently; their medians are not substituted for the paired whole-path timing ratio.
+In \cref{tab:phase-costs}, the row screen selects candidates for the separate upstream two-marginal verifier. The last column records state freezing or physical selection. Each column is summarized independently; paired whole-path timings determine the total-time ratio.
 
 \subsection{Width measurements and backend settings}
 \label{sec:backend-details}
 
-The width sweep uses an A100-SXM4-80GB with 108 SMs, driver 535.129.03, PyTorch 2.5.1 with CUDA 12.4, and Triton 3.1.0. Each primitive call contains two packed LogSumExp update kernels. Widths are randomized within 30-repeat blocks after warm-up. The $n=1024$ sweep covers widths 1--8, 10, 12, and 16; the other sizes cover 1, 2, 3, 4, 6, 8, 12, and 16. The synthetic inputs use feature dimension 500, column tile 64, and cost scale 1. The earlier MetroPT-3 component calibration uses dimension 15, column tile 128, and cost scale 0.0341; the Packer19 component application uses dimension 64. Thus the synthetic primitive time and the Packer19 correction time refer to different cost computations. The application reconstruction below calibrates its own complete kernel configuration.
+The width sweep uses an A100-SXM4-80GB with 108 SMs, driver 535.129.03, PyTorch 2.5.1 with CUDA 12.4, and Triton 3.1.0. Each primitive call contains two packed LogSumExp update kernels. Widths are randomized within 30-repeat blocks after warm-up. The $n=1024$ sweep covers widths 1--8, 10, 12, and 16; the other sizes cover 1, 2, 3, 4, 6, 8, 12, and 16. The synthetic inputs use feature dimension 500, column tile 64, and cost scale 1. The earlier MetroPT-3 component calibration uses dimension 15, column tile 128, and cost scale $3.41\times10^{-2}$; the Packer19 component application uses dimension 64. Thus the synthetic primitive time and the Packer19 correction time refer to different cost computations. The application reconstruction below calibrates its own complete kernel configuration.
 
 OTT-JAX verifies at phase boundaries and rebuckets unfinished problems. The tolerance sweep uses one fixed ImageNet-32 input, ten timing repeats per tolerance, and phase sizes selected on disjoint warm-up inputs: 20 updates at $10^{-3}$ and 10 updates at the other reported tolerances. Timings cover device-resident execution; loading, transfer, compilation, and the common post-run audit occur outside this interval. An earlier six-repeat study gives \COTTNativeActiveSpeedup{} relative to native vectorized execution and \COTTStaticActiveSpeedup{} relative to its matched fixed-phase baseline.
 
@@ -76,10 +89,27 @@ An independent test covers 84 near-threshold problems and 16 runtime stress case
 
 The guard is conservative: it releases three of the 21 near-threshold candidates at each GPU count, whereas FP64 replay accepts 11, 9, 12, and 11. Supported bounds above tolerance remain rejected. Thus zero false accepts measures guarded release safety, while accepted-set agreement is a different property. This stress configuration is separate from the timed application paths and the post-run MetroPT-3 output replay.
 
+\paragraph{Outward-bound calculation.}
+The certificate treats stored nonnegative $K,a,b$ and positive scalings $u,v$ as its numerical inputs. Each rank $p$ holds $n_p$ rows. Let $\widehat r_p=\operatorname{fl}(u_p\odot K_pv)$, $\widehat c_p=\operatorname{fl}(v\odot K_p^Tu_p)$ and $\widehat c$ be their FP32 column all-reduce over $P$ ranks. With machine epsilon $e$, define
+\[
+\gamma_k(e)=\frac{ke}{1-ke},\qquad
+\eta_k(e)=\max\!\left\{\frac{1}{(1-\gamma_k)(1-e)}-1,\;1-\frac{1}{(1+\gamma_k)(1+e)}\right\}.
+\]
+Here $\gamma_k=\gamma_k(e)$ inside $\eta_k$. Let $S(x)$ upper-bound the sum of stored nonnegative entries and $L(x,y)$ upper-bound their stored $L_1$ difference. The implementation accumulates these quantities in FP64, inflates a sum by $1/(1-\gamma_{N-1}(e_{64}))$ and an $N$-entry difference by $1/(1-\gamma_N(e_{64}))$, then rounds upward. Its residual bounds are
+\[
+\begin{aligned}
+B_r&=\sum_p^{\uparrow}\left[L(\widehat r_p,a_p)+\eta_m(e_{32})S(\widehat r_p)\right],\\
+B_c&=L(\widehat c,b)+\sum_p^{\uparrow}\eta_{n_p}(e_{32})S(\widehat c_p)
++\frac{\gamma_{P-1}(e_{32})}{1-\gamma_{P-1}(e_{32})}S(\widehat c),\qquad
+B=\max(B_r,B_c).
+\end{aligned}
+\]
+Upward sums include FP64 reduction inflation and final rounding toward $+\infty$. These bounds follow by bounding each dot-product/scaling error relative to its stored output and applying the triangle inequality; the last term covers the column all-reduce. The arithmetic assumptions are round-to-nearest operations with the stated dot/reduction error bounds, nonnegative sums, positive bound denominators, and normal finite arithmetic throughout. The runtime rejects detected non-finite values, subnormal inputs or outputs, nonpositive denominators, and TF32 use. The bound concerns the stored plan; the separate FP64 replay recomputes its row scaling. The implementation is \texttt{outward\_current\_certificate} in \texttt{studies/code/run\_p4\_finite\_precision\_gate.py}, with scalar-bound helpers in \texttt{studies/code/ot\_distributed\_certificate\_benchmark.py}.
+
 \subsection{Competitive execution and calibration settings}
 \label{sec:competitive-settings}
 
-The MetroPT-3 competitive controls use $n=16384$, feature dimension 15, and $\varepsilon=0.1$ on one A100-SXM4-80GB. All compared paths use FP32, disabled TF32, exp2, tiles $(64,64,16)$, four warps, and two stages. The common cost scale is 0.02822732106894366, fixed from the shared source and first target. Each method checks every four cycles at $9.5\times10^{-4}$ and uses packed updates down to width one. Continuous $E_1$ timing starts from ready GPU arrays and includes initialization, updates, screening, verification, output capture, control, and final synchronization. FP64 replay and file output follow the timing runs. Separately recorded consumer time is an adjacent measurement.
+The MetroPT-3 competitive controls use $n=16384$, feature dimension 15, and $\varepsilon=0.1$ on one A100-SXM4-80GB. All compared paths use FP32, disabled TF32, exp2, tiles $(64,64,16)$, four warps, and two stages. The common cost scale is approximately $2.823\times10^{-2}$, fixed from the shared source and first target. Each method checks every four cycles at $9.5\times10^{-4}$ and uses packed updates down to width one. Continuous $E_1$ timing starts from ready GPU arrays and includes initialization, updates, screening, verification, output capture, control, and final synchronization. FP64 replay and file output follow the timing runs. Separately recorded consumer time is an adjacent measurement.
 
 The four width-four groups contain target indices 0--3, 4--7, 8--11, and 12--15 from the existing failure-window input; the width-eight group contains indices 0--7. Their completion iterations are respectively $(356,312,320,272)$, $(140,32,32,32)$, $(28,32,100,172)$, and $(288,336,328,348)$. They share one source, and distinct target indices can contain overlapping sensor observations. Method order supplies timing repetitions for these fixed batches.
 
@@ -94,5 +124,7 @@ The earlier width-16 scheduling experiment uses the same prepared source and tar
 \input{figures/FIG-execution-settings.tex}
 
 \subsection{Reproducibility}
+
+\input{figures/FIG-backend-history.tex}
 
 The experiment artifacts record input and source identities, software and GPU environments, commands, timings, and output checks. Source code is hosted at \url{https://github.com/cis-aconiticacid/DrainSinkhorn}. Source-linked numerical summaries, figure sources, and reanalysis scripts accompany the manuscript.

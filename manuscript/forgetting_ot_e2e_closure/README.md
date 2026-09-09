@@ -4,7 +4,7 @@
 
 ## 章节导航
 
-当前标题为 DrainSinkhorn: Completion-Aware Execution for Batched Entropic Optimal Transport。最新审稿增量：澄清 Packer19 两臂均不复用 buffer；新增同校准线性成本模型消融；补全训练绝对时间与 coupling 频率；细微排序与旧调度数值移入附录。复现仍用 competitive_reanalysis.py；完整精度结果在 competitive_data.json 的 linear_model_comparison/training_times。已处理项、新增项与未闭合证据见 review disposition 顶部 Latest review。
+当前标题为 DrainSinkhorn: Completion-Aware Execution for Batched Entropic Optimal Transport。最新审稿增量：A.2 补指标公式与输入构造；Table 2 补同 campaign 的绝对时间；Table 5 明列消融两端；Table 9 区分 row screen 与 verifier；A.6 补 guard 上界及假设；历史 PyKeOps 配置移入 Table 12。Table 7 与 Section 5.7 同在第 10 页。已完成 anti-defensive-writing 审计；必要的统计与精度边界保留。完整精度结果在 competitive_data.json 的 endpoint_times_seconds/linear_model_comparison/training_times。处理状态见 review disposition 顶部 Latest review。
 
 1. [Introduction](sections/1_introduction.tex)：问题、关键观察与三项贡献。
 2. [Background and Motivation](sections/2_setting_related.tex)：EOT、实测完成项开销与相关系统；明确 logical mask 等是本文在 OT 后端中构建的实验对照，相关文献提供执行思想而非外部 OT 基线。
@@ -26,8 +26,8 @@
 | Figure 3 | [FIG-stopping.pdf](figures/FIG-stopping.pdf)：容差、speedup 与输出误差 |
 | Figure 4 / Appendix A.5 | [FIG-scaling.pdf](figures/FIG-scaling.pdf)：已有 W=1/2/4/8/16 的 padding 与完整配置时间比 |
 | Table 1 | [FIG-setup.tex](figures/FIG-setup.tex) |
-| Table 2 | [FIG-endpoints.tex](figures/FIG-endpoints.tex)：E1/E2/E3，包含同组 Packer19 的 solver 与 pipeline 结果 |
-| Table 3 | [FIG-backends.tex](figures/FIG-backends.tex)：OTT 同阶段／native 对照及 PyKeOps 完整配置比较 |
+| Table 2 | [FIG-endpoints.tex](figures/FIG-endpoints.tex)：E1/E2/E3，同组比值与绝对时间；聚合方式见 caption |
+| Table 3 | [FIG-backends.tex](figures/FIG-backends.tex)：OTT 同阶段／native 对照及 PyKeOps 每更新检查的匹配比较 |
 | Table 4 | [FIG-quality.tex](figures/FIG-quality.tex)：三 seed 的 mean ± sample SD |
 | Table 5 / Section 5.4 | [FIG-components.tex](figures/FIG-components.tex) |
 | Table 6 / Section 5.5 | [FIG-grouping.tex](figures/FIG-grouping.tex) |
@@ -36,6 +36,7 @@
 | Table 9 | [FIG-phases.tex](figures/FIG-phases.tex) |
 | Table 10 | [FIG-additional.tex](figures/FIG-additional.tex) |
 | Table 11 | [FIG-execution-settings.tex](figures/FIG-execution-settings.tex)：主要 Triton 对照的 buffer 策略、共同精度/初始化/检查/tail 设置和计时端点 |
+| Table 12 | [FIG-backend-history.tex](figures/FIG-backend-history.tex)：历史 PyKeOps 完整配置，保留静态批处理快于压缩的结果 |
 
 图表来源、设计与检查记录见 [visual review](support/audits/VISUAL_REVIEW.md)；可复现图形脚本见 [render_figures.py](support/figure_materials/render_figures.py)。其他原始图表数据与历史支持材料在 support/figure_materials/，不是论文真源。
 

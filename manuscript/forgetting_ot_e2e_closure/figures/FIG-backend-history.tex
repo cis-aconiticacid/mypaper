@@ -1,0 +1,16 @@
+\begin{table}[!htbp]
+\centering
+\caption{Earlier PyKeOps complete configurations on ImageNet-32, $n=16384,W=4$. Speedups are sequential/configuration ratios, summarized as the mean and range across three inputs. Static and logical-mask execution check every update; compaction uses the displayed interval.}
+\label{tab:backend-history}
+\small
+\begin{tabular}{@{}llll@{}}
+\toprule
+Configuration & Mean speedup & Seed range & Max. marginal $L_1$ \\
+\midrule
+Static batch & $1.55$ & $1.45$--$1.69$ & $8.80\times10^{-4}$ \\
+Logical mask & $1.55$ & $1.45$--$1.69$ & $8.93\times10^{-4}$ \\
+Compaction, check every 2 updates & $1.51$ & $1.43$--$1.59$ & $8.93\times10^{-4}$ \\
+Compaction, check every 4 updates & $1.42$ & $1.36$--$1.45$ & $8.93\times10^{-4}$ \\
+\bottomrule
+\end{tabular}
+\end{table}

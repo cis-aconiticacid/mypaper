@@ -1,18 +1,18 @@
 \begin{table}[!t]
 \centering
-\caption{Single-variable Packer19 component comparisons at $\tau=10^{-3}$. Ratios use OT-stage time after paired consumer subtraction. All four comparisons use 24 paired observations. The first two contrasts report paired wins; bootstrap intervals for the final two are detailed in Appendix~\ref{sec:timing-uncertainty}.}
+\caption{Packer19 component comparisons at $\tau=10^{-3}$: baseline/changed OT-stage time after paired consumer subtraction, using 24 paired observations. Every arm checks at four-cycle intervals and retains the upstream two-marginal release verifier. The first two rows change the preliminary audit at fixed width; each wins in all 24 pairs. Intervals for the final two appear in Appendix~\ref{sec:timing-uncertainty}.}
 \label{tab:packer19-components}
 \footnotesize
 \setlength{\tabcolsep}{4pt}
 \renewcommand{\arraystretch}{1.15}
-\begin{tabular}{@{}lrl@{}}
+\begin{tabular}{@{}p{0.34\columnwidth}p{0.39\columnwidth}r@{}}
 \toprule
-Change & Ratio & Evidence \\
+Baseline & Changed configuration & Time ratio \\
 \midrule
-Batched verification & $1.13$ & 24/24 faster \\
-One-marginal screen & $1.11$ & 24/24 faster \\
-Logical mask & $1.00$ & CI includes 1 \\
-Physical compaction & $1.54$ & CI above 1 \\
+Fixed width, per-lane two-marginal audit & Fixed width, batched two-marginal audit & $1.13$ \\
+Fixed width, batched two-marginal audit & Fixed width, row screen & $1.11$ \\
+Fixed width, row screen & Full-width logical mask, row screen & $1.00$ \\
+Full-width logical mask, row screen & Physical compaction, row screen & $1.54$ \\
 \bottomrule
 \end{tabular}
 \end{table}

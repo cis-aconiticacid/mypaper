@@ -1,6 +1,6 @@
 \begin{table*}[!t]
 \centering
-\caption{Backend comparisons on ImageNet-32. Top: OTT-JAX ($n=4096,W=16$), ten repeats per tolerance; fixed-phase and compacted execution share phase length $q$. Middle: earlier PyKeOps configurations ($n=16384,W=4$), with means and ranges of three sequential/configuration ratios. Bottom: separate PyKeOps runs with every-update checking and $W=4$; entries are means of three per-input median paired coupling-preparation ratios over three cyclic orders. The lower panels use their own measured baselines.}
+\caption{Backend comparisons on ImageNet-32. Top: OTT-JAX ($n=4096,W=16$), ten repeats per tolerance; fixed-phase and compacted execution share phase length $q$. Bottom: PyKeOps with every-update checking and $W=4$; entries are means of three per-input median paired coupling-preparation ratios over three cyclic orders. Earlier PyKeOps configurations appear in Table~\ref{tab:backend-history}.}
 \label{tab:ot-cross-backend}
 \small
 \setlength{\tabcolsep}{5pt}
@@ -14,14 +14,6 @@ $10^{-3}$ & 20 & $1.58$ & $2.64$ \\
 $3\times10^{-3}$ & 10 & $1.56$ & $2.62$ \\
 $5\times10^{-3}$ & 10 & $1.37$ & $2.30$ \\
 $10^{-2}$ & 10 & $0.995$ & $1.73$ \\
-\midrule
-\multicolumn{4}{@{}l}{PyKeOps: complete configurations relative to sequential execution} \\
-Configuration & Mean speedup & Seed range & Max. marginal $L_1$ \\
-\midrule
-Static batch & $1.55$ & $1.45$--$1.69$ & $8.80\times10^{-4}$ \\
-Logical mask & $1.55$ & $1.45$--$1.69$ & $8.93\times10^{-4}$ \\
-Compaction, check every 2 updates & $1.51$ & $1.43$--$1.59$ & $8.93\times10^{-4}$ \\
-Compaction, check every 4 updates & $1.42$ & $1.36$--$1.45$ & $8.93\times10^{-4}$ \\
 \midrule
 \multicolumn{4}{@{}l}{PyKeOps: every-update checking for all three methods} \\
 Support size $n$ & Static / DC & Mask / DC & Inputs $\times$ orders \\

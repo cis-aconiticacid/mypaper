@@ -1,5 +1,7 @@
 """Reconcile frozen records and render the competitive-controls table (CPU only)."""
 import argparse
+import csv
+import io
 import hashlib
 import importlib.util
 import json
@@ -111,6 +113,26 @@ def build(root):
                                "active_total_seconds": active["total_seconds"],
                                "saved_seconds": fixed["total_seconds"] - active["total_seconds"],
                                "windows": active["windows"], "steps": active["steps"]})
+    metro = read("studies/campaigns/C82_MetroPT3_static_active_corrected/analysis.json")
+    csv_path = "archive/inspections/C80_LM_20260828/analysis_extracted/c80_lm_analysis_793c08c_20260828T1825Z/absolute_metrics.csv"
+    csv_bytes = (root / csv_path).read_bytes()
+    sources[csv_path] = hashlib.sha256(csv_bytes).hexdigest()
+    packer = list(csv.DictReader(io.StringIO(csv_bytes.decode("utf-8-sig"))))
+    endpoint_times = {"metro_pipeline": {
+        "baseline": statistics.geometric_mean(r["static_median_makespan_seconds"] for r in metro["plan_rows"]),
+        "dc": statistics.geometric_mean(r["active_median_makespan_seconds"] for r in metro["plan_rows"])}}
+    for level in ("solver", "pipeline"):
+        endpoint_times["packer_" + level] = {}
+        for arm, name in (("lm", "baseline"), ("pc", "dc")):
+            rows = [r for r in packer if r["arm"] == arm]
+            assert len(rows) == 24
+            values = [float(r["ready_arrays_to_consumer_seconds_median"]) -
+                      (float(r["consumer_seconds_median"]) if level == "solver" else 0) for r in rows]
+            endpoint_times["packer_" + level][name] = statistics.median(values)
+    for level, key in (("solver", "solver_seconds"), ("training", "total_seconds")):
+        endpoint_times["imagenet_" + level] = {
+            name: statistics.geometric_mean(r["methods"][arm][key] for r in training["summary"]["raw_rows"])
+            for arm, name in (("project_cold_static", "baseline"), ("project_cold_active", "dc"))}
     return {"verification": "agent CPU reconciliation; human author review pending",
             "sources_sha256": sources, "cells": cells,
             "heldout_ordering": decisions,
@@ -119,6 +141,7 @@ def build(root):
                 "lookup_mean_absolute_error_percent": statistics.mean(abs(r["lookup_error_percent"]) for r in linear_comparisons),
                 "linear_mean_absolute_error_percent": statistics.mean(abs(r["linear_error_percent"]) for r in linear_comparisons)},
             "training_times": training_times,
+            "endpoint_times_seconds": endpoint_times,
             "guarded_stress": {"aggregate": stress["aggregate"], "by_world_size": stress["by_world_size"]},
             "fp64_method_problem_checks": len(residuals) // 2,
             "fp64_max_residual": max(residuals),
@@ -152,6 +175,10 @@ def main():
     args = parser.parse_args()
     data = build(args.evidence_root)
     here = Path(__file__).resolve().parent
+    endpoint_table = (here.parent.parent / "figures/FIG-endpoints.tex").read_text(encoding="utf-8")
+    for key, values in data["endpoint_times_seconds"].items():
+        pair = " & ".join(f'{values[arm]:.3g}' for arm in ("baseline", "dc"))
+        assert pair in endpoint_table, (key, pair)
     outputs = {here / "competitive_data.json": json.dumps(data, indent=2) + "\n",
                here.parent.parent / "figures/FIG-controls.tex": render(data)}
     for path, text in outputs.items():

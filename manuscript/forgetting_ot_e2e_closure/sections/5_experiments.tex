@@ -35,7 +35,7 @@ Packer19 shows how solver savings translate to the pipeline. In the same 24 pair
 
 Backend results separate the contribution of compaction from the benefit of a complete execution configuration (\cref{tab:ot-cross-backend}). In OTT-JAX, compaction gives $1.37$--$1.58\times$ over fixed-phase execution at tolerances from $10^{-3}$ to $5\times10^{-3}$. At $10^{-2}$, every problem completes in the first phase and the ratio is $0.995\times$. The native-reference ratio remains $1.73\times$ there because it also includes the change to fixed-phase execution.
 
-On PyKeOps, the earlier configuration comparison favors static batching over compaction with less frequent checking. Checking every four updates reaches 16 rounds, compared with 13 for the static batch, and achieves $1.42\times$ over sequential execution versus $1.55\times$ for static batching. A separate comparison now fixes every method's checking interval to one (\cref{tab:ot-cross-backend}). Across three inputs per size, static/compacted coupling-preparation time is $0.999\times$ at $n=2048$ and $1.02\times$ at $n=16384$. At the larger size, all methods take 13 batch rounds; compaction executes 50, 51, and 52 problem updates against 52 for static batching. The third input completes simultaneously and has a ratio of $1.00\times$ after rounding. Thus the matched comparison shows a small input-dependent benefit. Supplementary settings and deployment results appear in \cref{sec:backend-details,sec:worker-details}.
+The matched PyKeOps comparison fixes every method's checking interval to one (\cref{tab:ot-cross-backend}). Across three inputs per size, static/compacted coupling-preparation time is $0.999\times$ at $n=2048$ and $1.02\times$ at $n=16384$. At the larger size, all methods take 13 batch rounds; compaction executes 50, 51, and 52 problem updates against 52 for static batching. The third input completes simultaneously and has a ratio of $1.00\times$ after rounding. Thus the matched comparison shows a small input-dependent benefit. Supplementary settings and deployment results appear in \cref{sec:backend-details,sec:worker-details}.
 
 \subsection{Kernel time by active batch width}
 \label{sec:width-results}
@@ -85,7 +85,7 @@ As shown in Table~\ref{tab:metropt-grouping}, the fixed/DC ratio is \CMThreeHomo
 \subsection{Numerical accuracy and application outputs}
 \label{sec:numerical-results}
 
-The timed packed Triton applications use backend-computed two-marginal residuals for release. On primary MetroPT-3, maximum recorded row and column residuals are $9.5\times10^{-4}$ and $1.3\times10^{-6}$; both execution modes attain failure-window ROC AUC $1.0$. ImageNet-32 quality measurements are close across the three paired seeds in PCA500 feature space at NFE 4, 8, and 16 (\cref{tab:imagenet-quality}). These measurements describe the reported feature-space metrics.
+The timed packed Triton applications use backend-computed two-marginal residuals for release. On primary MetroPT-3, maximum recorded row and column residuals are $9.5\times10^{-4}$ and $1.3\times10^{-6}$; both execution modes attain failure-window ROC AUC $1.0$. ImageNet-32 quality measurements are close across the three paired seeds in PCA500 feature space at NFE 4, 8, and 16 (\cref{tab:imagenet-quality}).
 
 Screening and release are checked separately. The full-verifier replay of 1488 screen-negative events finds zero completed problems missed in this component workload; this measures screening delay at its configured tolerance. In the matched Packer19 LM/DC comparison, release decisions agree and the consumer TV difference is zero. The tolerance sweep in \cref{fig:stopping-results} reports achieved residuals and consumer deviations from a tighter reference.
 
@@ -93,17 +93,18 @@ The competitive MetroPT-3 study additionally saves the potentials emitted by the
 
 Finite-precision checks also exercise cases near the acceptance threshold. An independent stress test covers 84 near-threshold problems and 16 runtime cases. Raw FP32 and TF32 each produce three false accepts relative to independent FP64 replay. The guarded path has zero false accepts and is conservative near the threshold: its supported outward bounds can reject candidates that pass FP64 replay. \Cref{sec:precision-stress} specifies this separately evaluated configuration and its fallback rules.
 
+\input{figures/FIG-controls.tex}
+
 \subsection{Execution alternatives and calibrated runtime}
 \label{sec:execution-controls}
 
 We compare physical compaction with indexed execution and in-place skipping on one A100 using the existing MetroPT-3 failure-window input. Its 16 targets form four non-overlapping groups of four; a width-eight batch reuses the first eight targets. Each batch uses four cyclic method orders. The three primary implementations share in-place Gauss--Seidel buffers, screening, verification, and a packed width-one tail. Indexed execution changes only the active IDs and launch grid; in-place skipping retains the original grid and bypasses expensive updates for inactive problems. Both preserve the original state storage. A legacy logical-mask implementation is a secondary reference because it allocates new update outputs before restoring inactive state.
 
-\Cref{tab:execution-controls} reports absolute solver times. Paired index/DC ratios correspond to a $0.0500$--$0.0711\%$ timing disadvantage for DC; entry-skip/DC favors DC by $0.0168$--$0.0469\%$. All differences are below $0.1\%$; skipping completed computation gives similar measured runtime across these three state-management choices.
+\Cref{tab:execution-controls} reports absolute solver times. The three compute-skipping implementations differ by less than $0.1\%$ on these inputs.
 
 The same runs test \cref{eq:calibrated-runtime}. Independent calibration measures every active width with five primitive repeats and obtains control costs from a separate instrumented solve. Calibration on the first width-four group is transferred to the other three groups. Across the three primary methods and their four timing repeats, signed reconstruction errors are $+0.463\%$ to $+1.08\%$. These estimates use the observed completion and verification traces and shared-source inputs. Prefix-ID calibration approximates the noncontiguous survivor IDs used during indexed execution.
 
 A matched model ablation replaces only the update-cost lookup with $\widehat c(a)=\alpha a+\beta$, fitted to the same calibration medians. Across 36 method--repeat records in the three transferred groups, mean absolute percentage error is $0.853\%$ for the width lookup and $1.05\%$ for the linear model. The improvement is modest on this large-support configuration. Appendix~\ref{sec:competitive-settings} gives the fitting rule and the finer timing comparisons.
 
-\input{figures/FIG-controls.tex}
-
-These comparisons test whether full-state movement is needed to avoid completed updates. The regrouped inputs add execution contrasts to the existing workload evidence. Appendix~\ref{sec:competitive-settings} separately reports the earlier scheduling comparison, which varies when and how far to compact.
+Appendix~\ref{sec:competitive-settings} also reports the earlier scheduling comparison, which varies when and how far to compact.
+\FloatBarrier

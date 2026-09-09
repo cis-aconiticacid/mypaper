@@ -1,5 +1,18 @@
 # Manuscript restructuring and visual review
 
+## Latest review: definitions and table clarity (base dbf7e73)
+
+Updated editable LaTeX tables, using the user-supplied figure skill. Its companion workflow/source-map/audit files remain unavailable; the local source-bound checks below cover this revision.
+
+- Table 2: same-campaign absolute seconds beside existing ratios; caption defines geometric means versus paired-unit medians. CPU reanalysis checks displayed time pairs against full-precision aggregates (`competitive_data.json:endpoint_times_seconds`). No cross-campaign phase substitution.
+- Table 5: explicit baseline/changed-configuration lookup, common verifier in caption. Table 9 separates Sinkhorn updates, row screen and two-marginal verifier. No phase numbers changed.
+- Table 3: main matched PyKeOps comparison retained; Table 12 carries the four historical configurations unchanged. This is relocation, not removal of adverse results.
+- Table 4: readable mean +/- sample SD with compact decimals; underlying observations unchanged. Small residuals use scientific notation rather than rounding to zero.
+- Table 7: source insertion moved ahead of Section 5.7; final PDF places both on page 10. Tables 5 and 6 retain their numbers and source sections 5.4/5.5.
+- Final 17-page PDF: inspected result tables on pages 7/8, controls on 10, metric equations and input construction on 13, phase headings on 14, bound equations on 16, and historical backend table on 17. No overlaps or clipping observed. LaTeX reports no overfull boxes or unresolved references. Validation is an agent source/render check, not human publication approval.
+
+Sources, statistical units, unresolved metadata and anti-defensive-writing changes are itemized in the latest block of `REVIEW_DISPOSITION.md`.
+
 ## Latest review increment (base ab11094)
 
 Added FIG-execution-settings as Table 11 in Appendix A.7, referenced from Section 3.4. Purpose: compare allocation policies and timing endpoints across the primary Triton contrasts. Contract: editable monochrome four-column lookup table, three source-bound rows, common initialization/precision/check interval/tail in caption; no uncertainty or new performance values because this is a configuration display. Sources and four-step review decisions are recorded at the top of REVIEW_DISPOSITION.md.
