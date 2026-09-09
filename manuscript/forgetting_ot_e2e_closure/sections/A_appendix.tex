@@ -22,20 +22,29 @@ The Packer19 tolerance study uses two hosts, four GPUs per host, three method or
 \input{figures/FIG-phases.tex}
 
 \subsection{Width measurements and backend settings}
+\label{sec:backend-details}
 
 The width sweep uses an A100-SXM4-80GB with 108 SMs, driver 535.129.03, PyTorch 2.5.1 with CUDA 12.4, and Triton 3.1.0. Each primitive call contains two packed LogSumExp update kernels. Widths are randomized within 30-repeat blocks after warm-up. The $n=1024$ sweep covers widths 1--8, 10, 12, and 16; the other sizes cover 1, 2, 3, 4, 6, 8, 12, and 16.
 
-OTT-JAX verifies at phase boundaries and rebuckets unfinished problems. The tolerance sweep uses one fixed ImageNet-32 input, ten timing repeats per tolerance, and phase sizes selected on disjoint warm-up inputs: 20 updates at $10^{-3}$ and 10 updates at the other reported tolerances. PyKeOps uses a matrix-free batched operator, geometric verification schedule, and removal of completed state. Its tiled-log implementation reaches support size $n=65536$.
+OTT-JAX verifies at phase boundaries and rebuckets unfinished problems. The tolerance sweep uses one fixed ImageNet-32 input, ten timing repeats per tolerance, and phase sizes selected on disjoint warm-up inputs: 20 updates at $10^{-3}$ and 10 updates at the other reported tolerances. Timings cover device-resident execution; loading, transfer, compilation, and the common post-run audit occur outside this interval. An earlier six-repeat study gives \COTTNativeActiveSpeedup{} relative to native vectorized execution and \COTTStaticActiveSpeedup{} relative to its matched fixed-phase baseline.
 
-The shared-initialization experiment uses a constructed stream with 90\% support overlap over real ImageNet features. Its warm replay includes descriptor, transfer, initialization, correction, and verification costs; compilation, cache loading, and process startup occur before measurement. The reported result covers 40 controlled windows.
+PyKeOps uses a matrix-free batched operator. Its ImageNet-32 experiment compares static batching, logical masking, and two compacted configurations on the same three seeds. Static and masked execution check every update; compacted execution checks every two or four updates. At $n=16384,W=4$, the compacted configurations use mean update counts of 14 and 16, compared with 13 for static batching. On the separate A2D2 workload, compacted execution gives \CKeopsLiDARActiveSpeedup{} relative to sequential carry, with an observed clip range of $2.180$--$3.944\times$ and maximum marginal residual $9.97\times10^{-4}$.
+
+The shared-initialization experiment uses a constructed stream with 90\% support overlap over real ImageNet features. Its warm replay includes descriptor, transfer, initialization, correction, and verification costs; compilation, cache loading, and process startup occur before measurement. Across 40 controlled windows, compaction gives $1.421\times$ over static execution and removes 30.62\% of problem updates.
 
 \subsection{Worker scaling and grouping}
+\label{sec:worker-details}
 
-Independent GPU workers process different windows without a Sinkhorn collective. The one-to-four-worker throughput experiment holds work per worker fixed. The eight-worker experiment compares fixed-width and compacted execution at that worker count. \Cref{tab:additional-runtime} gives the two eight-worker inputs and the separate single-worker support-size comparisons. The reported support-size configurations meet the prespecified consumer criteria on both hosts.
+Independent GPU workers process different windows without a Sinkhorn collective. The one-to-four-worker throughput experiment holds work per worker fixed and achieves $3.965$--$3.979\times$ throughput scaling on held-out MetroPT-3 routes. The eight-worker experiment compares fixed-width and compacted execution at that worker count, with pipeline ratios of $3.110\times$ and $2.159\times$ for its two inputs. \Cref{tab:additional-runtime} gives the absolute eight-worker times and separate single-worker support-size comparisons. The reported support-size configurations meet the prespecified consumer criteria on both hosts.
 
 \input{figures/FIG-additional.tex}
 
 Grouping uses a fixed multiset of 32 problems. Offline iteration counts $q_t$ determine the layouts, fixing $\sum_t q_t$ while changing $\sum_w Wq_{\max,w}$. Runtime ratios describe the resulting effect for this problem set. The layouts provide a controlled analysis of completion variation.
+
+\subsection{Finite-precision stress test}
+\label{sec:precision-stress}
+
+An independent test covers 84 near-threshold problems and 16 runtime stress cases over 1/2/4/8 GPUs. Against FP64 replay, raw FP32 and TF32 each disagree on three acceptance decisions. An outward-bound guard followed by FP64 escalation has zero disagreements in these 100 cases. This guarded configuration is evaluated separately from the timed applications.
 
 \subsection{Reproducibility}
 

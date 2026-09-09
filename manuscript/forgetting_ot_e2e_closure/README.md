@@ -11,7 +11,7 @@
 5. [Experiments](sections/5_experiments.tex)：设置、应用、宽度、组件、grouping、正确性。
 6. [Discussion](sections/6_scope.tex)：适用条件与运行成本。
 7. [Conclusion](sections/7_conclusion.tex)。
-8. [Measurement Details](sections/A_appendix.tex)：计时、统计单位、输出与复现信息。
+8. [Measurement Details](sections/A_appendix.tex)：计时与统计单位、训练输出、后端补充结果、worker 扩展、独立精度压力测试与复现信息。
 
 ## 新图表
 
@@ -23,8 +23,8 @@
 | Figure 2 | [FIG-width.pdf](figures/FIG-width.pdf)：绝对 kernel 时间与 active width |
 | Figure 3 | [FIG-stopping.pdf](figures/FIG-stopping.pdf)：容差、speedup 与输出误差 |
 | Table 1 | [FIG-setup.tex](figures/FIG-setup.tex) |
-| Table 2 | [FIG-endpoints.tex](figures/FIG-endpoints.tex) |
-| Table 3 | [FIG-backends.tex](figures/FIG-backends.tex) |
+| Table 2 | [FIG-endpoints.tex](figures/FIG-endpoints.tex)：E1/E2/E3，包含同组 Packer19 的 solver 与 pipeline 结果 |
+| Table 3 | [FIG-backends.tex](figures/FIG-backends.tex)：OTT 同阶段／native 对照及 PyKeOps 完整配置比较 |
 | Table 4 | [FIG-quality.tex](figures/FIG-quality.tex) |
 | Table 5 / Section 5.4 | [FIG-components.tex](figures/FIG-components.tex) |
 | Table 6 / Section 5.5 | [FIG-grouping.tex](figures/FIG-grouping.tex) |

@@ -20,14 +20,16 @@ DrainSinkhorn reduces both solver time and application time, with the size of th
 
 \input{figures/FIG-endpoints.tex}
 
-ImageNet-32 gains are smaller. Across the same three paired training seeds, the Sinkhorn-time ratio is $1.054\times$ and the full-training ratio is \CFeatureTrainingActiveOverStatic{}. \Cref{tab:imagenet-quality} reports feature-space quality after training, and \cref{tab:imagenet-solver-pairs} gives absolute solver times by seed. A separate coupling-preparation diagnostic gives $1.105\times$. With one initialization shared across 40 controlled overlapping-support windows, compaction gives $1.421\times$ and removes 30.62\% of updates.
+Packer19 shows how solver savings translate to the pipeline. In the same 24 paired observations, LM/DC is $1.540\times$ for Sinkhorn time and $1.2243\times$ through the transition consumer. The shared consumer work reduces the pipeline ratio. ImageNet-32 gains are smaller: across three paired training seeds, the Sinkhorn-time ratio is $1.054\times$ and the full-training ratio is \CFeatureTrainingActiveOverStatic{}. \Cref{tab:imagenet-quality} reports feature-space quality after training, and \cref{tab:imagenet-solver-pairs} gives absolute solver times by seed.
 
 \input{figures/FIG-backends.tex}
 \input{figures/FIG-quality.tex}
 
-Removal of completed problems also reduces time in independent backend implementations (\cref{tab:ot-cross-backend}). OTT-JAX gives \COTTNativeActiveSpeedup{} relative to native vectorized execution. In the same backend study, its matched fixed-phase comparison gives \COTTStaticActiveSpeedup{}. A separate tolerance sweep gives $1.366$--$1.581\times$ at tolerances from $10^{-3}$ to $5\times10^{-3}$ and $0.995\times$ at $10^{-2}$. The PyKeOps comparisons against sequential execution give \CKeopsLiDARActiveSpeedup{} on A2D2 and \CKeopsImageNetActiveSpeedup{} on ImageNet-32. These contrasts evaluate the implementations named in the table.
+Backend results separate the contribution of compaction from the benefit of a complete execution configuration (\cref{tab:ot-cross-backend}). In OTT-JAX, compaction gives $1.366$--$1.581\times$ over fixed-phase execution at tolerances from $10^{-3}$ to $5\times10^{-3}$. At $10^{-2}$, every problem completes in the first phase and the ratio is $0.995\times$. The native-reference ratio remains $1.732\times$ there because it also includes the change to fixed-phase execution.
 
-The MetroPT-3 scale-out study assigns complete windows to eight workers on two hosts. Fixed-work-per-worker pipeline ratios are $3.110\times$ and $2.159\times$ for its two inputs. A separate one-to-four-worker study achieves $3.965$--$3.979\times$ throughput scaling on held-out routes. \Cref{tab:additional-runtime} lists the absolute eight-worker endpoint times and support-size results.
+On PyKeOps, static batching and logical masking outperform the tested compacted configurations on ImageNet-32. Checking every four updates reaches 16 update rounds, compared with 13 for the static batch, and achieves $1.415\times$ over sequential execution versus $1.549\times$ for static batching. Thus checking frequency and batch removal jointly determine the runtime of these configurations. Supplementary backend and deployment results appear in \cref{sec:backend-details,sec:worker-details}.
+
+
 
 \subsection{Kernel time by active batch width}
 \label{sec:width-results}
@@ -37,7 +39,7 @@ The width experiment tests the update-cost term in \cref{eq:time-difference}. It
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{figures/FIG-width.pdf}
-\caption{A100 packed-update time versus active batch width. Points show medians and whiskers show interquartile ranges from 30 repeats. Each panel uses its own vertical scale in milliseconds. Vertical guides locate initial widths $W=8$ and $W=16$. The $n=1024,W=8$ configuration matches the ImageNet-32 training solver with $\varepsilon=0.03$, verification interval 4, and tolerance $10^{-3}$.}
+\caption{A100 packed-update time versus active batch width on synthetic tensors. Points show medians and whiskers show interquartile ranges from 30 repeats. Each panel uses its own vertical scale in milliseconds. Vertical guides locate initial widths $W=8$ and $W=16$. ImageNet-32 training uses $n=1024,W=8$, with $\varepsilon=0.03$, verification interval 4, and tolerance $10^{-3}$; these training settings provide application context for the primitive measurement.}
 \label{fig:width-cost}
 \end{figure*}
 
@@ -79,4 +81,4 @@ As shown in Table~\ref{tab:metropt-grouping}, the fixed/DC ratio is \CMThreeHomo
 
 The timed packed Triton applications use the backend precision and the two-marginal verifier. All emitted plans meet the recorded marginal-residual bounds, and all reported consumer and training-quality checks pass. On primary MetroPT-3, maximum row and column residuals are $9.476650\times10^{-4}$ and $1.283915\times10^{-6}$; both execution modes attain failure-window ROC AUC $1.0$. ImageNet-32 quality is evaluated in PCA500 feature space at NFE 4, 8, and 16 (\cref{tab:imagenet-quality}).
 
-An independent finite-precision stress test covers 84 near-threshold problems and 16 runtime stress cases over 1/2/4/8 GPUs. Against FP64 replay, raw FP32 and TF32 each disagree on three acceptance decisions. An outward-bound guard followed by FP64 escalation has zero disagreements in these 100 cases. This guarded configuration is evaluated separately from the timed applications.
+\Cref{sec:precision-stress} reports a separate finite-precision stress test of an outward-bound guard and FP64 escalation.

@@ -30,7 +30,7 @@ Paths below are relative to the manuscript directory. Git paths use the reposito
 | FIG-stopping / Figure 3 | Relate benefit to tolerance and output error; forest plot plus log-log error panel | support/figure_materials/PACKER19_STOPPING_METRICS.csv, frozen analysis rows | sections/5_experiments.tex; bootstrap 95% intervals, 24 units per tolerance |
 | FIG-setup / Table 1 | Lookup primary configurations | 795cb6c:manuscript/forgetting_ot_e2e_closure/sections/5_experiments.tex, experimental setup; current manuscript source | figures/FIG-setup.tex, Section 5.1 |
 | FIG-endpoints / Table 2 | Compare within explicit E1/E2/E3 scopes | support/figure_materials/MAIN_RESULTS_BY_WIDTH.csv; ENDPOINT_TOTAL_SPEEDUPS.csv; RESULT_MACROS.tex for training range | figures/FIG-endpoints.tex, Section 5.2 |
-| FIG-backends / Table 3 | State implementation-specific baselines and results | 795cb6c:manuscript/forgetting_ot_e2e_closure/figures/table7_cross_backend_results.tex; manuscript summaries | figures/FIG-backends.tex, Section 5.2 |
+| FIG-backends / Table 3 | Separate matched-phase compaction from complete-configuration comparisons | OTT tolerance report and PyKeOps three-seed report, with checking intervals verified in implementation; see data-selection review below | figures/FIG-backends.tex, Section 5.2; two labeled blocks with distinct statistics |
 | FIG-quality / Table 4 | Lookup training quality; metric rows, NFE columns | 795cb6c:manuscript/forgetting_ot_e2e_closure/figures/table4_imagenet_quality.tex; three-seed means | figures/FIG-quality.tex, Section 5.2 |
 | FIG-components / Table 5 | Isolate four execution changes; one ratio and evidence column | 795cb6c:manuscript/forgetting_ot_e2e_closure/figures/table5_packer19_attribution.tex; frozen matched summaries | figures/FIG-components.tex, Section 5.4 |
 | FIG-grouping / Table 6 | Pair dynamic-update fraction with runtime ratio | 795cb6c:manuscript/forgetting_ot_e2e_closure/figures/table6_grouping_intervention.tex; grouping summary on 32 problems | figures/FIG-grouping.tex, Section 5.5 |
@@ -70,3 +70,21 @@ Readability review:
 - Main and appendix prose contain no displayed campaign codes or project-maintainer instructions.
 
 Build validation is recorded in support/build/main.log; page renders are in support/qa/. These are local manuscript/render checks, not GPU performance validation.
+
+## Ledger-based data selection, 2026-09-08
+
+This revision keeps the primary application, component, grouping, and neutral stopping results. It adds existing Packer19 pipeline evidence and replaces the backend table's isolated headline ratios with their comparison context. No experiments, confidence intervals, or cross-study aggregates were created. Evidence-repository paths below are relative to `C:/Users/ASUS/Documents/ai训练遗忘性研究`; manuscript paths are relative to this manuscript.
+
+| Decision / manuscript location | Evidence and source level |
+|---|---|
+| Add Packer19 E2 1.2243 [1.2240, 1.2247] to FIG-endpoints, Section 5.2, and abstract; retain paired E1 | Frozen analysis: `archive/inspections/C80_LM_20260828/analysis_extracted/c80_lm_analysis_793c08c_20260828T1825Z/analysis.json`, primary LM/PC summary; formal manifest `studies/campaigns/C80_LM_logical_mask_attribution/manifest.json`, formal_result; ledger lines 848-855. Round existing estimates only. |
+| Replace main OTT native-only headline with four matched-phase and native-reference pairs | Formal report: `studies/reports/OTT_IMAGENET_RELAXED_PHASE_ACTIVE_RESULTS_20260825_ZH.md`, lines 38-43; device-resident timing boundary lines 9-33. Earlier six-repeat values remain in Appendix A.3 under their own study identity. |
+| Show all four ImageNet-32 PyKeOps configurations at n16384, including static and mask outperforming compaction | Formal report: `studies/reports/IMAGENET32_KEOPS_PACKED_RESULTS_20260808.md`, lines 29-46 and 58-61. Values are arithmetic means of paired seed ratios, not ratios of mean times. Implementation: `studies/code/imagenet32_repeated_eot.py`, lines 417 and 446, checks at fixed intervals 1/2/4. These are not exponentially increasing schedules. |
+| Move coupling-preparation, shared-initialization, worker scaling, and guarded precision detail to appendix | Existing manuscript statements at 82456b1 in Sections 5 and A; ledger entries C33, C62, C67, and C10. Relocation preserves measurement scope and observations; no new numerical claims. |
+| Delete tiled-log capacity sentence from Appendix A.3 | Ledger lines 474-480 identifies an independent tiled-log implementation. Previous manuscript wording incorrectly attached this result to PyKeOps. The capacity claim is removed, not reassigned to another paper result. |
+| Identify FIG-width as synthetic-tensor primitive measurements; retain training settings as application context | `studies/local_results/A100_WIDTH_COST_ENGINEERING_20260907T205000Z_73aec294/REPORT_ZH.md`, Sections 1, 2, 4, 5. Different primitive/component configurations are not summed into an application prediction. |
+| Keep stopping-study LM/DC including simultaneous-completion neutrality | Current ledger lines 865-873 distinguishes valid LM/DC from invalid historical static-arm comparisons; this revision adds no static-derived stopping results. |
+
+Visual contract: FIG-endpoints remains a lookup table grouped by E1/E2/E3; FIG-backends uses two explicit comparison blocks with separate denominators and statistical definitions. Both use editable LaTeX, black text, booktabs rules, and existing manuscript typography. Caption text lives with each table. All three plot assets are unchanged; FIG-width's contextual caption is corrected.
+
+Local QA: compiled with latexmk; inspected rendered main-result/backend pages and both appendix pages for readable labels, alignment, and overflow. Table 5 and Table 6 retain their order. No overfull boxes or undefined references were reported. The supplied skills' missing companion audits remain unavailable; this is a local scientific/source and visual-readability review.

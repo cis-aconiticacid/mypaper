@@ -1,17 +1,27 @@
 \begin{table*}[!t]
 \centering
-\caption{Backend implementations and their comparison paths. All rows measure Sinkhorn time. Parentheses denote the observed repeat, clip, or seed range indicated in the last column. Residuals are maximum marginal $L_1$ errors.}
+\caption{Solver-stage backend comparisons. Top: OTT-JAX on ImageNet-32 ($n=4096,W=16$), with ten timing repeats per tolerance. Fixed-phase and compacted execution share the selected phase length $q$; ratios divide the named baseline time by compacted time. Bottom: PyKeOps on ImageNet-32 ($n=16384,W=4$), with arithmetic means of three paired sequential/configuration ratios and observed seed ranges. Its configurations use different checking schedules.}
 \label{tab:ot-cross-backend}
 \small
 \setlength{\tabcolsep}{5pt}
 \renewcommand{\arraystretch}{1.15}
-\begin{tabular}{@{}lllll@{}}
+\begin{tabular}{@{}llll@{}}
 \toprule
-Task / backend & Baseline & Speedup & Residual & Unit \\
+\multicolumn{4}{@{}l}{OTT-JAX: matched-phase compaction and native-reference comparisons} \\
+Tolerance & Phase length $q$ & Fixed-phase / DC & Native / DC \\
 \midrule
-ImageNet-32 / OTT-JAX & Native vectorized & $2.600$ (2.338--2.664) & $9.97\,10^{-4}$ & 6 repeats \\
-A2D2 / PyKeOps & Sequential carry & $3.174$ (2.180--3.944) & $9.97\,10^{-4}$ & 3 clips \\
-ImageNet-32 / PyKeOps & Sequential & $1.415$ (1.360--1.448) & $8.93\,10^{-4}$ & 3 seeds \\
+$10^{-3}$ & 20 & $1.581$ & $2.644$ \\
+$3\times10^{-3}$ & 10 & $1.556$ & $2.616$ \\
+$5\times10^{-3}$ & 10 & $1.366$ & $2.301$ \\
+$10^{-2}$ & 10 & $0.995$ & $1.732$ \\
+\midrule
+\multicolumn{4}{@{}l}{PyKeOps: complete configurations relative to sequential execution} \\
+Configuration & Mean speedup & Seed range & Max. marginal $L_1$ \\
+\midrule
+Static batch & $1.549$ & $1.451$--$1.686$ & $8.80\times10^{-4}$ \\
+Logical mask & $1.551$ & $1.451$--$1.688$ & $8.93\times10^{-4}$ \\
+Compaction, check every 2 updates & $1.508$ & $1.428$--$1.593$ & $8.93\times10^{-4}$ \\
+Compaction, check every 4 updates & $1.415$ & $1.360$--$1.448$ & $8.93\times10^{-4}$ \\
 \bottomrule
 \end{tabular}
 \end{table*}
