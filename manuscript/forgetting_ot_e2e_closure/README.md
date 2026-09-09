@@ -2,7 +2,7 @@
 
 本目录是当前英文论文的唯一真源。入口为 [main.tex](main.tex)，交付文件为 [main.pdf](main.pdf)。
 
-独立交付件：[全部实验结果对照总表](ALL_RESULTS.md)。汇总正文、附录和图中数据点，逐行给出比较双方、数值、统计口径与 source；不进入论文 PDF。由 [build_results_inventory.py](support/figure_materials/build_results_inventory.py) 从当前论文摘录和已有冻结数据生成，可用 `--check` 核对。表头注明对应论文提交，避免与后续修订混用。
+独立英文交付件：[Complete Experimental Results Comparison Table](ALL_RESULTS.md)。汇总正文、附录和图中数据点，逐行给出比较双方、数值、统计口径与 source；不进入论文 PDF。由 [build_results_inventory.py](support/figure_materials/build_results_inventory.py) 从当前论文摘录和已有冻结数据生成，可用 `--check` 核对。表头注明对应论文提交，避免与后续修订混用。
 
 ## 章节导航
 
