@@ -4,6 +4,8 @@
 
 ## 章节导航
 
+当前标题为 DrainSinkhorn: Completion-Aware Execution for Batched Entropic Optimal Transport。最新审稿增量：澄清 Packer19 两臂均不复用 buffer；新增同校准线性成本模型消融；补全训练绝对时间与 coupling 频率；细微排序与旧调度数值移入附录。复现仍用 competitive_reanalysis.py；完整精度结果在 competitive_data.json 的 linear_model_comparison/training_times。已处理项、新增项与未闭合证据见 review disposition 顶部 Latest review。
+
 1. [Introduction](sections/1_introduction.tex)：问题、关键观察与三项贡献。
 2. [Background and Motivation](sections/2_setting_related.tex)：EOT、实测完成项开销与相关系统；明确 logical mask 等是本文在 OT 后端中构建的实验对照，相关文献提供执行思想而非外部 OT 基线。
 3. [DrainSinkhorn](sections/3_method.tex)：screen、verify、compact 与状态一致性。
@@ -33,6 +35,7 @@
 | Table 8 | [FIG-seeds.tex](figures/FIG-seeds.tex) |
 | Table 9 | [FIG-phases.tex](figures/FIG-phases.tex) |
 | Table 10 | [FIG-additional.tex](figures/FIG-additional.tex) |
+| Table 11 | [FIG-execution-settings.tex](figures/FIG-execution-settings.tex)：主要 Triton 对照的 buffer 策略、共同精度/初始化/检查/tail 设置和计时端点 |
 
 图表来源、设计与检查记录见 [visual review](support/audits/VISUAL_REVIEW.md)；可复现图形脚本见 [render_figures.py](support/figure_materials/render_figures.py)。其他原始图表数据与历史支持材料在 support/figure_materials/，不是论文真源。
 

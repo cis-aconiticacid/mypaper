@@ -29,6 +29,7 @@ def build(root):
     cells = []
     residuals = []
     decisions = []
+    linear_comparisons = []
     for width, offset in ((4, 0), (4, 4), (4, 8), (4, 12), (8, 0)):
         name = f"metro_n16384_w{width}_offset{offset}"
         packet = read(prefix + name + ".json")
@@ -36,6 +37,33 @@ def build(root):
         suffix = "_heldout_analysis.json" if offset else "_analysis.json"
         assert result == read(prefix + name + suffix), name
         assert result["evidence_eligible"]
+        if result["model"]["input_heldout"]:
+            for method in METHODS:
+                calibration_rows = [r for r in calibrations[width]["width_calibration"] if r["method"] == method]
+                widths = sorted({r["active"] for r in calibration_rows})
+                costs = {a: statistics.median(r["update_seconds"] for r in calibration_rows if r["active"] == a) for a in widths}
+                xmean, ymean = statistics.mean(widths), statistics.mean(costs.values())
+                alpha = sum((a - xmean) * (costs[a] - ymean) for a in widths) / sum((a - xmean) ** 2 for a in widths)
+                beta = ymean - alpha * xmean
+                residual = [costs[a] - alpha * a - beta for a in widths]
+                assert abs(sum(residual)) < 1e-10
+                assert abs(sum(a * r for a, r in zip(widths, residual))) < 1e-10
+                assert all(alpha * a + beta > 0 for a in widths)
+                predictions = {r["repeat"]: r for r in result["model"]["methods"][method]}
+                for run in (r for r in packet["runs"] if r["method"] == method):
+                    trajectory = [t["active_width"] for t in run["trace"]]
+                    assert sum(trajectory) == sum(run["depths"])
+                    assert len(trajectory) == max(run["depths"])
+                    full = predictions[run["repeat"]]["estimated_seconds"]
+                    control = full - sum(costs[a] for a in trajectory)
+                    simple = control + alpha * sum(trajectory) + beta * len(trajectory)
+                    linear_comparisons.append({"offset": offset, "method": method, "repeat": run["repeat"],
+                        "alpha": alpha, "beta": beta, "calibration_widths": widths,
+                        "calibration_update_seconds": [costs[a] for a in widths],
+                        "control_seconds": control, "observed_seconds": run["solver_seconds"],
+                        "lookup_seconds": full, "linear_seconds": simple,
+                        "lookup_error_percent": 100 * (full / run["solver_seconds"] - 1),
+                        "linear_error_percent": 100 * (simple / run["solver_seconds"] - 1)})
         errors = [100 * p["relative_error"] for m in METHODS for p in result["model"]["methods"][m]]
         if result["model"]["input_heldout"]:
             pc = {r["repeat"]: r for r in result["model"]["methods"]["physical_compaction"]}
@@ -72,9 +100,25 @@ def build(root):
     assert stress["aggregate"]["raw_fp32_false_accepts"] == 3
     assert stress["aggregate"]["raw_tf32_false_accepts"] == 3
     assert stress["aggregate"]["production_false_accepts"] == 0
+    training = read("studies/campaigns/C63_semantic_latent_OTFM_feature_training/analysis.json")
+    assert len(linear_comparisons) == 36
+    training_times = []
+    for row in training["summary"]["raw_rows"]:
+        fixed, active = (row["methods"][m] for m in ("project_cold_static", "project_cold_active"))
+        assert fixed["steps"] == active["steps"] == 50000
+        assert fixed["windows"] == active["windows"] == 6250
+        training_times.append({"seed": row["seed"], "fixed_total_seconds": fixed["total_seconds"],
+                               "active_total_seconds": active["total_seconds"],
+                               "saved_seconds": fixed["total_seconds"] - active["total_seconds"],
+                               "windows": active["windows"], "steps": active["steps"]})
     return {"verification": "agent CPU reconciliation; human author review pending",
             "sources_sha256": sources, "cells": cells,
             "heldout_ordering": decisions,
+            "linear_model_comparison": {"fit": "unweighted OLS on per-width calibration medians; update term only; identical control costs",
+                "rows": linear_comparisons,
+                "lookup_mean_absolute_error_percent": statistics.mean(abs(r["lookup_error_percent"]) for r in linear_comparisons),
+                "linear_mean_absolute_error_percent": statistics.mean(abs(r["linear_error_percent"]) for r in linear_comparisons)},
+            "training_times": training_times,
             "guarded_stress": {"aggregate": stress["aggregate"], "by_world_size": stress["by_world_size"]},
             "fp64_method_problem_checks": len(residuals) // 2,
             "fp64_max_residual": max(residuals),
@@ -115,7 +159,7 @@ def main():
             assert path.read_text(encoding="utf-8") == text, path
         else:
             path.write_text(text, encoding="utf-8", newline="\n")
-    print("PASS: five model reconstructions, paired controls, input reuse, FP64 records and PyKeOps summaries")
+    print("PASS: five reconstructions, 36 matched linear-model comparisons, three training totals, paired controls, input reuse, FP64 and PyKeOps checks")
 
 
 if __name__ == "__main__":

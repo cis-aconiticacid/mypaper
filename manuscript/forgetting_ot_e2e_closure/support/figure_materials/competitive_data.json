@@ -14,7 +14,8 @@
     "studies/campaigns/EXP_Compaction_Competitive_Controls_20260908/raw/metro_n16384_w8_offset0_analysis.json": "28f79fbbe870f122f3cd7ec8264a4592506e0bff6af0f5eb5a1d3cacdc33fbdf",
     "studies/local_results/FLASH_COMPACTION_SCHEDULER_METROPT3_20260908_A100/raw_results.json": "5f548107ba6481bd89d35ef2200a990b15f020036604588244a65e50bde942f8",
     "studies/campaigns/EXP_KeOps_Check_Interval_20260908/analysis/summary.json": "ff28010321a388d856515119e17a253bd733a94fd8413f9f1cf14fd00dd6ed68",
-    "studies/raw_results/server_runs/20260808_p4_finite_precision_8gpu_multinode/analysis.json": "14c466ff64dedd2c0b8959506bf846a16fd5d69cd068e6bd78e209088f887485"
+    "studies/raw_results/server_runs/20260808_p4_finite_precision_8gpu_multinode/analysis.json": "14c466ff64dedd2c0b8959506bf846a16fd5d69cd068e6bd78e209088f887485",
+    "studies/campaigns/C63_semantic_latent_OTFM_feature_training/analysis.json": "c94e2e4d6c140e0b7eda1c6a460c196871b152ea0daf8e36e294448d249ba085"
   },
   "cells": [
     {
@@ -311,6 +312,939 @@
       ],
       "median_direction_agrees": true,
       "repeat_directions_agree": 3
+    }
+  ],
+  "linear_model_comparison": {
+    "fit": "unweighted OLS on per-width calibration medians; update term only; identical control costs",
+    "rows": [
+      {
+        "offset": 4,
+        "method": "active_index",
+        "repeat": 0,
+        "alpha": 0.002915427088737488,
+        "beta": 0.0009727068245410919,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004013381898403168,
+          0.006449602544307709,
+          0.010051161050796509,
+          0.01253095269203186
+        ],
+        "control_seconds": 0.17869450524449348,
+        "observed_seconds": 1.002487689256668,
+        "lookup_seconds": 1.0131302364170551,
+        "linear_seconds": 1.0029142536222935,
+        "lookup_error_percent": 1.061613750915824,
+        "linear_error_percent": 0.042550583932032815
+      },
+      {
+        "offset": 4,
+        "method": "active_index",
+        "repeat": 1,
+        "alpha": 0.002915427088737488,
+        "beta": 0.0009727068245410919,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004013381898403168,
+          0.006449602544307709,
+          0.010051161050796509,
+          0.01253095269203186
+        ],
+        "control_seconds": 0.17869450524449348,
+        "observed_seconds": 1.002436637878418,
+        "lookup_seconds": 1.0131302364170551,
+        "linear_seconds": 1.0029142536222935,
+        "lookup_error_percent": 1.0667605447132633,
+        "linear_error_percent": 0.047645479607205665
+      },
+      {
+        "offset": 4,
+        "method": "active_index",
+        "repeat": 2,
+        "alpha": 0.002915427088737488,
+        "beta": 0.0009727068245410919,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004013381898403168,
+          0.006449602544307709,
+          0.010051161050796509,
+          0.01253095269203186
+        ],
+        "control_seconds": 0.17869450524449348,
+        "observed_seconds": 1.002279371023178,
+        "lookup_seconds": 1.0131302364170551,
+        "linear_seconds": 1.0029142536222935,
+        "lookup_error_percent": 1.082618849353345,
+        "linear_error_percent": 0.06334387571673705
+      },
+      {
+        "offset": 4,
+        "method": "active_index",
+        "repeat": 3,
+        "alpha": 0.002915427088737488,
+        "beta": 0.0009727068245410919,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004013381898403168,
+          0.006449602544307709,
+          0.010051161050796509,
+          0.01253095269203186
+        ],
+        "control_seconds": 0.17869450524449348,
+        "observed_seconds": 1.0022850669920444,
+        "lookup_seconds": 1.0131302364170551,
+        "linear_seconds": 1.0029142536222935,
+        "lookup_error_percent": 1.0820443985619876,
+        "linear_error_percent": 0.06277521744759706
+      },
+      {
+        "offset": 4,
+        "method": "entry_skip",
+        "repeat": 0,
+        "alpha": 0.0029171034693717957,
+        "beta": 0.0009731817990541458,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004016019403934479,
+          0.006455585360527039,
+          0.010050896555185318,
+          0.012541260570287704
+        ],
+        "control_seconds": 0.17877956479787827,
+        "observed_seconds": 1.003253024071455,
+        "lookup_seconds": 1.0138299986720085,
+        "linear_seconds": 1.0034614354372025,
+        "lookup_error_percent": 1.0542679011950051,
+        "linear_error_percent": 0.02077355968503891
+      },
+      {
+        "offset": 4,
+        "method": "entry_skip",
+        "repeat": 1,
+        "alpha": 0.0029171034693717957,
+        "beta": 0.0009731817990541458,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004016019403934479,
+          0.006455585360527039,
+          0.010050896555185318,
+          0.012541260570287704
+        ],
+        "control_seconds": 0.17877956479787827,
+        "observed_seconds": 1.0033285394310951,
+        "lookup_seconds": 1.0138299986720085,
+        "linear_seconds": 1.0034614354372025,
+        "lookup_error_percent": 1.0466620681265582,
+        "linear_error_percent": 0.013245512400428261
+      },
+      {
+        "offset": 4,
+        "method": "entry_skip",
+        "repeat": 2,
+        "alpha": 0.0029171034693717957,
+        "beta": 0.0009731817990541458,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004016019403934479,
+          0.006455585360527039,
+          0.010050896555185318,
+          0.012541260570287704
+        ],
+        "control_seconds": 0.17877956479787827,
+        "observed_seconds": 1.0031884647905827,
+        "lookup_seconds": 1.0138299986720085,
+        "linear_seconds": 1.0034614354372025,
+        "lookup_error_percent": 1.0607711566587241,
+        "linear_error_percent": 0.027210305560765313
+      },
+      {
+        "offset": 4,
+        "method": "entry_skip",
+        "repeat": 3,
+        "alpha": 0.0029171034693717957,
+        "beta": 0.0009731817990541458,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004016019403934479,
+          0.006455585360527039,
+          0.010050896555185318,
+          0.012541260570287704
+        ],
+        "control_seconds": 0.17877956479787827,
+        "observed_seconds": 1.003227461129427,
+        "lookup_seconds": 1.0138299986720085,
+        "linear_seconds": 1.0034614354372025,
+        "lookup_error_percent": 1.056842835088001,
+        "linear_error_percent": 0.02332215941458493
+      },
+      {
+        "offset": 4,
+        "method": "physical_compaction",
+        "repeat": 0,
+        "alpha": 0.0029173508286476136,
+        "beta": 0.0009701177477836609,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004013042896986008,
+          0.006451651453971863,
+          0.010051783174276352,
+          0.012537501752376556
+        ],
+        "control_seconds": 0.17895158007740974,
+        "observed_seconds": 1.002900168299675,
+        "lookup_seconds": 1.0135602690279484,
+        "linear_seconds": 1.003262860327959,
+        "lookup_error_percent": 1.0629274044640535,
+        "linear_error_percent": 0.03616432021333882
+      },
+      {
+        "offset": 4,
+        "method": "physical_compaction",
+        "repeat": 1,
+        "alpha": 0.0029173508286476136,
+        "beta": 0.0009701177477836609,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004013042896986008,
+          0.006451651453971863,
+          0.010051783174276352,
+          0.012537501752376556
+        ],
+        "control_seconds": 0.17895158007740974,
+        "observed_seconds": 1.002863485366106,
+        "lookup_seconds": 1.0135602690279484,
+        "linear_seconds": 1.003262860327959,
+        "lookup_error_percent": 1.0666241036722424,
+        "linear_error_percent": 0.039823462283816724
+      },
+      {
+        "offset": 4,
+        "method": "physical_compaction",
+        "repeat": 2,
+        "alpha": 0.0029173508286476136,
+        "beta": 0.0009701177477836609,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004013042896986008,
+          0.006451651453971863,
+          0.010051783174276352,
+          0.012537501752376556
+        ],
+        "control_seconds": 0.17895158007740974,
+        "observed_seconds": 1.0028553567826748,
+        "lookup_seconds": 1.0135602690279484,
+        "linear_seconds": 1.003262860327959,
+        "lookup_error_percent": 1.0674432930803501,
+        "linear_error_percent": 0.040634329021438376
+      },
+      {
+        "offset": 4,
+        "method": "physical_compaction",
+        "repeat": 3,
+        "alpha": 0.0029173508286476136,
+        "beta": 0.0009701177477836609,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004013042896986008,
+          0.006451651453971863,
+          0.010051783174276352,
+          0.012537501752376556
+        ],
+        "control_seconds": 0.17895158007740974,
+        "observed_seconds": 1.0031835213303566,
+        "lookup_seconds": 1.0135602690279484,
+        "linear_seconds": 1.003262860327959,
+        "lookup_error_percent": 1.0343817932566113,
+        "linear_error_percent": 0.007908722174509997
+      },
+      {
+        "offset": 8,
+        "method": "active_index",
+        "repeat": 0,
+        "alpha": 0.002915427088737488,
+        "beta": 0.0009727068245410919,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004013381898403168,
+          0.006449602544307709,
+          0.010051161050796509,
+          0.01253095269203186
+        ],
+        "control_seconds": 0.21537240967154503,
+        "observed_seconds": 1.320667713880539,
+        "lookup_seconds": 1.3339801989495754,
+        "linear_seconds": 1.3505997769534588,
+        "lookup_error_percent": 1.0080116996212585,
+        "linear_error_percent": 2.2664340740919497
+      },
+      {
+        "offset": 8,
+        "method": "active_index",
+        "repeat": 1,
+        "alpha": 0.002915427088737488,
+        "beta": 0.0009727068245410919,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004013381898403168,
+          0.006449602544307709,
+          0.010051161050796509,
+          0.01253095269203186
+        ],
+        "control_seconds": 0.21537240967154503,
+        "observed_seconds": 1.3222230412065983,
+        "lookup_seconds": 1.3339801989495754,
+        "linear_seconds": 1.3505997769534588,
+        "lookup_error_percent": 0.8891962533225994,
+        "linear_error_percent": 2.1461383490160024
+      },
+      {
+        "offset": 8,
+        "method": "active_index",
+        "repeat": 2,
+        "alpha": 0.002915427088737488,
+        "beta": 0.0009727068245410919,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004013381898403168,
+          0.006449602544307709,
+          0.010051161050796509,
+          0.01253095269203186
+        ],
+        "control_seconds": 0.21537240967154503,
+        "observed_seconds": 1.320899710059166,
+        "lookup_seconds": 1.3339801989495754,
+        "linear_seconds": 1.3505997769534588,
+        "lookup_error_percent": 0.9902711606942116,
+        "linear_error_percent": 2.2484725121911353
+      },
+      {
+        "offset": 8,
+        "method": "active_index",
+        "repeat": 3,
+        "alpha": 0.002915427088737488,
+        "beta": 0.0009727068245410919,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004013381898403168,
+          0.006449602544307709,
+          0.010051161050796509,
+          0.01253095269203186
+        ],
+        "control_seconds": 0.21537240967154503,
+        "observed_seconds": 1.32125174254179,
+        "lookup_seconds": 1.3339801989495754,
+        "linear_seconds": 1.3505997769534588,
+        "lookup_error_percent": 0.9633634528495527,
+        "linear_error_percent": 2.2212295709226337
+      },
+      {
+        "offset": 8,
+        "method": "entry_skip",
+        "repeat": 0,
+        "alpha": 0.0029171034693717957,
+        "beta": 0.0009731817990541458,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004016019403934479,
+          0.006455585360527039,
+          0.010050896555185318,
+          0.012541260570287704
+        ],
+        "control_seconds": 0.2154860980808735,
+        "observed_seconds": 1.322123285382986,
+        "lookup_seconds": 1.3349781818687916,
+        "linear_seconds": 1.3513517193496227,
+        "lookup_error_percent": 0.9722918148349358,
+        "linear_error_percent": 2.2107192490880223
+      },
+      {
+        "offset": 8,
+        "method": "entry_skip",
+        "repeat": 1,
+        "alpha": 0.0029171034693717957,
+        "beta": 0.0009731817990541458,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004016019403934479,
+          0.006455585360527039,
+          0.010050896555185318,
+          0.012541260570287704
+        ],
+        "control_seconds": 0.2154860980808735,
+        "observed_seconds": 1.3230227082967758,
+        "lookup_seconds": 1.3349781818687916,
+        "linear_seconds": 1.3513517193496227,
+        "lookup_error_percent": 0.903648402785695,
+        "linear_error_percent": 2.1412339240432843
+      },
+      {
+        "offset": 8,
+        "method": "entry_skip",
+        "repeat": 2,
+        "alpha": 0.0029171034693717957,
+        "beta": 0.0009731817990541458,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004016019403934479,
+          0.006455585360527039,
+          0.010050896555185318,
+          0.012541260570287704
+        ],
+        "control_seconds": 0.2154860980808735,
+        "observed_seconds": 1.3218988180160522,
+        "lookup_seconds": 1.3349781818687916,
+        "linear_seconds": 1.3513517193496227,
+        "lookup_error_percent": 0.9894375934437427,
+        "linear_error_percent": 2.2280753210577986
+      },
+      {
+        "offset": 8,
+        "method": "entry_skip",
+        "repeat": 3,
+        "alpha": 0.0029171034693717957,
+        "beta": 0.0009731817990541458,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004016019403934479,
+          0.006455585360527039,
+          0.010050896555185318,
+          0.012541260570287704
+        ],
+        "control_seconds": 0.2154860980808735,
+        "observed_seconds": 1.3226708881556988,
+        "lookup_seconds": 1.3349781818687916,
+        "linear_seconds": 1.3513517193496227,
+        "lookup_error_percent": 0.9304879863390569,
+        "linear_error_percent": 2.168402695693694
+      },
+      {
+        "offset": 8,
+        "method": "physical_compaction",
+        "repeat": 0,
+        "alpha": 0.0029173508286476136,
+        "beta": 0.0009701177477836609,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004013042896986008,
+          0.006451651453971863,
+          0.010051783174276352,
+          0.012537501752376556
+        ],
+        "control_seconds": 0.21576806902885437,
+        "observed_seconds": 1.3216052800416946,
+        "lookup_seconds": 1.3346766382455826,
+        "linear_seconds": 1.3511887967586518,
+        "lookup_error_percent": 0.9890516027202478,
+        "linear_error_percent": 2.2384532782756317
+      },
+      {
+        "offset": 8,
+        "method": "physical_compaction",
+        "repeat": 1,
+        "alpha": 0.0029173508286476136,
+        "beta": 0.0009701177477836609,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004013042896986008,
+          0.006451651453971863,
+          0.010051783174276352,
+          0.012537501752376556
+        ],
+        "control_seconds": 0.21576806902885437,
+        "observed_seconds": 1.3223008401691914,
+        "lookup_seconds": 1.3346766382455826,
+        "linear_seconds": 1.3511887967586518,
+        "lookup_error_percent": 0.9359290791048469,
+        "linear_error_percent": 2.1846735411409135
+      },
+      {
+        "offset": 8,
+        "method": "physical_compaction",
+        "repeat": 2,
+        "alpha": 0.0029173508286476136,
+        "beta": 0.0009701177477836609,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004013042896986008,
+          0.006451651453971863,
+          0.010051783174276352,
+          0.012537501752376556
+        ],
+        "control_seconds": 0.21576806902885437,
+        "observed_seconds": 1.321716383099556,
+        "lookup_seconds": 1.3346766382455826,
+        "linear_seconds": 1.3511887967586518,
+        "lookup_error_percent": 0.9805624952331726,
+        "linear_error_percent": 2.2298591464819495
+      },
+      {
+        "offset": 8,
+        "method": "physical_compaction",
+        "repeat": 3,
+        "alpha": 0.0029173508286476136,
+        "beta": 0.0009701177477836609,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004013042896986008,
+          0.006451651453971863,
+          0.010051783174276352,
+          0.012537501752376556
+        ],
+        "control_seconds": 0.21576806902885437,
+        "observed_seconds": 1.3218106999993324,
+        "lookup_seconds": 1.3346766382455826,
+        "linear_seconds": 1.3511887967586518,
+        "lookup_error_percent": 0.9733570961603322,
+        "linear_error_percent": 2.2225646046997616
+      },
+      {
+        "offset": 12,
+        "method": "active_index",
+        "repeat": 0,
+        "alpha": 0.002915427088737488,
+        "beta": 0.0009727068245410919,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004013381898403168,
+          0.006449602544307709,
+          0.010051161050796509,
+          0.01253095269203186
+        ],
+        "control_seconds": 0.5942049771547318,
+        "observed_seconds": 4.678427319973707,
+        "lookup_seconds": 4.704923197627068,
+        "linear_seconds": 4.722762167453766,
+        "lookup_error_percent": 0.5663415468749822,
+        "linear_error_percent": 0.9476442498268289
+      },
+      {
+        "offset": 12,
+        "method": "active_index",
+        "repeat": 1,
+        "alpha": 0.002915427088737488,
+        "beta": 0.0009727068245410919,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004013381898403168,
+          0.006449602544307709,
+          0.010051161050796509,
+          0.01253095269203186
+        ],
+        "control_seconds": 0.5942049771547318,
+        "observed_seconds": 4.678430546075106,
+        "lookup_seconds": 4.704923197627068,
+        "linear_seconds": 4.722762167453766,
+        "lookup_error_percent": 0.5662721994277975,
+        "linear_error_percent": 0.9475746394450812
+      },
+      {
+        "offset": 12,
+        "method": "active_index",
+        "repeat": 2,
+        "alpha": 0.002915427088737488,
+        "beta": 0.0009727068245410919,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004013381898403168,
+          0.006449602544307709,
+          0.010051161050796509,
+          0.01253095269203186
+        ],
+        "control_seconds": 0.5942049771547318,
+        "observed_seconds": 4.679799251258373,
+        "lookup_seconds": 4.704923197627068,
+        "linear_seconds": 4.722762167453766,
+        "lookup_error_percent": 0.5368594894735734,
+        "linear_error_percent": 0.918050409616189
+      },
+      {
+        "offset": 12,
+        "method": "active_index",
+        "repeat": 3,
+        "alpha": 0.002915427088737488,
+        "beta": 0.0009727068245410919,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004013381898403168,
+          0.006449602544307709,
+          0.010051161050796509,
+          0.01253095269203186
+        ],
+        "control_seconds": 0.5942049771547318,
+        "observed_seconds": 4.679154586046934,
+        "lookup_seconds": 4.704923197627068,
+        "linear_seconds": 4.722762167453766,
+        "lookup_error_percent": 0.550710841162938,
+        "linear_error_percent": 0.931954279451852
+      },
+      {
+        "offset": 12,
+        "method": "entry_skip",
+        "repeat": 0,
+        "alpha": 0.0029171034693717957,
+        "beta": 0.0009731817990541458,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004016019403934479,
+          0.006455585360527039,
+          0.010050896555185318,
+          0.012541260570287704
+        ],
+        "control_seconds": 0.5944500006735325,
+        "observed_seconds": 4.683018073439598,
+        "lookup_seconds": 4.708205822855234,
+        "linear_seconds": 4.72535177692771,
+        "lookup_error_percent": 0.5378529192208825,
+        "linear_error_percent": 0.9039833462999747
+      },
+      {
+        "offset": 12,
+        "method": "entry_skip",
+        "repeat": 1,
+        "alpha": 0.0029171034693717957,
+        "beta": 0.0009731817990541458,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004016019403934479,
+          0.006455585360527039,
+          0.010050896555185318,
+          0.012541260570287704
+        ],
+        "control_seconds": 0.5944500006735325,
+        "observed_seconds": 4.682959455996752,
+        "lookup_seconds": 4.708205822855234,
+        "linear_seconds": 4.72535177692771,
+        "lookup_error_percent": 0.539111369545453,
+        "linear_error_percent": 0.9052463795447219
+      },
+      {
+        "offset": 12,
+        "method": "entry_skip",
+        "repeat": 2,
+        "alpha": 0.0029171034693717957,
+        "beta": 0.0009731817990541458,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004016019403934479,
+          0.006455585360527039,
+          0.010050896555185318,
+          0.012541260570287704
+        ],
+        "control_seconds": 0.5944500006735325,
+        "observed_seconds": 4.686530213803053,
+        "lookup_seconds": 4.708205822855234,
+        "linear_seconds": 4.72535177692771,
+        "lookup_error_percent": 0.4625086804805223,
+        "linear_error_percent": 0.8283647251503323
+      },
+      {
+        "offset": 12,
+        "method": "entry_skip",
+        "repeat": 3,
+        "alpha": 0.0029171034693717957,
+        "beta": 0.0009731817990541458,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004016019403934479,
+          0.006455585360527039,
+          0.010050896555185318,
+          0.012541260570287704
+        ],
+        "control_seconds": 0.5944500006735325,
+        "observed_seconds": 4.683023411780596,
+        "lookup_seconds": 4.708205822855234,
+        "linear_seconds": 4.72535177692771,
+        "lookup_error_percent": 0.5377383126313084,
+        "linear_error_percent": 0.9038683223456134
+      },
+      {
+        "offset": 12,
+        "method": "physical_compaction",
+        "repeat": 0,
+        "alpha": 0.0029173508286476136,
+        "beta": 0.0009701177477836609,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004013042896986008,
+          0.006451651453971863,
+          0.010051783174276352,
+          0.012537501752376556
+        ],
+        "control_seconds": 0.594896849244833,
+        "observed_seconds": 4.681880157440901,
+        "lookup_seconds": 4.707538407295942,
+        "linear_seconds": 4.725053902715445,
+        "lookup_error_percent": 0.5480330335722705,
+        "linear_error_percent": 0.9221454591469502
+      },
+      {
+        "offset": 12,
+        "method": "physical_compaction",
+        "repeat": 1,
+        "alpha": 0.0029173508286476136,
+        "beta": 0.0009701177477836609,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004013042896986008,
+          0.006451651453971863,
+          0.010051783174276352,
+          0.012537501752376556
+        ],
+        "control_seconds": 0.594896849244833,
+        "observed_seconds": 4.683516550809145,
+        "lookup_seconds": 4.707538407295942,
+        "linear_seconds": 4.725053902715445,
+        "lookup_error_percent": 0.5129021372337617,
+        "linear_error_percent": 0.8868838501088216
+      },
+      {
+        "offset": 12,
+        "method": "physical_compaction",
+        "repeat": 2,
+        "alpha": 0.0029173508286476136,
+        "beta": 0.0009701177477836609,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004013042896986008,
+          0.006451651453971863,
+          0.010051783174276352,
+          0.012537501752376556
+        ],
+        "control_seconds": 0.594896849244833,
+        "observed_seconds": 4.683002319186926,
+        "lookup_seconds": 4.707538407295942,
+        "linear_seconds": 4.725053902715445,
+        "lookup_error_percent": 0.5239392687996114,
+        "linear_error_percent": 0.8979620478987815
+      },
+      {
+        "offset": 12,
+        "method": "physical_compaction",
+        "repeat": 3,
+        "alpha": 0.0029173508286476136,
+        "beta": 0.0009701177477836609,
+        "calibration_widths": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "calibration_update_seconds": [
+          0.004013042896986008,
+          0.006451651453971863,
+          0.010051783174276352,
+          0.012537501752376556
+        ],
+        "control_seconds": 0.594896849244833,
+        "observed_seconds": 4.681758530437946,
+        "lookup_seconds": 4.707538407295942,
+        "linear_seconds": 4.725053902715445,
+        "lookup_error_percent": 0.5506451622908637,
+        "linear_error_percent": 0.9247673069001427
+      }
+    ],
+    "lookup_mean_absolute_error_percent": 0.8528189360252661,
+    "linear_mean_absolute_error_percent": 1.05139163360821
+  },
+  "training_times": [
+    {
+      "seed": 20260891,
+      "fixed_total_seconds": 189.76028392650187,
+      "active_total_seconds": 183.55636326037347,
+      "saved_seconds": 6.203920666128397,
+      "windows": 6250,
+      "steps": 50000
+    },
+    {
+      "seed": 20260892,
+      "fixed_total_seconds": 191.52446689642966,
+      "active_total_seconds": 183.6099012363702,
+      "saved_seconds": 7.914565660059452,
+      "windows": 6250,
+      "steps": 50000
+    },
+    {
+      "seed": 20260893,
+      "fixed_total_seconds": 183.88355311006308,
+      "active_total_seconds": 178.55827113986015,
+      "saved_seconds": 5.325281970202923,
+      "windows": 6250,
+      "steps": 50000
     }
   ],
   "guarded_stress": {

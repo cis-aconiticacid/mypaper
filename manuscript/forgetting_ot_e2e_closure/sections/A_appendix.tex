@@ -23,6 +23,8 @@ ImageNet-32 uses paired seeds 20260891, 20260892, and 20260893 throughout traini
 
 \input{figures/FIG-seeds.tex}
 
+For the same three seeds, complete fixed-width training takes 190, 192, and 184 s, versus 184, 184, and 179 s with compaction. Paired savings computed before rounding are 6.20, 7.91, and 5.33 s. Each run makes 6250 training-window solve calls at width eight, producing 50,000 couplings for 50,000 optimizer updates. Each coupling supplies one update with 256 sampled pairs; a new batch of eight couplings precedes the next eight updates. These counts exclude warm-up and evaluation solves.
+
 All 48 worker-level primary MetroPT-3 repeats converge. The solver receives sensor inputs without failure labels. Maximum paired differences in transport cost and barycentric shift are $0.0279$ and $0.00347$ under the fixed failure-window consumer.
 
 The Packer19 tolerance study uses two hosts, four GPUs per host, three method orders, and three timing repeats. Each tolerance has 24 paired observations indexed by host, order, and GPU, with an equal-host bootstrap interval. Consumer TV compares outputs to the $10^{-6}$ reference. Absolute OT-stage medians at $10^{-3}$ are 2.04 s for logical masking and 1.30 s for compaction in this stopping study. The component study's phase medians in \cref{tab:phase-costs} are summarized independently and belong to its own LM/DC comparison.
@@ -83,7 +85,13 @@ The four width-four groups contain target indices 0--3, 4--7, 8--11, and 12--15 
 
 Width-four calibration uses the first group, and width-eight calibration uses the first eight targets. Each method and width has five update/screen measurements after warm-up. Separate instrumented solves measure initialization, verification per candidate, and release-event cost, including empty-event paths. Calibration samples use prefix target IDs at each width. The model sums these costs using each target run's observed trace and event counts. Error ranges in \cref{tab:execution-controls} span the three compute-skipping methods and four repeats; they are descriptive ranges. Same-input validation uses separate calibration and timing runs, while target-group transfer also changes the evaluated targets.
 
-The earlier width-16 scheduling experiment uses the same prepared source and targets. Its policies keep, delay, or bucket the physical capacity after verified release, with four-cycle graph blocks. Cost calibration measures update-plus-screen blocks and workspace movement; the solver separately records update, screen, verifier, and movement time. Compilation, graph capture, and calibration precede steady-state solver timing. These measurements support the scheduling comparison reported in \cref{sec:execution-controls}.
+The model ablation fits $\alpha$ and $\beta$ by unweighted least squares over the four per-width update-time medians from the width-four calibration group, separately for each execution method. It replaces the update sum by $\alpha\sum_t n_t+\beta n_{\max}$ and retains the lookup model's initialization, screen, verifier, and release costs unchanged. The target totals do not enter the fit. This post-hoc comparison uses three transferred groups, three methods, and four repeats. The width lookup has mean absolute percentage error $0.853\%$, compared with $1.05\%$ for the linear model. Application-time validation here uses $n=16384$; the synthetic small-problem width plateau remains a separate primitive measurement.
+
+A separate post-hoc comparison of estimated indexed/DC and entry-skip/DC ratios agrees with the measured paired median direction in all six group--contrast cases, and with 23 of 24 individual paired-repeat directions. All effects are below $0.1\%$. These descriptive directions characterize the repeated timings of the fixed input groups.
+
+The earlier width-16 scheduling experiment uses the same prepared source and targets. Its policies keep, delay, or bucket the physical capacity after verified release, with four-cycle graph blocks. Immediate compaction takes 8.43 s, four-cycle graph replay 8.42 s, and bucketed execution 9.24 s. Cost calibration measures update-plus-screen blocks and workspace movement; the solver separately records update, screen, verifier, and movement time. Compilation, graph capture, and calibration precede steady-state solver timing.
+
+\input{figures/FIG-execution-settings.tex}
 
 \subsection{Reproducibility}
 

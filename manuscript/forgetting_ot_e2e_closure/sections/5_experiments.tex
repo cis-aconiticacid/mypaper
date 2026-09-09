@@ -56,7 +56,7 @@ The small-problem plateau helps interpret the modest ImageNet-32 solver gain: la
 \subsection{Packer19 single-variable component tests}
 \label{sec:components}
 
-The Packer19 study asks which parts of the execution layer reduce time. It uses one transition workload on two hosts with four A100 GPUs each. Three method orders produce 24 paired observations indexed by host, order, and GPU. Timings are medians after warm-up. As shown in Table~\ref{tab:packer19-components}, each contrast changes one component at tolerance $10^{-3}$.
+The Packer19 study asks which parts of the execution layer reduce time. It uses one transition workload on two hosts with four A100 GPUs each. Three method orders produce 24 paired observations indexed by host, order, and GPU. Timings are medians after warm-up. As shown in Table~\ref{tab:packer19-components}, each contrast changes one component at tolerance $10^{-3}$. In the LM/DC contrast, both arms disable packed-buffer reuse, check every four cycles with the same verifier, and retain packed execution through width one. The comparison measures freezing versus removal under this common allocation policy.
 
 \input{figures/FIG-components.tex}
 
@@ -102,8 +102,8 @@ We compare physical compaction with indexed execution and in-place skipping on o
 
 The same runs test \cref{eq:calibrated-runtime}. Independent calibration measures every active width with five primitive repeats and obtains control costs from a separate instrumented solve. Calibration on the first width-four group is transferred to the other three groups. Across the three primary methods and their four timing repeats, signed reconstruction errors are $+0.463\%$ to $+1.08\%$. These estimates use the observed completion and verification traces and shared-source inputs. Prefix-ID calibration approximates the noncontiguous survivor IDs used during indexed execution.
 
-A post-hoc comparison uses ratios of the independently estimated times to predict the ordering of the execution choices. For both indexed/DC and entry-skip/DC, the predicted direction agrees with the measured paired median on each of the three transferred target groups. At the individual-repeat level, 23 of the 24 paired directions agree. These comparisons concern sub-$0.1\%$ differences between compute-skipping implementations, so the practical result is their similar cost on this input pool.
+A matched model ablation replaces only the update-cost lookup with $\widehat c(a)=\alpha a+\beta$, fitted to the same calibration medians. Across 36 method--repeat records in the three transferred groups, mean absolute percentage error is $0.853\%$ for the width lookup and $1.05\%$ for the linear model. The improvement is modest on this large-support configuration. Appendix~\ref{sec:competitive-settings} gives the fitting rule and the finer timing comparisons.
 
 \input{figures/FIG-controls.tex}
 
-An earlier scheduling study uses the same source and targets together at width 16. It compares immediate exact compaction with graph replay, periodic compaction, and bucketed capacities. Immediate compaction takes 8.43~s; four-cycle graph replay also takes 8.42~s, while bucketed execution takes 9.24~s. Its independently measured width and movement costs explain why saving a small amount of movement can add more padded update work. That study tests when and how far to compact. The present comparison tests whether full-state movement is needed to avoid completed updates; its regrouped inputs add execution contrasts to the existing workload evidence.
+These comparisons test whether full-state movement is needed to avoid completed updates. The regrouped inputs add execution contrasts to the existing workload evidence. Appendix~\ref{sec:competitive-settings} separately reports the earlier scheduling comparison, which varies when and how far to compact.

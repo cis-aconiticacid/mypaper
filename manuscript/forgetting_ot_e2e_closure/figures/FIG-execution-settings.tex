@@ -1,0 +1,16 @@
+\begin{table}[!htbp]
+\centering
+\caption{Allocation and timing settings for the principal Triton contrasts. All rows use cold initialization, FP32 with TF32 disabled, checks every four cycles, and packed execution through width one. The internal screen/verifier threshold is $9.5\times10^{-4}$. Buffer policy is shared within each listed contrast.}
+\label{tab:execution-settings}
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}llll@{}}
+\toprule
+Study & Compared execution & Update outputs & Reported endpoint \\
+\midrule
+MetroPT-3 application & Fixed / DC & Newly allocated & Four-worker pipeline time \\
+Packer19 component & LM / DC & Newly allocated & Pipeline; paired consumer-subtracted solver \\
+MetroPT-3 competitive & Indexed / entry skip / DC & Reused & Continuous solver time \\
+\bottomrule
+\end{tabular}
+\end{table}

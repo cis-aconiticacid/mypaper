@@ -1,5 +1,11 @@
 # Manuscript restructuring and visual review
 
+## Latest review increment (base ab11094)
+
+Added FIG-execution-settings as Table 11 in Appendix A.7, referenced from Section 3.4. Purpose: compare allocation policies and timing endpoints across the primary Triton contrasts. Contract: editable monochrome four-column lookup table, three source-bound rows, common initialization/precision/check interval/tail in caption; no uncertainty or new performance values because this is a configuration display. Sources and four-step review decisions are recorded at the top of REVIEW_DISPOSITION.md.
+
+The user-supplied figure skill's companion workflow/source-map/final-audit references remain unavailable. Local review inspected the rendered Table 11 and title pages for readability, alignment and clipping; both are clear. The PDF is 16 pages with no overfull-box or undefined-reference warnings. Tables 5 and 6 retain their numbers and source insertion in Sections 5.4/5.5. Table 7 retains its absolute-time precision; fine ordering discussion is in A.7. These are agent source and visual checks, not an external design or human publication approval.
+
 ## Scope and writing decisions
 
 The current English manuscript was rebuilt from title through appendix. The starting checkpoint is 795cb6c. All old figure/table files in figures/ were removed; Git retains their previous contents. Source CSVs, frozen analyses, and numerical macros remain available.
