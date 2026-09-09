@@ -1,5 +1,6 @@
 """Render manuscript figures from frozen summaries; no experimental runs."""
 import csv
+import io
 import json
 from pathlib import Path
 import matplotlib
@@ -24,7 +25,14 @@ BLUE, ORANGE = SPEC["style"]["colors"]
 def save(fig, stem):
     OUT.mkdir(parents=True, exist_ok=True)
     for extension in ("pdf", "svg", "png"):
-        fig.savefig(OUT / f"{stem}.{extension}", dpi=200, bbox_inches="tight")
+        target = OUT / f"{stem}.{extension}"
+        if extension == "svg":
+            stream = io.StringIO()
+            fig.savefig(stream, format="svg", bbox_inches="tight")
+            text = "\n".join(line.rstrip() for line in stream.getvalue().splitlines()) + "\n"
+            target.write_text(text, encoding="utf-8", newline="\n")
+        else:
+            fig.savefig(target, dpi=200, bbox_inches="tight")
     plt.close(fig)
 
 # Totals are shown separately; no pooling or invented completion trajectories.
