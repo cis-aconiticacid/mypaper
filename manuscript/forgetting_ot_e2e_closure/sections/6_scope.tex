@@ -1,36 +1,8 @@
-\section{Operating Regime and Composition}
+\section{Discussion}
 \label{sec:scope}
 
-\policy{} applies to batched positive EOT problems with compatible batched
-representations and a two-marginal verifier. Different numbers of iterations
-within a batch create removable work; net acceleration depends on runtime as a
-function of batch width and on incremental control and state-movement costs
-(\cref{eq:active-gate}).
+DrainSinkhorn benefits batches whose members complete at different verification rounds and whose narrower kernels save enough time to cover screening, verification, and state movement. The grouping test and width sweep examine these two conditions separately. Initialization and batch assignment affect completion iterations, while problem size and kernel configuration determine the time associated with each active width.
 
-Initialization shapes both the total iteration count and its variation within
-a window. The study that uses one initialization for multiple problems uses
-controlled overlapping ImageNet-32
-supports: dynamic-compaction execution reduces updates by 30.62\% and accelerates the
-steady-state critical path by $1.421\times$, including proposal and transfer
-costs. The feature-training study uses cold proposals for independently
-resampled OT-FM couplings.
+Compaction adds buffers and data movement. The Packer19 component test measures 26.1 MiB of additional peak allocation together with lower runtime and GPU energy; \cref{tab:phase-costs} reports its phase costs. Backend implementations can use different packing and tail-handoff strategies, so their full execution costs include these choices.
 
-The executor removes problems under the configured stopping rule. The grouping
-test changes how a fixed problem set is assigned to batches using offline
-iteration counts. The width sweep measures update time at each active batch
-width. These measurements supply the terms in \cref{eq:time-difference} and can
-also guide grouping when completion depths can be estimated.
-
-Dynamic compaction trades computation for state movement and buffers.
-The matched logical-mask/dynamic-compaction study reports 26.1 MiB of additional peak
-allocation alongside lower time and endpoint energy; \cref{tab:phase-costs}
-reports its phase costs. OTT-JAX and PyKeOps
-realize release through backend-specific rebucketing and batched
-independent-problem execution.
-
-The measured width--runtime relation belongs to a specified device, kernel path,
-problem shape, and numerical configuration. The packed Triton path also
-switches narrow tails to its matched single-problem solver, so its complete
-runtime includes that routing boundary. The update-count identity and
-\cref{eq:time-difference} apply with any measured width--runtime relation; the
-reported wave boundaries are specific to the A100 Triton configuration.
+The performance model uses a width-cost function for a specified device, kernel, problem shape, and precision. The reported scheduling-wave behavior describes the measured A100 Triton configuration. Applying the model to another backend requires its corresponding width-cost measurements. Offline completion counts also support analysis of batch grouping; using estimated counts for online grouping remains a separate scheduling problem.

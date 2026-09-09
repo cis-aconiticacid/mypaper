@@ -1,0 +1,18 @@
+\begin{table*}[!t]
+\centering
+\caption{Application results grouped by timing level. Ratios are baseline/DC. Ranges in parentheses describe observed seeds or execution orders; brackets denote bootstrap 95\% intervals. Each row retains its own observations and is not pooled with other rows.}
+\label{tab:main-results}
+\small
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}lllll@{}}
+\toprule
+Scope & Task & Baseline & Speedup & Observations \\
+\midrule
+$E_1$ & ImageNet-32 & Fixed & $1.054$ (1.033--1.072) & 3 training seeds \\
+$E_1$ & Packer19 components & LM & $1.540$ [1.5389, 1.5404] & 24 paired units \\
+$E_2$ & MetroPT-3 & Fixed & $1.7455$ (1.7453--1.7460) & 3 orders; 4 workers \\
+$E_3$ & ImageNet-32 & Fixed & $1.036$ (1.030--1.043) & 3 training seeds \\
+\bottomrule
+\end{tabular}
+\end{table*}

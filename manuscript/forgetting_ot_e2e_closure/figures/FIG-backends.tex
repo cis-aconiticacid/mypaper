@@ -1,0 +1,17 @@
+\begin{table*}[!t]
+\centering
+\caption{Backend implementations and their comparison paths. All rows measure Sinkhorn time. Parentheses denote the observed repeat, clip, or seed range indicated in the last column. Residuals are maximum marginal $L_1$ errors.}
+\label{tab:ot-cross-backend}
+\small
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}lllll@{}}
+\toprule
+Task / backend & Baseline & Speedup & Residual & Unit \\
+\midrule
+ImageNet-32 / OTT-JAX & Native vectorized & $2.600$ (2.338--2.664) & $9.97\,10^{-4}$ & 6 repeats \\
+A2D2 / PyKeOps & Sequential carry & $3.174$ (2.180--3.944) & $9.97\,10^{-4}$ & 3 clips \\
+ImageNet-32 / PyKeOps & Sequential & $1.415$ (1.360--1.448) & $8.93\,10^{-4}$ & 3 seeds \\
+\bottomrule
+\end{tabular}
+\end{table*}

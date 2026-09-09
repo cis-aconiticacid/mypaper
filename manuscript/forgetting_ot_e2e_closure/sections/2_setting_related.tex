@@ -1,7 +1,8 @@
-\section{Setting and Prior Systems}
+\section{Background and Motivation}
 \label{sec:setting-related}
 
-\paragraph{Entropic optimal transport.}
+\subsection{Batched entropic optimal transport}
+
 For positive unit-mass marginals $a\in\R_+^n$ and $b\in\R_+^m$, EOT solves
 \begin{equation}
 \min_{\pi\geq0}\ \langle C,\pi\rangle
@@ -9,57 +10,27 @@ For positive unit-mass marginals $a\in\R_+^n$ and $b\in\R_+^m$, EOT solves
 \pi\ones=a,\quad\pi^\top\ones=b.
 \label{eq:eot}
 \end{equation}
-With $K=\exp(-C/\varepsilon)$, Sinkhorn alternates diagonal scalings to form
-$\pi=\diag(u)K\diag(v)$ \citep{cuturi2013sinkhorn}. Coordinate, relaxed,
-low-rank, and Newton methods reduce arithmetic or iteration count inside one
-solve \citep{altschuler2017near,thibault2017overrelaxed,scetbon2021lowrank,kemertas2025truncated}.
-Fused streaming implementations rewrite stabilized updates as LogSumExp
-reductions and reduce memory traffic \citep{ye2026flashsinkhorn}. \policy{}
-keeps the chosen inner update and changes the set of problems that receive the
-next one.
+Here $C$ is the transport cost, $\varepsilon>0$ is the regularization parameter, and $\pi$ is the coupling. With $K=\exp(-C/\varepsilon)$, Sinkhorn alternates diagonal scalings to form $\pi=\diag(u)K\diag(v)$ \citep{cuturi2013sinkhorn}. A batched solver applies these updates to several independent problems.
 
-\paragraph{Initialization and repeated couplings.}
-Carry, analytic extensions, and learned dual proposals can reduce a new
-problem's starting defect \citep{amos2023meta,thornton2023initialization}.
-Large-coupling Flow Matching also uses soft $c$-transforms when supports change
-\citep{zhang2025large}. These mechanisms change the numbers of iterations
-required by the problems. DrainSinkhorn accommodates both regimes: the formal Packer19
-attribution uses the same fixed proposal in every arm, and the ImageNet-32
-training experiment uses independent cold-start couplings.
+Coordinate, relaxed, low-rank, and Newton methods change the work inside an individual solve \citep{altschuler2017near,thibault2017overrelaxed,scetbon2021lowrank,kemertas2025truncated}. Matrix-free and fused implementations reduce memory traffic, including the stabilized LogSumExp updates of FlashSinkhorn \citep{ye2026flashsinkhorn}. DrainSinkhorn operates around the selected update kernel and changes the set of problems receiving its next invocation.
 
-\paragraph{Dynamic batching and batched solvers.}
-Automatic batching tracks the program point of each member in a data-dependent
-program \citep{radul2020autobatching}. Orca schedules autoregressive inference
-one iteration at a time \citep{yu2022orca}. Outside OT, Ginkgo's batched CG
-provides a related execution precedent: each uniform independent linear system
-exits once its residual reaches the stopping tolerance, and later iterations skip converged systems
-inside the fused solver \citep{ginkgoBatched}. jaxipm redesigns IPOPT around heterogeneous iteration fusion and
-replacement of completed problems \citep{viljoen2026jaxipm}. Within OT, POT's \texttt{solve\_batch}
-parallelizes independent OT problems represented by batched cost matrices, and
-OTT-JAX uses JAX transformations to vectorize multiple Sinkhorn solves
-\citep{flamary2021pot,pot2025batch,cuturi2022ott}. Fixed-width multi-problem
-Sinkhorn execution is the starting point for our work. We target the subsequent
-removal of completed EOT problems while retaining online pairwise interactions
-instead of materializing one cost tensor per problem.
+\subsection{Completed problems consume batch work}
 
-DrainSinkhorn addresses the numerical structure of EOT batches. Alternating
-scaling permits a preliminary screen using the current marginals; the
-two-marginal verifier is evaluated on problem outputs; dynamic compaction must preserve the
-batch-element
-correspondence of potentials, marginals, supports, and scratch state. Generic
-masking leaves those EOT-specific state transformations and the width
-unchanged. \Cref{tab:prior-systems} compares the batched object, completion
-signal, and execution action of prior systems. Our OTT-JAX and PyKeOps variants
-remove completed problems, whereas the packed Triton realization also performs a
-preliminary screen using the current marginals.
+Fixed-width execution presents the original batch to every update. When some problems have passed verification, later kernels still contain their lanes. The Packer19 component experiment makes this cost visible: logical masking retains 256 problem-update slots, whereas dynamic compaction executes 156 (\cref{fig:motivation-work}). This comparison uses the same observed completion decisions; \cref{sec:components} gives the measurement settings.
 
-\paragraph{OT consumers.}
-OTT provides a broad transport API \citep{cuturi2022ott}. Multisample Flow
-Matching consumes an OT coupling to select training pairs
-\citep{pooladian2023multisample}; these couplings can be prepared independently
-of network optimization \citep{zhang2025large}. We evaluate the complete path
-from the OT coupling to the downstream consumer for industrial endpoints and carry the same
-execution path through a fixed-update feature-space OT-FM training pipeline.
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/FIG-work.pdf}
+\caption{Problem updates before and after compaction. Each panel uses its own workload: the primary four-worker MetroPT-3 study and the Packer19 logical-mask control. Counts are totals for the respective measured execution.}
+\label{fig:motivation-work}
+\end{figure}
 
-\input{figures/table1_prior_systems}
+Fewer update slots need not produce a proportional reduction in GPU time. The kernel's grid depends on batch width and problem size, and GPU scheduling groups blocks into waves. A width reduction saves kernel time when it shortens this execution. This motivates both an executor that removes completed problems and a model that accounts for the measured cost at each remaining width.
 
+\subsection{Related execution systems}
+
+Dynamic batching already supports data-dependent execution in other settings. Automatic batching groups program members by execution point \citep{radul2020autobatching}, and Orca schedules autoregressive inference one iteration at a time \citep{yu2022orca}. Ginkgo's batched conjugate-gradient solver skips converged systems inside its fused kernel \citep{ginkgoBatched}; jaxipm combines heterogeneous iterations and replacement of completed problems \citep{viljoen2026jaxipm}. Within OT, POT provides \texttt{solve\_batch}, and OTT-JAX supports vectorized Sinkhorn solves \citep{flamary2021pot,pot2025batch,cuturi2022ott}.
+
+DrainSinkhorn applies completion-driven compaction to matrix-free EOT batches. Its packed Triton implementation uses the alternating-scaling structure for screening and preserves the correspondence among all per-problem tensors during compaction. OTT-JAX and PyKeOps implementations use their own verification and packing mechanisms.
+
+Initialization also affects batch execution by changing completion iterations. Carried potentials, analytic extensions, and learned proposals reduce the initial residual \citep{amos2023meta,thornton2023initialization}; soft $c$-transforms support changing couplings in flow matching \citep{zhang2025large}. Our experiments include cold-start couplings and a controlled setting with shared initialization. Downstream tasks consume the resulting coupling, for example to select flow-matching training pairs \citep{pooladian2023multisample}. Their total runtime includes both the solver and this consumer work.

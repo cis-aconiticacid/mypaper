@@ -1,71 +1,16 @@
 \section{Introduction}
 \label{sec:introduction}
 
-GPU implementations of entropic optimal transport (EOT) have become markedly
-better at executing a single Sinkhorn update. Matrix-free operators, tiled
-reductions, and fused streaming kernels reduce memory traffic and avoid
-materializing the transport matrix
-\citep{feydy2019sinkhorn,cuturi2022ott}. Many workloads,
-however, prepare a batch of couplings for predictive maintenance, scientific
-state transitions, or minibatch training. Once the inner update is fast, total
-cost also depends on how long each problem remains in that batch.
+Entropic optimal transport (EOT) supplies couplings for industrial sensor analysis, single-cell trajectory inference, and flow-matching training. GPU implementations accelerate Sinkhorn updates through matrix-free operators, tiled reductions, and fused kernels \citep{feydy2019sinkhorn,cuturi2022ott,ye2026flashsinkhorn}. These applications often require multiple independent couplings, which can share a batched kernel.
 
-Different problems usually reach the stopping tolerance at different
-iterations. A static batch runs until the problem requiring the most iterations
-finishes: completed problems continue to occupy state, verification bandwidth,
-and kernel lanes. A logical
-mask freezes their state but does not shrink the tensor seen by a fused kernel.
-The updates between each problem's completion and the end of the batch are
-wasted OT work.
+The problems in a batch reach the stopping tolerance at different iterations. A fixed-width kernel nevertheless retains every problem until the slowest one finishes. Completed problems continue to occupy kernel lanes and verification bandwidth. Logical masking freezes their state while preserving the original tensor width. As inner kernels become faster, the execution of these completed problems becomes a separate source of cost.
 
-We introduce \policy{}, an execution layer that removes this padding. It starts
-from standard batched execution of independent Sinkhorn problems and removes a
-problem after it passes verification used by the selected solver. A
-full alternating cycle makes the newly updated marginal current in exact
-arithmetic, so the other marginal provides a cheap batched screen. Lanes that
-pass the subsequent two-marginal verifier are removed from potentials, marginals,
-support descriptors, and scratch buffers. The next backend update runs at the
-width of the unfinished set.
+Our key observation is that each verified completion provides an opportunity to shrink the next update. Sinkhorn problems are independent along the batch dimension, so removing one problem preserves the update applied to the remaining problems. Real workloads contain enough variation in completion iterations for this removal to matter: in the Packer19 component test, physical compaction reduces executed problem updates from 256 to 156 (\cref{fig:motivation-work,tab:packer19-components}).
 
-This design separates kernel optimization from batch execution.
-The inner backend determines the cost of one stabilized update; \policy{}
-changes the number and width of updates executed across a batch. We implement
-the execution layer with a packed Triton kernel, OTT-JAX, and PyKeOps. The packed
-Triton path additionally uses the current marginal in a preliminary screen; the
-OTT-JAX and PyKeOps paths remove completed problems with independent backend
-mechanisms.
+We introduce \policy{}, an execution layer that performs screen, verify, and compact during batched Sinkhorn. After a complete scaling cycle, one marginal is current in exact arithmetic. A batched screen evaluates the other marginal and selects candidates for the full two-marginal verifier. The executor emits verified outputs and compacts potentials, marginals, support descriptors, and scratch buffers together. Subsequent kernels process the unfinished batch.
 
-For problem $t$, let $n_t$ be the batched-iteration number of the first
-configured verification round at which it passes the two-marginal verifier.
-Fixed-width execution performs $Wn_{\max}$ problem updates, whereas dynamic
-compaction performs exactly $\sum_t n_t$. This identity depends only on the
-observed iteration numbers. Removable work exists whenever a batch contains
-both completed and unfinished problems before an update. If
-$c_k(a,\xi_k)$ denotes the measured cost of update $k$ at width $a$, the
-wall-clock saving is
-$\sum_k[c_k(W,\xi_k)-c_k(A_k,\xi_k)]$ minus incremental control overhead.
-The completion depths and width-dependent update times therefore determine the
-runtime benefit.
+The runtime benefit depends on the GPU cost of the resulting widths. A smaller batch can launch fewer blocks while still occupying the same number of scheduling waves. We therefore model runtime using completion iterations, measured update time at each active width, and control overhead. The model connects the amount of removable work to the hardware conditions under which compaction saves time.
 
-GPU update time can change at scheduling-wave boundaries rather than in
-proportion to the number of problems. The packed Triton update launches a
-width-dependent number of thread blocks; reducing $A_k$ saves time when the
-grid requires fewer waves. We measure this relation with a width sweep.
+We evaluate this design on MetroPT-3, ImageNet-32, Packer19, and A2D2. The primary MetroPT-3 experiment achieves \CMetroCorrectedEndpointSpeedup{} pipeline speedup. ImageNet-32 achieves $1.054\times$ Sinkhorn speedup and \CFeatureTrainingActiveOverStatic{} over full training. Component tests identify the effects of screening, verification, and compaction; width and grouping experiments explain variation in runtime benefit. OTT-JAX and PyKeOps implementations test the execution principle across backends.
 
-Our contributions are:
-\begin{enumerate}[leftmargin=*,itemsep=2pt,topsep=3pt]
-  \item \textbf{Dynamic compaction during batched Sinkhorn.} Starting from
-  standard fixed-width batching and the selected solver's stopping rule, we
-  dynamically remove completed problems from all per-problem state. Each
-  subsequent kernel executes at a width of the unfinished set.
-  \item \textbf{Hardware-aware performance model.} An update-count identity
-  measures removed work. A matched runtime decomposition uses measured update
-  time at each active width and includes control overhead.
-  \item \textbf{Component analysis.} Matched controls separate
-  batched verification, Sinkhorn-specific screening, logical masking, and dynamic compaction. Grouping experiments that hold total iteration counts fixed and
-  width sweeps identify when dynamic compaction reduces runtime.
-  \item \textbf{Evaluation across backends and tasks.} MetroPT-3, Packer19, and
-  ImageNet-32 evaluate the packed Triton path; OTT-JAX and PyKeOps test transfer
-  on ImageNet-32 and A2D2. The evaluation reports runtime, residuals,
-  finite-precision decisions, consumer outputs, and training quality.
-\end{enumerate}
+This paper makes three contributions. First, DrainSinkhorn combines Sinkhorn-specific screening with verified completion and physical compaction of batched state. Second, a hardware-aware performance model relates removed updates to kernel time and control overhead. Third, application and component experiments establish the runtime effects, output quality, and operating conditions of the execution layer.

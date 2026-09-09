@@ -1,140 +1,75 @@
 \section{Hardware-Aware Performance Model}
 \label{sec:cost-hypothesis}
 
-The model combines per-problem completion depths with measured update time at
-each active batch width. Completion depths determine how many updates can be
-removed; width-dependent kernel time determines the runtime reduction. This
-follows the standard use of accelerator performance models to relate workload
-shape and hardware execution cost \citep{yu2021habitat,nvidia2022gpuperformance}.
+The model connects completion iterations to executed work and runtime. Its inputs are the observed completion iteration of each problem, the measured update cost at each batch width, and the control overhead. This use of workload shape and device cost follows accelerator performance modeling \citep{yu2021habitat,nvidia2022gpuperformance}. The model organizes the width, component, and grouping experiments in \cref{sec:experiments}.
 
-\subsection{Counting removed updates}
+\subsection{Completion iterations determine active width}
 
-For problem $t$, let $n_t$ be the batched-iteration number of the first
-configured verification round at which the problem passes the two-marginal
-verifier, and let
+Let $n_t$ be the iteration of the first configured verification at which problem $t$ passes, and let $n_{\max}=\max_t n_t$. Before update $k$, the active width is
 \begin{equation}
-A_k=\bigl|\{t:n_t\geq k\}\bigr|
+A_k=\bigl|\{t:n_t\geq k\}\bigr|.
 \label{eq:active-width}
 \end{equation}
-be the active batch width before packed update $k$. Verification
-supplies both quantities.
+These iteration counts include the effect of the verification interval. A more frequent schedule can observe completion earlier and produce a different trajectory.
 
-\begin{proposition}[Update-count identity]
-For a finite window of $W$ problems,
+For the same completion decisions, fixed-width execution uses $Wn_{\max}$ problem-update slots. Compaction uses
 \begin{equation}
-S_{\mathrm{active}}
-=\sum_{k=1}^{n_{\max}}A_k
-=\sum_{t=1}^{W}n_t,
-\qquad
-S_{\mathrm{static}}=Wn_{\max}.
+S_{\mathrm{active}}=\sum_{k=1}^{n_{\max}}A_k=\sum_{t=1}^{W}n_t,
+\qquad S_{\mathrm{static}}=Wn_{\max}.
 \label{eq:update-count-identity}
 \end{equation}
-Hence dynamic compaction removes exactly
+The identity follows by counting each problem once at every iteration before its completion. The removed work is
 \begin{equation}
-R=Wn_{\max}-\sum_{t=1}^{W}n_t
+R=Wn_{\max}-\sum_t n_t.
 \label{eq:removable-updates}
 \end{equation}
-problem updates relative to a fixed-width batch with the same final
-boundary.
-\end{proposition}
-\begin{proof}
-Use $n_t=\sum_{k\geq1}\mathbf 1\{n_t\geq k\}$ and exchange the two finite
-sums. Fixed-width execution keeps all $W$ lanes through $n_{\max}$.
-\end{proof}
+Geometrically, $R$ is the area between the fixed-width rectangle and the active-width trajectory. In the matched logical-mask control, completed states are frozen while the launched width remains $W$.
 
-Logical masking changes which states update but not the width seen by
-the kernel, so it retains $Wn_{\max}$ updates. The area between the static
-rectangle and the active-width trajectory is therefore the exact work removed
-by dynamic compaction. The verification interval is already reflected in the observed $n_t$;
-the first passing iteration on a denser verification schedule would define a different
-quantity.
+A batch has removable work when completed and unfinished problems coexist before an update. Thus variation within a batch matters: identical completion iterations yield $R=0$, even if completion iterations differ across batches. The grouping experiment changes this within-batch variation using a fixed set of problems.
 
-\begin{proposition}[Condition for removable work]
-Let $(n_1,\ldots,n_W)$ be any random vector of finite iteration numbers.
-Then $\mathbb E[R]>0$ if and only if there exists a batched iteration $k$ such that
-\begin{equation}
-\Pr(0<A_k<W)>0.
-\label{eq:joint-iteration-condition}
-\end{equation}
-\end{proposition}
-\begin{proof}
-$R$ is nonnegative and is zero exactly when every lane has the same iteration
-number. Different finite iteration numbers create a value of $k$ with both
-active and completed lanes, and the converse follows directly from the
-definition of $A_k$.
-\end{proof}
+\subsection{Kernel savings must cover control cost}
 
-The condition depends on the joint distribution of iteration numbers inside a
-packed window. Perfectly synchronized lanes create no removable work even when
-the required iteration numbers vary across windows.
-
-\subsection{Exact wall-clock accounting for a measured backend}
-
-Let $c_k(a,\xi_k)$ be the cost of matched update $k$ at width $a$,
-where $\xi_k$ records support shape, data type, kernel configuration, and other
-backend state held fixed by the comparison. Then
+Let $c_k(a,\xi_k)$ denote the measured cost of update $k$ at width $a$. The state $\xi_k$ specifies support shape, data type, kernel configuration, and other conditions of the comparison. The compacted runtime is
 \begin{equation}
 \begin{split}
 T_{\mathrm{active}}={}&\sum_k c_k(A_k,\xi_k)
 +H_{\mathrm{screen}}+H_{\mathrm{verification}}\\
-&+H_{\mathrm{compact}}+H_{\mathrm{other}},
+&+H_{\mathrm{compact}}+H_{\mathrm{other}}.
 \end{split}
 \label{eq:time-accounting}
 \end{equation}
-$H_{\mathrm{other}}$ covers remaining timed control work. Let $H_{\mathrm{fixed}}$
-be the corresponding fixed-width control cost and let $\Delta H$ denote active
-control cost minus $H_{\mathrm{fixed}}$.
+The $H$ terms account for screening, verification, compaction, and remaining timed control work. Write their sum as $H_{\mathrm{active}}$, and let $\Delta H=H_{\mathrm{active}}-H_{\mathrm{fixed}}$ be the incremental control cost relative to fixed-width execution.
 
-\begin{proposition}[Runtime decomposition]
-For a matched fixed-width/dynamic-compaction execution with the same final verifier
-boundary and matched update states $\xi_k$,
+For a comparison with the same completion decisions and matched update states, subtracting the two runtime accounts gives
 \begin{equation}
+\begin{split}
 T_{\mathrm{fixed}}-T_{\mathrm{active}}
-=\sum_{k=1}^{n_{\max}}
-\left[c_k(W,\xi_k)-c_k(A_k,\xi_k)\right]-\Delta H.
+={}&\sum_{k=1}^{n_{\max}}
+[c_k(W,\xi_k)-c_k(A_k,\xi_k)]\\
+&-\Delta H.
+\end{split}
 \label{eq:time-difference}
 \end{equation}
-Consequently, dynamic compaction is faster exactly when
+Compaction reduces runtime when
 \begin{equation}
-\sum_k\!\left[c_k(W,\xi_k)-c_k(A_k,\xi_k)\right]
->\Delta H.
+\sum_k[c_k(W,\xi_k)-c_k(A_k,\xi_k)]>\Delta H.
 \label{eq:active-gate}
 \end{equation}
-\end{proposition}
-\begin{proof}
-Write $T_{\mathrm{fixed}}=\sum_k c_k(W,\xi_k)+H_{\mathrm{fixed}}$,
-subtract Equation~\eqref{eq:time-accounting}, and collect the control terms.
-\end{proof}
+The width sweep measures the update-cost term, and component measurements quantify the additional control work. This equation explains the break-even condition for the measured execution path.
 
-Variation among $n_t$ creates removable updates. The measured function
-$c_k(a,\xi_k)$ determines whether the smaller active widths reduce kernel time.
-If $c_k(A_k,\xi_k)=c_k(W,\xi_k)$ for every $k$, compaction removes updates but
-saves no update time. It reduces total runtime when the summed update-time
-reduction exceeds $\Delta H$.
+\subsection{GPU scheduling makes width cost stepwise}
 
-\subsection{Width-dependent kernel time}
-
-For the packed Triton update used in our implementation, the launch grid has
+For the packed Triton update, width $a$ and support size $n$ produce
 \begin{equation}
 B(a,n)=a\left\lceil\frac{n}{b_m}\right\rceil
 \label{eq:block-grid}
 \end{equation}
-thread blocks, where $b_m$ is the row tile size. GPU scheduling processes this
-grid in occupancy-dependent waves \citep{nvidia2022gpuperformance,nvidia2024cuda}. The resulting model is
+thread blocks, where $b_m$ is the row tile size. GPU scheduling executes blocks in waves whose capacity depends on occupancy \citep{nvidia2022gpuperformance,nvidia2024cuda}. A model of this cost is
 \begin{equation}
 c(a;n,\xi)\approx g_{n,\xi}\!\left(
-\left\lceil\frac{B(a,n)}{Q_{\xi}}\right\rceil\right),
+\left\lceil\frac{B(a,n)}{Q_\xi}\right\rceil\right),
 \label{eq:wave-cost}
 \end{equation}
-where $Q_{\xi}$ is the measured resident block capacity of the kernel and
-$g_{n,\xi}$ maps wave count to time. Registers, shared memory, and kernel state
-enter through $Q_{\xi}$; the value is calibrated for the selected device and
-kernel configuration.
+where $Q_\xi$ is the resident block capacity for the device and kernel, and $g_{n,\xi}$ maps wave count to elapsed time. Registers and shared memory affect $Q_\xi$.
 
-On the measured A100/Triton configuration with $b_m=64$, the first-wave estimate
-places the saturation width near $6.75$ for $n=1024$, $1.69$ for $n=4096$, and
-below one for $n=16384$. Direct primitive measurements locate the first large
-increase at widths $6\rightarrow7$ and $1\rightarrow2$ for the first two sizes;
-the $n=16384$ curve is responsive from width one. These measurements instantiate
-$c(a)$ for this backend and explain why equal update-count reductions can have different
-wall-clock value across problem sizes.
+Reducing width within a scheduling wave can leave update time nearly unchanged. Larger problems launch more blocks per lane, so removing a lane can reduce the number of waves earlier. \Cref{sec:width-results} measures this relation on A100 and uses it to interpret the application results.

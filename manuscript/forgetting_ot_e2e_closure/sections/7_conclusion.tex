@@ -1,30 +1,4 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-\policy{} removes padded OT work from batches whose problems require different
-numbers of iterations.
-It starts from fixed-width execution of independent Sinkhorn problems. The
-solver's stopping rule determines completion, and dynamic compaction narrows
-each subsequent update. The hardware-aware performance model combines an
-update-count identity with measured kernel time at each active width. Its
-runtime decomposition includes control overhead and gives the matched-path
-break-even condition.
-
-Matched fixed-width/dynamic-compaction comparisons deliver
-\CMetroCorrectedEndpointSpeedup{} on the four-worker MetroPT-3 endpoint,
-$1.054\times$ for ImageNet-32 Sinkhorn time, and $1.616$--$3.110\times$
-in the MetroPT-3 scale-out study. A setting that uses one
-initialization for multiple problems gives
-$1.421\times$ with 30.62\% fewer problem updates. OTT-JAX and
-PyKeOps implementations remove completed problems through independent backends.
-
-Matched controls separate verification, screening, logical masking, and dynamic
-compaction. In MetroPT-3 and Packer19, compaction also reduces measured GPU
-energy. The grouping test shows that variation in completion depth creates more
-removable updates. A100 width sweeps show stepwise kernel times from wave
-quantization. The application results report runtime together with residuals
-and consumer or training outputs.
-
-\paragraph{Reproducibility.}
-The release artifact records source and input identities, commands, software and
-GPU environments, raw outputs, numerical checks, and paired analyses.
+DrainSinkhorn removes completed problems from batched Sinkhorn execution through screening, verification, and physical compaction. The resulting active-width trajectory reduces problem-update slots, while measured kernel cost and control overhead determine runtime benefit. Application experiments report solver, pipeline, and training time; component and grouping tests explain when compaction helps. Together, these results establish completion-driven batch execution as a way to reduce the cost of repeated EOT solves across several backends.

@@ -1,153 +1,54 @@
 \section{DrainSinkhorn}
 \label{sec:method}
 
-\subsection{Problem: wasted lanes in a fixed-width batch}
+\subsection{Problem and execution state}
 
-Consider a window of $W$ independent EOT problems of the form in
-\cref{eq:eot}. A batched backend applies one Sinkhorn cycle to every lane in
-parallel. The problems need not pass the stopping rule at the same iteration,
-yet conventional fixed-width execution retains all $W$ lanes until the slowest
-problem finishes. Earlier completions therefore continue to occupy positions
-in later kernels.
+Consider a batch of $W$ independent EOT problems from \cref{eq:eot}. A lane contains one problem's marginals, support descriptors, dual potentials, and temporary state. An active problem is one that has yet to pass the configured stopping rule. DrainSinkhorn maintains a packed array of active problems and their output destinations.
 
-DrainSinkhorn stops sending completed problems to later kernels. It retains
-each problem's EOT objective, Sinkhorn update, stopping rule, backend, and
-downstream consumer; its execution layer changes which problems receive the
-next update.
+The executor advances this array until every problem has completed or the configured iteration limit is reached. Its central invariant is that all tensors at an active lane refer to the same problem. Each emitted output must also pass the two-marginal verifier. These two conditions govern screening, output release, and compaction.
 
-For problem $t$, let $n_t$ be the batched iteration of the first configured
-verification at which the problem passes. Before update $k$, the required
-active batch width is
-\[
-A_k=\left|\{t:n_t\geq k\}\right|.
-\]
-Fixed-width execution always presents width $W$ to the backend. DrainSinkhorn
-instead presents width $A_k$, physically removing each problem after its
-verified completion.
+\subsection{Screen, verify, and compact}
 
-\subsection{Method: screen, verify, and compact}
+Each iteration applies a batched Sinkhorn cycle to the active problems. At the verification interval, the executor screens every active lane, verifies screen-positive candidates, emits passing outputs, and compacts the unfinished state. The verification interval counts the Sinkhorn cycles between these checks.
 
-DrainSinkhorn repeats four operations. First, it advances every active problem
-by one batched Sinkhorn cycle. Second, at the configured verification interval,
-it computes a cheap one-marginal screen for all active lanes. Third, it applies
-the backend's full two-marginal verifier only to screen-positive lanes. Fourth,
-it emits every verified output and compacts all corresponding per-problem
-state. The next update then runs on the smaller active batch. The
-verification interval is the number of batched iterations between consecutive
-screen-and-verify rounds.
 
-\begin{figure*}[t]
-\centering
-\setlength{\fboxsep}{6pt}
-\fbox{\parbox{.13\textwidth}{\centering
-\textbf{Batched update}\\[-1pt]
-$u\leftarrow a/(Kv)$\\
-$v\leftarrow b/(K^\top u)$}}
-\hspace{2pt}$\rightarrow$\hspace{2pt}
-\fbox{\parbox{.13\textwidth}{\centering
-\textbf{One-marginal screen}\\[-1pt]
-batch row residuals\\
-updated column identity}}
-\hspace{2pt}$\rightarrow$\hspace{2pt}
-\fbox{\parbox{.13\textwidth}{\centering
-\textbf{Two-marginal verify}\\[-1pt]
-current row and column\\
-stopping tolerance}}
-\hspace{2pt}$\rightarrow$\hspace{2pt}
-\fbox{\parbox{.13\textwidth}{\centering
-\textbf{Release and compact}\\[-1pt]
-emit passing problems\\
-compact all OT state}}
-\hspace{2pt}$\rightarrow$\hspace{2pt}
-\fbox{\parbox{.11\textwidth}{\centering
-\textbf{Narrower next kernel}\\[-1pt]
-$W_k\to W_{k+1}$}}
-\caption{DrainSinkhorn's execution loop. The one-marginal screen selects
-candidates for full verification. A problem leaves the batch after passing the
-two-marginal stopping rule, after which every
-associated tensor is compacted before the next update.}
-\label{fig:active-loop}
-\end{figure*}
-
-\subsection{Why the screen preserves the release rule}
-
-Let $F_t$ denote one complete Sinkhorn cycle for problem $t$, including its
-marginals, kernel operator, and numerical representation. Standard batching
-adds a leading problem dimension but no cross-problem reduction. In ideal
-arithmetic,
-\begin{equation}
-\widetilde F\!\left(\operatorname{pack}(z_1,\ldots,z_W)\right)
-=\operatorname{pack}\!\left(F_1(z_1),\ldots,F_W(z_W)\right).
-\label{eq:pack-commutes}
-\end{equation}
-Filtering the problem dimension therefore preserves the update applied to each
-remaining problem.
-
-For one problem, a Sinkhorn cycle is
+For one problem, a Sinkhorn cycle computes
 \begin{equation}
 u^{k+1}=a\oslash(Kv^k),\qquad
 v^{k+1}=b\oslash(K^\top u^{k+1}),
 \label{eq:sinkhorn-cycle}
 \end{equation}
-where $\oslash$ denotes elementwise division. Immediately after the second
-leg, exact arithmetic gives
+where $\oslash$ denotes elementwise division. Immediately after the second scaling, exact arithmetic gives
 \begin{equation}
 v^{k+1}\odot(K^\top u^{k+1})=b.
 \label{eq:updated-marginal}
 \end{equation}
-The column marginal is current by construction, whereas the row marginal
-$u^{k+1}\odot(Kv^{k+1})$ can remain outside tolerance. DrainSinkhorn batches
-this row-residual calculation across the active lanes. A problem is
-screen-positive when its value
-$\widehat r^{\mathrm{row}}_{t,k}\leq\tau_{\mathrm{screen}}$.
+The updated column marginal therefore satisfies its target, while the row marginal $u^{k+1}\odot(Kv^{k+1})$ may still have a residual. The screen batches this row-residual calculation and selects a problem when $\widehat r^{\mathrm{row}}_{t,k}\leq\tau_{\mathrm{screen}}$, where $\tau_{\mathrm{screen}}$ is the screening threshold.
 
-Screen-positive status triggers the full verifier. The implementation
-recomputes both marginals and releases a problem when
+The full verifier recomputes both marginals of each selected coupling $\pi_{t,k}$ and tests
 \begin{equation}
-r_{t,k}=\max\!\left\{
-\|\pi_{t,k}\ones-a_t\|_1,
+r_{t,k}=\max\left\{
+\|\pi_{t,k}\ones-a_t\|_1,\,
 \|\pi_{t,k}^\top\ones-b_t\|_1
-\right\}\leq\tau_{\mathrm{stop}}.
+\right\}\leq\tau_{\mathrm{stop}},
 \label{eq:release-contract}
 \end{equation}
-A rejected problem remains active. A false-positive screen adds an unnecessary
-verification, while a false-negative screen delays compaction; neither screen
-outcome can release a problem by itself. The component tests in
-\cref{sec:experiments} replay both cases and evaluate the candidates with the
-same two-marginal verifier.
+where $\tau_{\mathrm{stop}}$ is the stopping tolerance. Passing problems are emitted; rejected candidates remain active. A screen false positive adds a verifier call, and a false negative postpones compaction. The component experiment measures these effects by replaying screening decisions with the full verifier.
 
-\subsection{Physical compaction and matched controls}
+\subsection{Compacting independent state}
 
-After a problem passes, DrainSinkhorn writes its output and compacts every
-per-problem object: source and target descriptors, marginals, dual potentials,
-centered shifts, log weights, and scratch buffers. Compaction must preserve the
-alignment of these objects so that Equation~\eqref{eq:pack-commutes} continues
-to apply to the remaining problems.
+After verification, the executor applies the same selection to support descriptors, marginals, potentials, centered shifts, log weights, and scratch buffers. It preserves each problem's output destination as lanes move. This aligned selection produces the narrower inputs for the next backend call.
 
-We separate three execution modes. \emph{Fixed-width} execution updates all
-$W$ lanes through the common final boundary. \emph{Logical masking} records
-per-problem completion and freezes completed states but keeps width $W$.
-\emph{Dynamic compaction} removes verified completions and runs subsequent
-kernels at width $A_k$. Fixed-width versus dynamic compaction measures the
-combined effect of release and width reduction. Logical masking versus dynamic
-compaction (LM/DC) holds the observed release decisions fixed and isolates the
-effect of physically narrowing the batch.
+Let $F_t$ be one Sinkhorn cycle on the complete state $z_t$ of problem $t$. Because batching adds a problem dimension with independent updates, ideal arithmetic gives
+\begin{equation}
+\widetilde F\!\left(\operatorname{pack}(z_1,\ldots,z_W)\right)
+=\operatorname{pack}\!\left(F_1(z_1),\ldots,F_W(z_W)\right).
+\label{eq:pack-commutes}
+\end{equation}
+Selecting a subset of the packed problems therefore preserves the update of each remaining problem. The output verifier enforces the stopping rule after finite-precision execution; \cref{sec:numerical-results} reports residuals and output checks.
 
-Equations~\eqref{eq:pack-commutes} and \eqref{eq:updated-marginal} state the
-ideal-arithmetic invariants. The experiments separately test fixed-work parity,
-achieved residuals, near-threshold decisions, application outputs, and the
-timing effects of screening, verification, and compaction.
+\subsection{Backend execution}
 
-\subsection{Execution boundary and fallback}
+The packed Triton implementation applies screening and verification at the configured interval and compacts all matrix-free solver state. A tail threshold controls handoff to its single-problem solver; MetroPT-3 and Packer19 set this threshold to one. Iteration limits and non-finite states terminate with failure. Runtime includes the configured control and handoff operations.
 
-The comparisons fix the execution mode, initial width, verification
-interval, proposal, tolerance, and fallback policy before timing. Iteration
-limits and non-finite states fail closed. The packed Triton implementation may
-hand a small active batch to the matched single-problem solver when
-the width falls below \texttt{min\_packed\_width}; the
-MetroPT-3 and Packer19 configurations set this threshold to one.
-
-When one problem fits on an accelerator, windows are assigned to independent
-workers, one per GPU. Each device then has an independent update
-path and no per-update Sinkhorn collective. The scale-out experiments use this
-configuration; row sharding is reserved for an oversized problem.
+The OTT-JAX implementation verifies at fixed phase boundaries, removes completed problems, and rebuckets the remaining batch. PyKeOps uses a batched independent-problem operator with a geometric verification schedule and removal of completed state. When a problem fits on one GPU, independent workers process different windows. The scale-out experiments use one worker per GPU.

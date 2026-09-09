@@ -1,53 +1,44 @@
 # DrainSinkhorn 英文论文目录
 
-本目录是仓库内当前英文论文的唯一真源，包含编译入口、正文、参考文献、实际引用的图表和交付 PDF。
+本目录是当前英文论文的唯一真源。入口为 [main.tex](main.tex)，交付文件为 [main.pdf](main.pdf)。
 
-## 论文入口
+## 章节导航
 
-- [`main.tex`](main.tex)：英文 LaTeX 入口。
-- [`main.pdf`](main.pdf)：当前英文 PDF。
-- [`sections/`](sections/)：按编译顺序拆分的正文和附录。
-- [`figures/`](figures/)：当前论文实际 `\input` 或 `\includegraphics` 的图表文件。
-- [`math_commands.tex`](math_commands.tex)：数学命令。
-- [`references.bib`](references.bib)：参考文献。
+1. [Introduction](sections/1_introduction.tex)：问题、关键观察与三项贡献。
+2. [Background and Motivation](sections/2_setting_related.tex)：EOT、实测完成项开销与相关系统。
+3. [DrainSinkhorn](sections/3_method.tex)：screen、verify、compact 与状态一致性。
+4. [Hardware-Aware Performance Model](sections/4_cost_and_hypothesis.tex)：更新数、运行时间与 GPU wave。
+5. [Experiments](sections/5_experiments.tex)：设置、应用、宽度、组件、grouping、正确性。
+6. [Discussion](sections/6_scope.tex)：适用条件与运行成本。
+7. [Conclusion](sections/7_conclusion.tex)。
+8. [Measurement Details](sections/A_appendix.tex)：计时、统计单位、输出与复现信息。
 
-## 支持材料
+## 新图表
 
-不直接进入论文编译的材料统一放在 [`support/`](support/)：
+所有图表已重新设计；旧图表可通过 Git 提交 795cb6c 查看，不参与当前编译。
 
-- [`support/audits/`](support/audits/)：主张审计、证据范围、术语和写作检查材料。
-- [`support/figure_materials/`](support/figure_materials/)：图表数据、生成脚本和当前未引用的历史表格源码。
-- [`support/build/`](support/build/)：LaTeX 中间文件、构建日志和脚本缓存。
-- [`support/qa/`](support/qa/)：页面渲染与目视检查截图。
-
-这些支持材料不是第二套论文真源。论文内容只在 `main.tex`、`sections/` 和当前实际引用的
-`figures/` 文件中修改。
-
-## 当前表格位置
-
-| PDF 编号 | 英文 TeX |
+| PDF | 源码 / 数据图 |
 |---|---|
-| Table 1 | [`figures/table1_prior_systems.tex`](figures/table1_prior_systems.tex) |
-| Table 2 | [`figures/table2_main_results_by_width.tex`](figures/table2_main_results_by_width.tex) |
-| Table 3 | [`figures/table3_eight_gpu_decomposition.tex`](figures/table3_eight_gpu_decomposition.tex) |
-| Table 4 | [`figures/table4_imagenet_quality.tex`](figures/table4_imagenet_quality.tex) |
-| Table 5 | [`figures/table5_packer19_attribution.tex`](figures/table5_packer19_attribution.tex) |
-| Table 6 | [`figures/table6_grouping_intervention.tex`](figures/table6_grouping_intervention.tex) |
-| Table 7 | [`figures/table7_cross_backend_results.tex`](figures/table7_cross_backend_results.tex) |
-| Table 8 | [`figures/table8_workload_configurations.tex`](figures/table8_workload_configurations.tex) |
-| Table 9 | [`figures/table9_absolute_ot_times.tex`](figures/table9_absolute_ot_times.tex) |
-| Table 10 | [`figures/table10_attribution_map.tex`](figures/table10_attribution_map.tex) |
-| Table 11 | [`figures/table11_imagenet_solver_pairs.tex`](figures/table11_imagenet_solver_pairs.tex) |
-| Table 12 | [`figures/table12_packer19_phase_costs.tex`](figures/table12_packer19_phase_costs.tex) |
+| Figure 1 | [FIG-work.pdf](figures/FIG-work.pdf)：两个独立工作负载的更新数 |
+| Figure 2 | [FIG-width.pdf](figures/FIG-width.pdf)：绝对 kernel 时间与 active width |
+| Figure 3 | [FIG-stopping.pdf](figures/FIG-stopping.pdf)：容差、speedup 与输出误差 |
+| Table 1 | [FIG-setup.tex](figures/FIG-setup.tex) |
+| Table 2 | [FIG-endpoints.tex](figures/FIG-endpoints.tex) |
+| Table 3 | [FIG-backends.tex](figures/FIG-backends.tex) |
+| Table 4 | [FIG-quality.tex](figures/FIG-quality.tex) |
+| Table 5 / Section 5.4 | [FIG-components.tex](figures/FIG-components.tex) |
+| Table 6 / Section 5.5 | [FIG-grouping.tex](figures/FIG-grouping.tex) |
+| Table 7 | [FIG-seeds.tex](figures/FIG-seeds.tex) |
+| Table 8 | [FIG-phases.tex](figures/FIG-phases.tex) |
+| Table 9 | [FIG-additional.tex](figures/FIG-additional.tex) |
 
-编号以最新编译 PDF 和 `support/build/main.aux` 为准。
+图表来源、设计与检查记录见 [visual review](support/audits/VISUAL_REVIEW.md)；可复现图形脚本见 [render_figures.py](support/figure_materials/render_figures.py)。其他原始图表数据与历史支持材料在 support/figure_materials/，不是论文真源。
 
 ## 构建
 
-在本目录运行：
-
 ```powershell
+python support/figure_materials/render_figures.py
 latexmk -pdf -interaction=nonstopmode -halt-on-error -auxdir=support/build main.tex
 ```
 
-交付前检查 PDF 的章节、公式、图表、引用、数字和限定条件。
+编号以编译 PDF 和 support/build/main.aux 为准。

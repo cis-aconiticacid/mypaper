@@ -11,8 +11,11 @@
 \newtheorem{hypothesis}{Hypothesis}
 \input{math_commands}
 \input{figures/RESULT_MACROS}
+\renewcommand{\dbltopfraction}{0.85}
+\renewcommand{\textfraction}{0.05}
+\setcounter{dbltopnumber}{2}
 
-\title{\textsc{DrainSinkhorn}: Safe Elimination for Batched Entropic Optimal Transport%
+\title{\textsc{DrainSinkhorn}: Dynamic Compaction for Batched Entropic Optimal Transport%
 \thanks{Code: \href{https://github.com/cis-aconiticacid/DrainSinkhorn}{github.com/cis-aconiticacid/DrainSinkhorn}}}
 \author{Xinyang Wen}
 \date{}
@@ -31,6 +34,7 @@
 \input{sections/5_experiments}
 \input{sections/6_scope}
 \input{sections/7_conclusion}
+\FloatBarrier
 
 \begingroup
 \small
@@ -38,6 +42,8 @@
 \bibliography{references}
 \endgroup
 
+\clearpage
+\onecolumn
 \appendix
 \input{sections/A_appendix}
 \end{document}

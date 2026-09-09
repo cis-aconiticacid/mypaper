@@ -1,169 +1,42 @@
-\section{Measurement Contracts and Additional Detail}
+\section{Measurement Details}
+\label{sec:measurement-details}
 
-\subsection{ImageNet-32 seed provenance}
-The quality evaluation uses the same three paired training seeds,
-20260891, 20260892, and 20260893, throughout the reported NFE values.
-The full per-seed measurements and analysis artifacts are available in the
-public GitHub repository at
-\url{https://github.com/cis-aconiticacid/DrainSinkhorn}.
+\subsection{Timing and statistical units}
 
-\paragraph{Measurement levels.}
-E1 terminates at the measured coupling output or potentials after the
-two-marginal verifier passes. E2 includes
-the fixed downstream consumer. E3 includes training, generation, or task
-evaluation. The MetroPT-3 and Packer19 pipeline studies record $E_2$ endpoints,
-whereas ImageNet-32 records an $E_3$ training endpoint. The primary MetroPT-3
-ratio uses its registered $E_2$ endpoint directly. The two-host MetroPT-3 and
-Packer19 component studies subtract each unit's paired consumer time before
-ratio formation and bootstrap, while ImageNet-32 uses the recorded Sinkhorn
-time. The Packer19 stopping study records $E_1$ directly for every
-stopping-controller and execution-mode cell. Unchanged consumer or model time
-in $E_2$ or $E_3$ dilutes the corresponding OT-stage gain. The ImageNet-32
-fixed-width/dynamic-compaction ratio reported as a training ablation is
-computed from the full fixed-update $E_3$ interval.
+The primary MetroPT-3 endpoint is the maximum pipeline time across four independent GPU workers. Each of three execution orders is summarized by the median of two timing repeats. The reported $1.745535\times$ is the descriptive geometric mean of the three order ratios. Both paths use the same input, initialization, regularization, tolerance, verification schedule, backend, and consumer. Each repeat invokes and evaluates 16 verifier candidates and launches 32 plan-application kernels.
 
-\paragraph{GPU-energy interval.}
-GPU energy is the change in the A100 NVML cumulative total-energy counter from
-immediately before the registered method call to after the final CUDA
-synchronization. The counter reports millijoules and the analysis converts the
-difference to joules. This pipeline interval starts with prepared input arrays
-and ends after the downstream consumer. It includes
-solver/proposal and consumer work and excludes compilation, warm-up, and the
-prepared-input transfer component. Unsupported counters are recorded as
-unavailable rather than replaced by a power-limit estimate.
+The two-host MetroPT-3 comparison uses three order-balanced plans on each host, with four GPU placements per host. Its six host/plan combinations are paired timing units for a fixed workload; placements and repeats stabilize timing. The $E_2$ ratio is $1.744723\times$, with stratified bootstrap interval $[1.743410,1.746706]$. Subtracting each unit's paired consumer time gives the $E_1$ ratio \CMetroRetirementOTSpeedup{}. The primary four-worker and two-host comparisons use their own endpoints and observations.
 
-\paragraph{Primary MetroPT-3 matched fixed/dynamic control.}
-This study runs fixed-width and dynamic-compaction paths on the same MetroPT-3 input,
-cold proposal, regularization, tolerance, verification schedule,
-two-marginal verifier, packed backend, and fixed consumer. The experimental
-variable is whether verifier-approved lanes are dynamically removed from later
-kernels. One host supplies four independent A100 workers, one per GPU, with
-no inter-worker collective or problem sharding. For each plan and timing repeat,
-the endpoint is the maximum pipeline time across the four
-workers. Each plan is summarized by the median of two timing repeats, and the
-reported $1.745535\times$ is the descriptive geometric mean of the three plan
-ratios. The plan identifiers freeze execution order and are not independent
-MetroPT samples. All 48 worker-level repeats converge; the maximum row and
-column $L_1$ residuals are $9.476650\times10^{-4}$ and
-$1.283915\times10^{-6}$. Both arms attain failure-window ROC AUC $1.0$ under
-the frozen consumer. The solver receives sensor inputs without failure labels.
-The largest paired transport-cost and barycentric-shift differences are
-$0.02792263$ and $0.00346756$.
+GPU energy is the change in the A100 NVML cumulative energy counter between the start of the method call and the final CUDA synchronization. The counter reports millijoules, converted to joules. This interval starts with prepared arrays and includes solver, initialization, and consumer work; compilation, warm-up, and prepared-input transfer occur before it. Unsupported counters are recorded as unavailable.
 
-\paragraph{Two-host MetroPT-3 matched control.}
-Within this matched contrast, fixed-width and dynamic-compaction execution use the same inputs, cold proposal,
-regularization, tolerance, verification schedule, two-marginal verifier,
-packed backend, and
-fixed consumer; stopping-rule-triggered release and dynamic compaction are the controlled
-difference. Three order-balanced plan seeds are reused across four GPU
-placements on each of two hosts. GPU placements and timing repeats stabilize end-to-end measurement;
-the registered endpoint ratio includes unchanged non-OT consumer time. The
-main-text MetroPT-3 OT-stage ratio subtracts the paired consumer time within each
-host--plan unit. The host--plan combinations are paired timing units for this
-fixed workload; placements and repeats are timing replicas. A reanalysis of the
-six valid host--plan units reports a
-stratified bootstrap interval.
+\subsection{Training and output measurements}
 
-\paragraph{Packer19 stopping-study provenance.}
-The stopping--execution protocol has SHA-256
-\nolinkurl{c010bcf9b3e276c8269514324cc8ed4bc2fc5958c362c7b880e3946dee75075b}
-and is bound to source commit
-\nolinkurl{96de52b8ceff8fa3c0468bf45567e6b017483e73}. Two hosts, four
-A100-SXM4-80GB GPUs per host, three prespecified method orders, and three timing
-repeats produce 768 formal cells. Each tolerance has 24 paired
-paired observations indexed by host, order, and GPU and an equal-host bootstrap interval. Consumer TV
-numerically checks differences in outputs.
+ImageNet-32 uses paired seeds 20260891, 20260892, and 20260893 throughout training and NFE evaluation. \Cref{tab:imagenet-solver-pairs} reports each seed's solver time. The full-training ratio uses the complete 50,000-update interval. The separate coupling-preparation diagnostic gives paired ratios $1.156$, $1.082$, and $1.079$, with fixed/DC update counts $64/52$, $64/56$, and $64/56$.
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=\columnwidth]{figures/PACKER19_PARETO.pdf}
-\caption{Tolerance-dependent Packer19 OT speed--output frontier for the
-dynamic-compaction path. Each point is the median E1 OT-stage time over 24
-paired units at that residual tolerance; consumer TV is measured against the
-campaign's $10^{-6}$ tight reference.}
-\label{fig:packer-pareto}
-\end{figure}
+\input{figures/FIG-seeds.tex}
 
-\paragraph{Execution-mode protocol.}
-The experiments fix representation, width, execution mode, verification interval,
-stopping tolerance, verification path, tail-handoff threshold, and fail-closed
-policy before timing. The width and grouping interventions map conditions for
-selecting fixed-width execution or dynamic compaction.
+All 48 worker-level primary MetroPT-3 repeats converge. The solver receives sensor inputs without failure labels. Maximum paired differences in transport cost and barycentric shift are $0.02792263$ and $0.00346756$ under the fixed failure-window consumer.
 
-\paragraph{Width-cost diagnostic provenance.}
-The primitive sweep uses one NVIDIA A100-SXM4-80GB with 108 SMs, driver
-535.129.03, PyTorch 2.5.1 with CUDA 12.4, Triton 3.1.0, and source commit
-\nolinkurl{73aec2941bfa1a5caa6a6bddf7aa83b734f9bb8b}. Each measured call to
-\texttt{shifted\_step} contains two packed Triton log-sum-exp kernels and excludes
-the marginal screen, two-marginal verifier, dynamic compaction, and outer
-\texttt{solve\_batch} loop. Widths are randomized within 30-repeat blocks after
-warm-up. The $n=1024$ sweep covers widths 1--8, 10, 12, and 16; the $n=4096$ and
-$n=16384$ sweeps cover 1, 2, 3, 4, 6, 8, 12, and 16. This diagnostic supplies
-the packed-update component of the measured width-cost curve in
-\cref{eq:time-difference}.
+The Packer19 tolerance study uses two hosts, four GPUs per host, three method orders, and three timing repeats. Each tolerance has 24 paired observations indexed by host, order, and GPU, with an equal-host bootstrap interval. Consumer TV compares outputs to the $10^{-6}$ reference. Absolute OT-stage medians at $10^{-3}$ are 2.038 s for logical masking and 1.299 s for compaction in this stopping study. The component study's phase medians in \cref{tab:phase-costs} are summarized independently and belong to its own LM/DC comparison.
 
-\paragraph{Independent backend realizations.}
-The OTT-JAX and PyKeOps paths remove completed problems through their native
-backend mechanisms. OTT-JAX executes fixed 20-update phases, verifies at phase
-boundaries, removes passing lanes, and rebuckets the remaining problems; native
-\texttt{vmap} and a matched fixed-phase static path provide its controls. The
-PyKeOps paths use one
-batched independent-problem matrix-free operator, a fixed geometric
-verification schedule, the two-marginal verifier, and removal of
-passing problem state.
-Sequential and static-padded PyKeOps paths use the same symbolic backend. The
-shared principle is per-problem release followed by dynamic removal; verifying
-and packing mechanisms remain backend-specific. All cross-backend
-rows in \cref{tab:ot-cross-backend} report their achieved two-marginal residual.
+\input{figures/FIG-phases.tex}
 
-\subsection{Independent backend implementations}
+\subsection{Width measurements and backend settings}
 
-\input{figures/table7_cross_backend_results.tex}
+The width sweep uses an A100-SXM4-80GB with 108 SMs, driver 535.129.03, PyTorch 2.5.1 with CUDA 12.4, and Triton 3.1.0. Each primitive call contains two packed LogSumExp update kernels. Widths are randomized within 30-repeat blocks after warm-up. The $n=1024$ sweep covers widths 1--8, 10, 12, and 16; the other sizes cover 1, 2, 3, 4, 6, 8, 12, and 16.
 
-\input{figures/table8_workload_configurations.tex}
+OTT-JAX verifies at phase boundaries and rebuckets unfinished problems. The tolerance sweep uses one fixed ImageNet-32 input, ten timing repeats per tolerance, and phase sizes selected on disjoint warm-up inputs: 20 updates at $10^{-3}$ and 10 updates at the other reported tolerances. PyKeOps uses a matrix-free batched operator, geometric verification schedule, and removal of completed state. Its tiled-log implementation reaches support size $n=65536$.
 
-\section{Deployment and Operating Conditions}
+The shared-initialization experiment uses a constructed stream with 90\% support overlap over real ImageNet features. Its warm replay includes descriptor, transfer, initialization, correction, and verification costs; compilation, cache loading, and process startup occur before measurement. The reported result covers 40 controlled windows.
 
-\paragraph{One worker per GPU and row partitioning.}
-When one problem fits on one accelerator, GPU workers process
-different windows and require no Sinkhorn collective. Partitioning the matrix by rows supplies a
-capacity path for an oversized single problem. One-worker-per-GPU execution is the
-throughput path used by the MetroPT-3 scale-out study. On one host, increasing from one to four workers
-yields $3.965$--$3.979\times$ fixed-per-worker throughput scaling on two
-held-out MetroPT routes. The two-host, eight-worker fixed-per-worker run reports
-endpoint comparisons at that worker count. We report the one-to-four and
-two-host eight-worker results as distinct scaling studies. Peak memory remains
-local to each worker.
+\subsection{Worker scaling and grouping}
 
-\subsection{Supplementary attribution and evidence boundaries}
-\input{figures/table9_absolute_ot_times.tex}
-\input{figures/table10_attribution_map.tex}
-\input{figures/table11_imagenet_solver_pairs}
-\input{figures/table12_packer19_phase_costs}
+Independent GPU workers process different windows without a Sinkhorn collective. The one-to-four-worker throughput experiment holds work per worker fixed. The eight-worker experiment compares fixed-width and compacted execution at that worker count. \Cref{tab:additional-runtime} gives the two eight-worker inputs and the separate single-worker support-size comparisons. The reported support-size configurations meet the prespecified consumer criteria on both hosts.
 
-The ImageNet-32 coupling-preparation diagnostic holds the packed Triton adapter,
-input, and numerical contract fixed and changes
-dynamic compaction; its three fixed-width/dynamic-compaction ratios are $1.156$, $1.082$,
-and $1.079$. Fixed-width/dynamic-compaction update counts are $64/52$, $64/56$, and $64/56$.
-The measurements cover coupling preparation.
-The OTT-JAX study uses one frozen ImageNet-32 input and ten timing repeats per tolerance;
-the phase size is chosen on a disjoint warmup bank. Its ratio at $10^{-2}$ is
-$0.995\times$.
+\input{figures/FIG-additional.tex}
 
-The MetroPT-3 eight-worker results aggregate the downstream-consumer endpoint
-at fixed work per worker. Fixed/dynamic seconds are $12.523/4.026$ for the
-higher-workload input and $7.999/3.705$ for the lower-workload input, with
-update counts $4736/1276$ and $3008/1244$.
-The support-size comparison uses the lower-workload input at $n=8192$ and
-$32768$ and applies the same prespecified criteria on both hosts. Transport-cost and
-barycentric-shift differences are diagnostics under the registered binary
-consumer endpoint.
+Grouping uses a fixed multiset of 32 problems. Offline iteration counts $q_t$ determine the layouts, fixing $\sum_t q_t$ while changing $\sum_w Wq_{\max,w}$. Runtime ratios describe the resulting effect for this problem set. The layouts provide a controlled analysis of completion variation.
 
-The ImageNet-32 shared-anchor result uses a constructed 90\%-overlap target stream over real
-ImageNet features. Its canonical reverse-order warm replay excludes
-compile, cache load and process startup, while retaining descriptor, transfer,
-anchor, proposal, correction and verification costs.
-The MetroPT-3 grouping ratios describe one fixed 32-problem multiset; oracle
-iteration numbers $q_t$ define the grouping intervention. The fixed multiset
-fixes $\sum_t q_t$, while grouping changes $\sum_w W q_{\max,w}$ across windows.
-The ratios report the resulting relative-runtime effect.
+\subsection{Reproducibility}
+
+The experiment artifacts record input and source identities, software and GPU environments, commands, timings, and output checks. Per-seed measurements and paired analyses are available at \url{https://github.com/cis-aconiticacid/DrainSinkhorn}. Figure sources and plotting scripts accompany the manuscript.

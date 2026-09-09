@@ -1,0 +1,18 @@
+\begin{table}[!t]
+\centering
+\caption{Single-variable Packer19 component comparisons at $\tau=10^{-3}$. Ratios use OT-stage time after paired consumer subtraction. All four comparisons use 24 paired observations. Intervals shown are bootstrap 95\% intervals; the first two contrasts report paired wins.}
+\label{tab:packer19-components}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}lrl@{}}
+\toprule
+Change & Ratio & Evidence \\
+\midrule
+Batched verification & $1.133$ & 24/24 faster \\
+One-marginal screen & $1.105$ & 24/24 faster \\
+Logical mask & $1.000$ & [0.9998, 1.0003] \\
+Physical compaction & $1.540$ & [1.5389, 1.5404] \\
+\bottomrule
+\end{tabular}
+\end{table}

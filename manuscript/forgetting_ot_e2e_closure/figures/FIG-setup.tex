@@ -1,0 +1,18 @@
+\begin{table*}[!t]
+\centering
+\caption{Primary task settings. The packed Triton paths use cold initialization. Component and stopping studies use their own observation units, as specified in the text.}
+\label{tab:workload-configs}
+\small
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}lllrrl@{}}
+\toprule
+Task & Backend & Endpoint & $n$ & $W$ & Numerical settings \\
+\midrule
+MetroPT-3 & Triton & Pipeline & 16384 & 16 & $\varepsilon=0.1,\ \tau=10^{-3}$ \\
+ImageNet-32 & Triton & Training & 1024 & 8 & $\varepsilon=0.03,\ \tau=10^{-3}$ \\
+Packer19 & Triton & Transition & 16384 & 8 & $\varepsilon=0.1,\ \tau=10^{-4}$--$10^{-2}$ \\
+A2D2 & PyKeOps & Matching & 8192 & 8 & Three LiDAR clips \\
+\bottomrule
+\end{tabular}
+\end{table*}

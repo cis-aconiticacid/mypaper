@@ -1,0 +1,20 @@
+\begin{table}[!t]
+\centering
+\caption{ImageNet-32 quality after 50,000 updates in PCA500 feature space. Entries are three-seed means; lower values are better. Held-out flow-matching MSE has the same reported value at all three NFE settings.}
+\label{tab:imagenet-quality}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}llrrr@{}}
+\toprule
+Metric & Execution & NFE 4 & NFE 8 & NFE 16 \\
+\midrule
+Curvature & Fixed & 5.4524 & 2.8388 & 1.4546 \\
+ & Compacted & 5.4448 & 2.8356 & 1.4528 \\
+\midrule Projected Fr\'echet & Fixed & 1.2967 & 1.5286 & 1.8182 \\
+ & Compacted & 1.2886 & 1.5224 & 1.8136 \\
+\midrule Held-out FM MSE & Fixed & \multicolumn{3}{c}{1.07854} \\
+ & Compacted & \multicolumn{3}{c}{1.07859} \\
+\bottomrule
+\end{tabular}
+\end{table}
