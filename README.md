@@ -8,6 +8,7 @@ paper. The links below are the authoritative navigation entry points.
 - [Section sources](manuscript/forgetting_ot_e2e_closure/sections)
 - [Current figures and tables](manuscript/forgetting_ot_e2e_closure/figures)
 - [Detailed manuscript navigator](manuscript/forgetting_ot_e2e_closure/README.md)
+- [Standalone results comparison table](manuscript/forgetting_ot_e2e_closure/ALL_RESULTS.md) — all reported experimental results and plotted points, with contrasts, timing scopes and sources; not included in the manuscript PDF.
 
 Build commands:
 

@@ -2,6 +2,8 @@
 
 本目录是当前英文论文的唯一真源。入口为 [main.tex](main.tex)，交付文件为 [main.pdf](main.pdf)。
 
+独立交付件：[全部实验结果对照总表](ALL_RESULTS.md)。汇总正文、附录和图中数据点，逐行给出比较双方、数值、统计口径与 source；不进入论文 PDF。由 [build_results_inventory.py](support/figure_materials/build_results_inventory.py) 从当前论文摘录和已有冻结数据生成，可用 `--check` 核对。表头注明对应论文提交，避免与后续修订混用。
+
 ## 章节导航
 
 当前标题为 DrainSinkhorn: Completion-Aware Execution for Batched Entropic Optimal Transport。最新审稿增量：A.2 补指标公式与输入构造；Table 2 补同 campaign 的绝对时间；Table 5 明列消融两端；Table 9 区分 row screen 与 verifier；A.6 补 guard 上界及假设；历史 PyKeOps 配置移入 Table 12。Table 7 与 Section 5.7 同在第 10 页。已完成 anti-defensive-writing 审计；必要的统计与精度边界保留。完整精度结果在 competitive_data.json 的 endpoint_times_seconds/linear_model_comparison/training_times。处理状态见 review disposition 顶部 Latest review。
