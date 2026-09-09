@@ -5,7 +5,7 @@
 ## 章节导航
 
 1. [Introduction](sections/1_introduction.tex)：问题、关键观察与三项贡献。
-2. [Background and Motivation](sections/2_setting_related.tex)：EOT、实测完成项开销与相关系统。
+2. [Background and Motivation](sections/2_setting_related.tex)：EOT、实测完成项开销与相关系统；明确 logical mask 等是本文在 OT 后端中构建的实验对照，相关文献提供执行思想而非外部 OT 基线。
 3. [DrainSinkhorn](sections/3_method.tex)：screen、verify、compact 与状态一致性。
 4. [Hardware-Aware Performance Model](sections/4_cost_and_hypothesis.tex)：更新数、独立校准的条件时间重构与 GPU wave。
 5. [Experiments](sections/5_experiments.tex)：设置、应用、宽度、组件、grouping、实际输出精度、无状态搬移对照及模型验证。
