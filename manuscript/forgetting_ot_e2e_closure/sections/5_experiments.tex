@@ -16,20 +16,18 @@ Fixed-width execution keeps the original batch through the final verification. L
 \subsection{Application runtime and backend transfer}
 \label{sec:application-results}
 
-DrainSinkhorn reduces both solver time and application time, with the size of the benefit depending on the workload. \Cref{tab:main-results} separates the three timing levels. The primary MetroPT-3 pipeline achieves \CMetroCorrectedEndpointSpeedup{} speedup with four independent GPU workers as problem updates fall from \CMetroSlotsStatic{} to \CMetroSlotsActive{}. All three execution orders favor compaction, with an observed range of \CMetroCorrectedEndpointRange{}. The corresponding ratio of fixed to compacted GPU energy is \CMetroCorrectedEnergyFactor{}.
+DrainSinkhorn reduces both solver time and application time, with the size of the benefit depending on the workload. \Cref{tab:main-results} separates the three timing levels. The primary MetroPT-3 pipeline achieves \CMetroCorrectedEndpointSpeedup{} speedup with four independent GPU workers as problem updates fall from \CMetroSlotsStatic{} to \CMetroSlotsActive{}. The corresponding ratio of fixed to compacted GPU energy is \CMetroCorrectedEnergyFactor{}. This experiment measures one fixed failure-window workload under three execution orders. The grouping intervention in \cref{sec:grouping-results} examines batch-assignment sensitivity on a fixed pool of 32 other MetroPT-3 problems.
 
 \input{figures/FIG-endpoints.tex}
 
-Packer19 shows how solver savings translate to the pipeline. In the same 24 paired observations, LM/DC is $1.540\times$ for Sinkhorn time and $1.2243\times$ through the transition consumer. The shared consumer work reduces the pipeline ratio. ImageNet-32 gains are smaller: across three paired training seeds, the Sinkhorn-time ratio is $1.054\times$ and the full-training ratio is \CFeatureTrainingActiveOverStatic{}. \Cref{tab:imagenet-quality} reports feature-space quality after training, and \cref{tab:imagenet-solver-pairs} gives absolute solver times by seed.
+Packer19 shows how solver savings translate to the pipeline. In the same 24 paired observations, LM/DC is $1.54\times$ for Sinkhorn time and $1.22\times$ through the transition consumer. The shared consumer work reduces the pipeline ratio. ImageNet-32 gains are smaller: across three paired training seeds, the Sinkhorn-time ratio is $1.05\times$ and the full-training ratio is \CFeatureTrainingActiveOverStatic{}. \Cref{tab:imagenet-quality} reports feature-space quality after training, and \cref{tab:imagenet-solver-pairs} gives absolute solver times by seed.
 
 \input{figures/FIG-backends.tex}
 \input{figures/FIG-quality.tex}
 
-Backend results separate the contribution of compaction from the benefit of a complete execution configuration (\cref{tab:ot-cross-backend}). In OTT-JAX, compaction gives $1.366$--$1.581\times$ over fixed-phase execution at tolerances from $10^{-3}$ to $5\times10^{-3}$. At $10^{-2}$, every problem completes in the first phase and the ratio is $0.995\times$. The native-reference ratio remains $1.732\times$ there because it also includes the change to fixed-phase execution.
+Backend results separate the contribution of compaction from the benefit of a complete execution configuration (\cref{tab:ot-cross-backend}). In OTT-JAX, compaction gives $1.37$--$1.58\times$ over fixed-phase execution at tolerances from $10^{-3}$ to $5\times10^{-3}$. At $10^{-2}$, every problem completes in the first phase and the ratio is $0.995\times$. The native-reference ratio remains $1.73\times$ there because it also includes the change to fixed-phase execution.
 
-On PyKeOps, static batching and logical masking outperform the tested compacted configurations on ImageNet-32. Checking every four updates reaches 16 update rounds, compared with 13 for the static batch, and achieves $1.415\times$ over sequential execution versus $1.549\times$ for static batching. Thus checking frequency and batch removal jointly determine the runtime of these configurations. Supplementary backend and deployment results appear in \cref{sec:backend-details,sec:worker-details}.
-
-
+On PyKeOps, static batching and logical masking outperform the tested compacted configurations on ImageNet-32. Checking every four updates reaches 16 update rounds, compared with 13 for the static batch, and achieves $1.42\times$ over sequential execution versus $1.55\times$ for static batching. Thus checking frequency and batch removal jointly determine the runtime of these configurations. An every-update compacted configuration would isolate compaction at the static schedule; the current runner supports that interval, while the reported records cover intervals two and four. Supplementary backend and deployment results appear in \cref{sec:backend-details,sec:worker-details}.
 
 \subsection{Kernel time by active batch width}
 \label{sec:width-results}
@@ -45,7 +43,7 @@ The width experiment tests the update-cost term in \cref{eq:time-difference}. It
 
 At $n=1024$, widths one through six have similar update time, followed by a large increase from six to seven. At $n=4096$, the first large increase occurs from one to two; the $n=16384$ curve responds from width one. With row tile size $b_m=64$ and 108 SMs, the one-block-per-SM wave-width estimate $b_mN_{\mathrm{SM}}/n$ is 6.75, 1.69, and 0.42 for these three sizes. The observed steps are consistent with the scheduling-wave explanation.
 
-The small-problem plateau helps interpret the modest ImageNet-32 solver gain: lane removal within the plateau reduces update slots with little change in primitive time. Larger problems have a stronger width response, consistent with the larger MetroPT-3 gains. The application endpoint additionally includes control and consumer work, as expressed in \cref{eq:time-difference}.
+The small-problem plateau helps interpret the modest ImageNet-32 solver gain: lane removal within the plateau reduces update slots with little change in primitive time. Larger problems have a stronger width response, consistent with the larger MetroPT-3 gains. The application endpoint additionally includes control and consumer work, as expressed in \cref{eq:time-difference}. The separate initial-width study in \cref{fig:width-scaling} shows how padding and complete-configuration runtime vary over $W=1,2,4,8,16$.
 
 \subsection{Packer19 single-variable component tests}
 \label{sec:components}
@@ -54,11 +52,11 @@ The Packer19 study asks which parts of the execution layer reduce time. It uses 
 
 \input{figures/FIG-components.tex}
 
-Batched verification and the one-marginal screen reduce OT-stage time by factors of $1.133$ and $1.105$, respectively. All 24 paired observations favor each change. Replaying \CPackerShadowNegatives{} screen-negative events with the full verifier finds \CPackerShadowMissedReady{} already-completed problems; the maximum row-residual discrepancy is \CPackerScreenDiscrepancy{}.
+Batched verification and the one-marginal screen reduce OT-stage time by factors of $1.13$ and $1.11$, respectively. Screening lowers the cost of finding completed problems; physical compaction produces the larger timing effect by removing their later updates. All 24 paired observations favor each change. The screen's replay checks are reported in \cref{sec:numerical-results}.
 
-Logical masking leaves the packed width at eight and yields a ratio near one. Compaction reduces problem updates from 256 to 156 and gives \CPackerCompactionOTSpeedup{} speedup, with interval \CPackerCompactionOTRange{}. Across paired-observation medians, GPU energy falls from 879.9 to 688.1 J, while peak allocated memory increases from 80.8 to 106.9 MiB. \Cref{tab:phase-costs} gives the separately summarized phase times.
+Logical masking leaves the packed width at eight and yields a ratio near one. Compaction reduces problem updates from 256 to 156 and gives \CPackerCompactionOTSpeedup{} speedup, with timing uncertainty summarized in \cref{sec:timing-uncertainty}. Across paired-observation medians, GPU energy falls from 880 to 688 J, while peak allocated memory increases from 80.8 to 107 MiB. \Cref{tab:phase-costs} gives the separately summarized phase times.
 
-A separate stopping-tolerance sweep tests the same LM/DC comparison over five tolerances. \Cref{fig:stopping-results} shows speedup alongside achieved residual and consumer total-variation distance (TV) from the tight reference. Compaction gives \CPackerCompactionRange{} from $10^{-4}$ through $3\times10^{-3}$. At $10^{-2}$, all eight problems first pass at update 8; the ratio is \CPackerNeutralCompaction{} with 95\% interval \CPackerNeutralCompactionCI{}. This equal-completion case exercises the $R=0$ condition in the model.
+A separate stopping-tolerance sweep tests the same LM/DC comparison over five tolerances. \Cref{fig:stopping-results} shows speedup alongside achieved residual and consumer total-variation distance (TV) from the tight reference. Compaction gives \CPackerCompactionRange{} from $10^{-4}$ through $3\times10^{-3}$. At $10^{-2}$, all eight problems first pass at update 8; the ratio is \CPackerNeutralCompaction{} with a timing interval spanning equal runtime (\cref{sec:timing-uncertainty}). This equal-completion case exercises the $R=0$ condition in the model.
 
 \begin{figure*}[t]
 \centering
@@ -72,13 +70,15 @@ A separate stopping-tolerance sweep tests the same LM/DC comparison over five to
 
 The grouping test asks whether completion variation within a batch changes compaction benefit. It holds 32 real MetroPT-3 problems fixed and changes their assignment to windows. Offline every-cycle completion iterations $q_t$ define the grouping; verifier-derived iterations $n_t$ measure the executed work. Homogeneous grouping places problems with similar completion iterations together, while heterogeneous and random layouts create more completed lanes inside unfinished batches.
 
-As shown in Table~\ref{tab:metropt-grouping}, the fixed/DC ratio is \CMThreeHomogeneousRetirementSpeedup{} for homogeneous grouping, \CMThreeHeterogeneousRetirementSpeedup{} for heterogeneous grouping, and $1.235$--$1.271\times$ for random layouts. The corresponding dynamic-update fractions are 0.892, 0.802, and 0.764--0.789. These comparisons show how batch assignment changes removable work for the same problem set.
+As shown in Table~\ref{tab:metropt-grouping}, the fixed/DC ratio is \CMThreeHomogeneousRetirementSpeedup{} for homogeneous grouping, \CMThreeHeterogeneousRetirementSpeedup{} for heterogeneous grouping, and $1.23$--$1.27\times$ for random layouts. The corresponding dynamic-update fractions are 0.892, 0.802, and 0.764--0.789. These comparisons show how batch assignment changes removable work for the same problem set.
 
 \input{figures/FIG-grouping.tex}
 
 \subsection{Numerical accuracy and application outputs}
 \label{sec:numerical-results}
 
-The timed packed Triton applications use the backend precision and the two-marginal verifier. All emitted plans meet the recorded marginal-residual bounds, and all reported consumer and training-quality checks pass. On primary MetroPT-3, maximum row and column residuals are $9.476650\times10^{-4}$ and $1.283915\times10^{-6}$; both execution modes attain failure-window ROC AUC $1.0$. ImageNet-32 quality is evaluated in PCA500 feature space at NFE 4, 8, and 16 (\cref{tab:imagenet-quality}).
+The timed packed Triton applications use the backend precision and the two-marginal verifier. All emitted plans meet the recorded marginal-residual bounds, and all reported consumer and training-quality checks pass. On primary MetroPT-3, maximum row and column residuals are $9.5\times10^{-4}$ and $1.3\times10^{-6}$; both execution modes attain failure-window ROC AUC $1.0$. ImageNet-32 quality is evaluated in PCA500 feature space at NFE 4, 8, and 16 (\cref{tab:imagenet-quality}).
 
-\Cref{sec:precision-stress} reports a separate finite-precision stress test of an outward-bound guard and FP64 escalation.
+Screening and release are checked separately. The full-verifier replay of 1488 screen-negative events finds zero completed problems missed in this component workload; this measures screening delay at its configured tolerance. In the matched Packer19 LM/DC comparison, release decisions agree and the consumer TV difference is zero. The tolerance sweep in \cref{fig:stopping-results} reports achieved residuals and consumer deviations from a tighter reference.
+
+Finite-precision checks also exercise cases near the acceptance threshold. An independent stress test covers 84 near-threshold problems and 16 runtime cases. Raw FP32 and TF32 each disagree with FP64 replay on three acceptance decisions; an outward-bound guard with FP64 escalation has zero disagreements. \Cref{sec:precision-stress} specifies this separate guarded configuration.

@@ -175,24 +175,6 @@
       }
     }
   },
-  "work": {
-    "source": "795cb6c:manuscript/forgetting_ot_e2e_closure/figures/RESULT_MACROS.tex",
-    "source_level": "manuscript result registry; primary study and component study separately",
-    "rows": [
-      {
-        "task": "MetroPT-3",
-        "baseline": "Fixed width",
-        "fixed": 5696,
-        "compacted": 3128
-      },
-      {
-        "task": "Packer19",
-        "baseline": "Logical mask",
-        "fixed": 256,
-        "compacted": 156
-      }
-    ]
-  },
   "stopping": {
     "source": "support/figure_materials/PACKER19_STOPPING_METRICS.csv",
     "source_level": "frozen analysis summary",
@@ -212,5 +194,19 @@
       "png"
     ],
     "uncertainty": "width: IQR, stopping: bootstrap 95% interval; work: totals"
+  },
+  "method": {
+    "source": "figures/FIG-method.tex",
+    "reference": "User-requested execution-loop / active-width two-panel layout, implemented as editable TikZ",
+    "trace": "review_data.json; W=4, seed=2026082400, start_frame=0",
+    "backend": "TikZ vector drawing embedded in LaTeX; draw.io executable unavailable"
+  },
+  "scaling": {
+    "source": "review_data.json",
+    "panels": [
+      "per-window padding and 40-window mean",
+      "eight-worker complete-configuration time ratios"
+    ],
+    "scope": "W=1,2,4,8,16; no extrapolated 32/64 measurements"
   }
 }

@@ -17,7 +17,7 @@ plt.rcParams.update({
     "axes.titlesize": 10, "axes.labelsize": 9,
     "xtick.labelsize": 8, "ytick.labelsize": 8,
     "legend.fontsize": 8, "pdf.fonttype": 42,
-    "svg.fonttype": "none", "axes.spines.top": False,
+    "svg.fonttype": "none", "svg.hashsalt": "drainsinkhorn-paper", "axes.spines.top": False,
     "axes.spines.right": False, "axes.linewidth": .7,
 })
 BLUE, ORANGE = SPEC["style"]["colors"]
@@ -28,27 +28,12 @@ def save(fig, stem):
         target = OUT / f"{stem}.{extension}"
         if extension == "svg":
             stream = io.StringIO()
-            fig.savefig(stream, format="svg", bbox_inches="tight")
+            fig.savefig(stream, format="svg", bbox_inches="tight", metadata={"Date": None})
             text = "\n".join(line.rstrip() for line in stream.getvalue().splitlines()) + "\n"
             target.write_text(text, encoding="utf-8", newline="\n")
         else:
-            fig.savefig(target, dpi=200, bbox_inches="tight")
+            fig.savefig(target, dpi=200, bbox_inches="tight", metadata=({"CreationDate": None, "ModDate": None} if extension == "pdf" else None))
     plt.close(fig)
-
-# Totals are shown separately; no pooling or invented completion trajectories.
-fig, axes = plt.subplots(2, 1, figsize=(3.45, 3.2), layout="constrained")
-for ax, row in zip(axes, SPEC["work"]["rows"]):
-    values = [row["fixed"], row["compacted"]]
-    ax.barh([1, 0], values, height=.52, color=["#707070", BLUE])
-    ax.set_yticks([1, 0], [row["baseline"], "Compacted"])
-    ax.set_xlim(0, row["fixed"] * 1.20)
-    for y, value in zip([1, 0], values):
-        ax.text(value + row["fixed"] * .025, y, f"{value:,}", va="center", fontsize=9)
-    ax.set_title(row["task"], loc="left", fontweight="bold")
-    ax.set_xlabel("Problem updates")
-    ax.grid(axis="x", color="#dddddd", lw=.5)
-    ax.set_axisbelow(True)
-save(fig, "FIG-work")
 
 fig, axes = plt.subplots(1, 3, figsize=(7.15, 2.9), layout="constrained")
 for ax, n, letter in zip(axes, (1024, 4096, 16384), "abc"):
@@ -87,7 +72,7 @@ ax.invert_yaxis()
 ax.set_xlim(.9, 1.83)
 ax.axvline(1, color="#777777", linestyle="--", lw=.9)
 for yy, value in zip(y, ratio):
-    ax.text(value+.035, yy, f"{value:.3f}", va="center", fontsize=8)
+    ax.text(value+.035, yy, f"{value:.3g}", va="center", fontsize=8)
 ax.set_xlabel("Logical-mask / compacted time")
 ax.set_ylabel("Stopping tolerance")
 ax.set_title("(a) Runtime", loc="left")
@@ -101,4 +86,27 @@ bx.set_title("(b) Output checks", loc="left")
 bx.legend(frameon=False, fontsize=7.5)
 bx.grid(which="major", color="#dddddd", lw=.5)
 save(fig, "FIG-stopping")
-print("Rendered FIG-work, FIG-width, FIG-stopping as PDF, SVG, PNG.")
+review = json.loads((HERE / "review_data.json").read_text(encoding="utf-8"))
+fig, (ax, bx) = plt.subplots(1, 2, figsize=(7.15, 2.8), layout="constrained")
+widths = [r["width"] for r in review["widths"]]
+for row in review["widths"]:
+    values = [w["padding_ratio"] for w in row["windows"]]
+    ax.scatter([row["width"]]*len(values), values, color=BLUE, s=9, alpha=.25)
+ax.plot(widths, [r["mean_padding_ratio"] for r in review["widths"]], "o-", color=BLUE, ms=4, label="Mean over 40 windows")
+ax.set_ylabel(r"Fixed-width slots / executed slots")
+ax.set_title("(a) Padding within each batch", loc="left")
+ax.legend(frameon=False, fontsize=7)
+bx.plot(widths, [r["steady_speedup"] for r in review["widths"]], "o-", color=BLUE, ms=4, label="Steady-state")
+bx.plot(widths, [r["deployment_speedup"] for r in review["widths"]], "s--", color=ORANGE, ms=4, label="Including startup")
+bx.set_ylabel("Sequential / compacted execution time")
+bx.set_title("(b) Complete-configuration comparison", loc="left")
+bx.legend(frameon=False, fontsize=7)
+for panel in (ax, bx):
+    panel.set_xscale("log", base=2)
+    panel.set_xticks(widths, [str(w) for w in widths])
+    panel.set_xlabel("Initial batch width W")
+    panel.axhline(1, color="#777777", lw=.8, linestyle=":")
+    panel.set_ylim(.8, 2.1)
+    panel.grid(axis="y", color="#dddddd", lw=.5)
+save(fig, "FIG-scaling")
+print("Rendered width, stopping, and scaling figures as PDF, SVG, PNG.")

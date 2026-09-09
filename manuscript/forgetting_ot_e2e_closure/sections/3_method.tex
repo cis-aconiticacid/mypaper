@@ -1,6 +1,8 @@
 \section{DrainSinkhorn}
 \label{sec:method}
 
+\input{figures/FIG-method.tex}
+
 \subsection{Problem and execution state}
 
 Consider a batch of $W$ independent EOT problems from \cref{eq:eot}. A lane contains one problem's marginals, support descriptors, dual potentials, and temporary state. An active problem is one that has yet to pass the configured stopping rule. DrainSinkhorn maintains a packed array of active problems and their output destinations.
@@ -23,7 +25,7 @@ where $\oslash$ denotes elementwise division. Immediately after the second scali
 v^{k+1}\odot(K^\top u^{k+1})=b.
 \label{eq:updated-marginal}
 \end{equation}
-The updated column marginal therefore satisfies its target, while the row marginal $u^{k+1}\odot(Kv^{k+1})$ may still have a residual. The screen batches this row-residual calculation and selects a problem when $\widehat r^{\mathrm{row}}_{t,k}\leq\tau_{\mathrm{screen}}$, where $\tau_{\mathrm{screen}}$ is the screening threshold.
+This alternating-scaling identity supplies the OT-specific screen: the updated column marginal satisfies its target, while the row marginal $u^{k+1}\odot(Kv^{k+1})$ may still have a residual. The screen batches this row-residual calculation and selects a problem when $\widehat r^{\mathrm{row}}_{t,k}\leq\tau_{\mathrm{screen}}$, where $\tau_{\mathrm{screen}}$ is the screening threshold.
 
 The full verifier recomputes both marginals of each selected coupling $\pi_{t,k}$ and tests
 \begin{equation}
@@ -51,4 +53,4 @@ Selecting a subset of the packed problems therefore preserves the update of each
 
 The packed Triton implementation applies screening and verification at the configured interval and compacts all matrix-free solver state. A tail threshold controls handoff to its single-problem solver; MetroPT-3 and Packer19 set this threshold to one. Iteration limits and non-finite states terminate with failure. Runtime includes the configured control and handoff operations.
 
-The OTT-JAX implementation verifies at fixed phase boundaries, removes completed problems, and rebuckets the remaining batch. PyKeOps uses a batched independent-problem operator with a geometric verification schedule and removal of completed state. When a problem fits on one GPU, independent workers process different windows. The scale-out experiments use one worker per GPU.
+The OTT-JAX implementation verifies at fixed phase boundaries, removes completed problems, and rebuckets the remaining batch. PyKeOps uses a batched independent-problem operator with a fixed checking interval and removal of completed state. When a problem fits on one GPU, independent workers process different windows. The scale-out experiments use one worker per GPU.

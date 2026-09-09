@@ -2,44 +2,61 @@
 \label{sec:measurement-details}
 
 \subsection{Timing and statistical units}
+\label{sec:timing-uncertainty}
 
-The primary MetroPT-3 endpoint is the maximum pipeline time across four independent GPU workers. Each of three execution orders is summarized by the median of two timing repeats. The reported $1.745535\times$ is the descriptive geometric mean of the three order ratios. Both paths use the same input, initialization, regularization, tolerance, verification schedule, backend, and consumer. Each repeat invokes and evaluates 16 verifier candidates and launches 32 plan-application kernels.
+The primary MetroPT-3 endpoint is the maximum pipeline time across four independent GPU workers. Each of three execution orders is summarized by the median of two timing repeats. The reported $1.75\times$ is the descriptive geometric mean of the three order ratios. Both paths use the same input, initialization, regularization, tolerance, verification schedule, backend, and consumer. Each repeat invokes and evaluates 16 verifier candidates and launches 32 plan-application kernels.
 
-The two-host MetroPT-3 comparison uses three order-balanced plans on each host, with four GPU placements per host. Its six host/plan combinations are paired timing units for a fixed workload; placements and repeats stabilize timing. The $E_2$ ratio is $1.744723\times$, with stratified bootstrap interval $[1.743410,1.746706]$. Subtracting each unit's paired consumer time gives the $E_1$ ratio \CMetroRetirementOTSpeedup{}. The primary four-worker and two-host comparisons use their own endpoints and observations.
+The two-host MetroPT-3 comparison uses three order-balanced plans on each host, with four GPU placements per host. Its six host/plan combinations are paired timing units for a fixed workload; placements and repeats stabilize timing. The $E_2$ ratio is $1.74\times$, with a stratified bootstrap interval of $[74.3,74.7]\%$ for the relative timing ratio increase, $100(S-1)$. Subtracting each unit's paired consumer time gives the $E_1$ ratio \CMetroRetirementOTSpeedup{}. The primary four-worker and two-host comparisons use their own endpoints and observations.
+
+Ratios are displayed to three significant digits. For narrow timing intervals, we report $100(S-1)$ in percent to retain their resolution: the Packer19 component intervals are $[53.9,54.0]\%$ for $E_1$ and $[22.4,22.5]\%$ for $E_2$. The logical-mask comparison has interval $[-0.019,0.033]\%$; the simultaneous-completion stopping case has interval $[-0.134,0.0320]\%$. These bootstrap intervals describe timing variation for the fixed inputs and host/order/GPU units. Across-seed training variation is reported separately as sample standard deviation.
 
 GPU energy is the change in the A100 NVML cumulative energy counter between the start of the method call and the final CUDA synchronization. The counter reports millijoules, converted to joules. This interval starts with prepared arrays and includes solver, initialization, and consumer work; compilation, warm-up, and prepared-input transfer occur before it. Unsupported counters are recorded as unavailable.
 
 \subsection{Training and output measurements}
 
-ImageNet-32 uses paired seeds 20260891, 20260892, and 20260893 throughout training and NFE evaluation. \Cref{tab:imagenet-solver-pairs} reports each seed's solver time. The full-training ratio uses the complete 50,000-update interval. The separate coupling-preparation diagnostic gives paired ratios $1.156$, $1.082$, and $1.079$, with fixed/DC update counts $64/52$, $64/56$, and $64/56$.
+ImageNet-32 uses paired seeds 20260891, 20260892, and 20260893 throughout training and NFE evaluation. \Cref{tab:imagenet-solver-pairs} reports each seed's solver time. The full-training ratio uses the complete 50,000-update interval. The separate coupling-preparation diagnostic gives paired ratios $1.16$, $1.08$, and $1.08$, with fixed/DC update counts $64/52$, $64/56$, and $64/56$.
 
 \input{figures/FIG-seeds.tex}
 
-All 48 worker-level primary MetroPT-3 repeats converge. The solver receives sensor inputs without failure labels. Maximum paired differences in transport cost and barycentric shift are $0.02792263$ and $0.00346756$ under the fixed failure-window consumer.
+All 48 worker-level primary MetroPT-3 repeats converge. The solver receives sensor inputs without failure labels. Maximum paired differences in transport cost and barycentric shift are $0.0279$ and $0.00347$ under the fixed failure-window consumer.
 
-The Packer19 tolerance study uses two hosts, four GPUs per host, three method orders, and three timing repeats. Each tolerance has 24 paired observations indexed by host, order, and GPU, with an equal-host bootstrap interval. Consumer TV compares outputs to the $10^{-6}$ reference. Absolute OT-stage medians at $10^{-3}$ are 2.038 s for logical masking and 1.299 s for compaction in this stopping study. The component study's phase medians in \cref{tab:phase-costs} are summarized independently and belong to its own LM/DC comparison.
+The Packer19 tolerance study uses two hosts, four GPUs per host, three method orders, and three timing repeats. Each tolerance has 24 paired observations indexed by host, order, and GPU, with an equal-host bootstrap interval. Consumer TV compares outputs to the $10^{-6}$ reference. Absolute OT-stage medians at $10^{-3}$ are 2.04 s for logical masking and 1.30 s for compaction in this stopping study. The component study's phase medians in \cref{tab:phase-costs} are summarized independently and belong to its own LM/DC comparison.
 
 \input{figures/FIG-phases.tex}
 
 \subsection{Width measurements and backend settings}
 \label{sec:backend-details}
 
-The width sweep uses an A100-SXM4-80GB with 108 SMs, driver 535.129.03, PyTorch 2.5.1 with CUDA 12.4, and Triton 3.1.0. Each primitive call contains two packed LogSumExp update kernels. Widths are randomized within 30-repeat blocks after warm-up. The $n=1024$ sweep covers widths 1--8, 10, 12, and 16; the other sizes cover 1, 2, 3, 4, 6, 8, 12, and 16.
+The width sweep uses an A100-SXM4-80GB with 108 SMs, driver 535.129.03, PyTorch 2.5.1 with CUDA 12.4, and Triton 3.1.0. Each primitive call contains two packed LogSumExp update kernels. Widths are randomized within 30-repeat blocks after warm-up. The $n=1024$ sweep covers widths 1--8, 10, 12, and 16; the other sizes cover 1, 2, 3, 4, 6, 8, 12, and 16. The synthetic inputs use feature dimension 500, column tile 64, and cost scale 1. The separate MetroPT-3 component calibration uses dimension 15, column tile 128, and cost scale 0.0341; the Packer19 component application uses dimension 64. These configurations provide separate measurements of width response and control cost.
 
 OTT-JAX verifies at phase boundaries and rebuckets unfinished problems. The tolerance sweep uses one fixed ImageNet-32 input, ten timing repeats per tolerance, and phase sizes selected on disjoint warm-up inputs: 20 updates at $10^{-3}$ and 10 updates at the other reported tolerances. Timings cover device-resident execution; loading, transfer, compilation, and the common post-run audit occur outside this interval. An earlier six-repeat study gives \COTTNativeActiveSpeedup{} relative to native vectorized execution and \COTTStaticActiveSpeedup{} relative to its matched fixed-phase baseline.
 
-PyKeOps uses a matrix-free batched operator. Its ImageNet-32 experiment compares static batching, logical masking, and two compacted configurations on the same three seeds. Static and masked execution check every update; compacted execution checks every two or four updates. At $n=16384,W=4$, the compacted configurations use mean update counts of 14 and 16, compared with 13 for static batching. On the separate A2D2 workload, compacted execution gives \CKeopsLiDARActiveSpeedup{} relative to sequential carry, with an observed clip range of $2.180$--$3.944\times$ and maximum marginal residual $9.97\times10^{-4}$.
+PyKeOps uses a matrix-free batched operator. Its ImageNet-32 experiment compares static batching, logical masking, and two compacted configurations on the same three seeds. Static and masked execution check every update; compacted execution checks every two or four updates. At $n=16384,W=4$, the compacted configurations use mean update counts of 14 and 16, compared with 13 for static batching. On the separate A2D2 workload, compacted execution gives \CKeopsLiDARActiveSpeedup{} relative to sequential carry, with an observed clip range of $2.18$--$3.94\times$ and maximum marginal residual $9.97\times10^{-4}$.
 
-The shared-initialization experiment uses a constructed stream with 90\% support overlap over real ImageNet features. Its warm replay includes descriptor, transfer, initialization, correction, and verification costs; compilation, cache loading, and process startup occur before measurement. Across 40 controlled windows, compaction gives $1.421\times$ over static execution and removes 30.62\% of problem updates.
+The shared-initialization experiment uses a constructed stream with 90\% support overlap over real ImageNet features. Its warm replay includes descriptor, transfer, initialization, correction, and verification costs; compilation, cache loading, and process startup occur before measurement. Across 40 controlled windows, compaction gives $1.42\times$ over static execution and removes 30.6\% of problem updates.
 
 \subsection{Worker scaling and grouping}
 \label{sec:worker-details}
 
-Independent GPU workers process different windows without a Sinkhorn collective. The one-to-four-worker throughput experiment holds work per worker fixed and achieves $3.965$--$3.979\times$ throughput scaling on held-out MetroPT-3 routes. The eight-worker experiment compares fixed-width and compacted execution at that worker count, with pipeline ratios of $3.110\times$ and $2.159\times$ for its two inputs. \Cref{tab:additional-runtime} gives the absolute eight-worker times and separate single-worker support-size comparisons. The reported support-size configurations meet the prespecified consumer criteria on both hosts.
+Independent GPU workers process different windows without a Sinkhorn collective. The one-to-four-worker throughput experiment holds work per worker fixed and achieves $3.97$--$3.98\times$ throughput scaling on held-out MetroPT-3 routes. The eight-worker experiment compares fixed-width and compacted execution at that worker count, with pipeline ratios of $3.11\times$ and $2.16\times$ for its two inputs. \Cref{tab:additional-runtime} gives the absolute eight-worker times and separate single-worker support-size comparisons. The reported support-size configurations meet the prespecified consumer criteria on both hosts.
 
 \input{figures/FIG-additional.tex}
 
 Grouping uses a fixed multiset of 32 problems. Offline iteration counts $q_t$ determine the layouts, fixing $\sum_t q_t$ while changing $\sum_w Wq_{\max,w}$. Runtime ratios describe the resulting effect for this problem set. The layouts provide a controlled analysis of completion variation.
+
+\subsection{Initial batch width}
+\label{sec:width-scaling}
+
+The ImageNet-32 width study uses $n=4096$, $\varepsilon=0.1$, $\tau=10^{-3}$, and checks every five updates. Each width in $\{1,2,4,8,16\}$ contains 40 recorded windows across eight A100 workers on two hosts. The comparison is sequential project-adapter execution with projected carry against shared-initialization active execution. Its runtime ratio measures the combined execution configuration.
+
+\Cref{fig:width-scaling} separates padding from runtime. For each recorded window, the ratio $Wn_{\max}/\sum_t n_t$ compares hypothetical fixed-width work with its executed active work. Its mean rises from $1.00$ at $W=1$ to $1.44$ at $W=16$. Steady-state sequential/active time rises from $0.979\times$ to $1.85\times$ over these widths. The padding ratios use completion counts within each active run; the timing ratios use the two measured execution configurations.
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/FIG-scaling.pdf}
+\caption{Initial-width sensitivity on ImageNet-32. Left: each point is one window's $Wn_{\max}/\sum_t n_t$; the line joins means over 40 windows per width. Right: ratios of the two eight-worker critical-path times, with and without startup costs. The baseline uses sequential projected carry and the compacted configuration uses shared initialization. Panel (a) describes padding; panel (b) measures their complete execution comparison.}
+\label{fig:width-scaling}
+\end{figure}
 
 \subsection{Finite-precision stress test}
 \label{sec:precision-stress}

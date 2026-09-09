@@ -16,21 +16,17 @@ Coordinate, relaxed, low-rank, and Newton methods change the work inside an indi
 
 \subsection{Completed problems consume batch work}
 
-Fixed-width execution presents the original batch to every update. When some problems have passed verification, later kernels still contain their lanes. The Packer19 component experiment makes this cost visible: logical masking retains 256 problem-update slots, whereas dynamic compaction executes 156 (\cref{fig:motivation-work}). This comparison uses the same observed completion decisions; \cref{sec:components} gives the measurement settings.
+Fixed-width execution presents the original batch to every update. When some problems have passed verification, later kernels still contain their lanes. The Packer19 component experiment makes this cost visible: logical masking retains 256 problem-update slots, whereas dynamic compaction executes 156 (\cref{tab:packer19-components}). This comparison uses the same observed completion decisions; \cref{sec:components} gives the measurement settings.
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=\columnwidth]{figures/FIG-work.pdf}
-\caption{Problem updates before and after compaction. Each panel uses its own workload: the primary four-worker MetroPT-3 study and the Packer19 logical-mask control. Counts are totals for the respective measured execution.}
-\label{fig:motivation-work}
-\end{figure}
 
 Fewer update slots need not produce a proportional reduction in GPU time. The kernel's grid depends on batch width and problem size, and GPU scheduling groups blocks into waves. A width reduction saves kernel time when it shortens this execution. This motivates both an executor that removes completed problems and a model that accounts for the measured cost at each remaining width.
 
 \subsection{Related execution systems}
 
-Dynamic batching already supports data-dependent execution in other settings. Automatic batching groups program members by execution point \citep{radul2020autobatching}, and Orca schedules autoregressive inference one iteration at a time \citep{yu2022orca}. Ginkgo's batched conjugate-gradient solver skips converged systems inside its fused kernel \citep{ginkgoBatched}; jaxipm combines heterogeneous iterations and replacement of completed problems \citep{viljoen2026jaxipm}. Within OT, POT provides \texttt{solve\_batch}, and OTT-JAX supports vectorized Sinkhorn solves \citep{flamary2021pot,pot2025batch,cuturi2022ott}.
+Completion-aware execution has a history in numerical solvers and accelerator systems. At MLSys 2020, \citet{radul2020autobatching} batch control-intensive programs by tracking each member's program position and advancing compatible members together. Orca, presented at OSDI 2022, schedules autoregressive requests at iteration boundaries, returns completed requests, and admits new ones \citep{yu2022orca}. These systems establish iteration-level scheduling as a general technique for heterogeneous workloads.
 
-DrainSinkhorn applies completion-driven compaction to matrix-free EOT batches. Its packed Triton implementation uses the alternating-scaling structure for screening and preserves the correspondence among all per-problem tensors during compaction. OTT-JAX and PyKeOps implementations use their own verification and packing mechanisms.
+Numerical solvers also exploit independent completion. Ginkgo's batched CG assigns independent systems to workgroups inside a fused kernel, where each system stops at its own residual threshold \citep{ginkgoBatched}. Ginkgo's batched sparse solvers have also been integrated into plasma simulations \citep{kashi2023batched}. The jaxipm preprint combines heterogeneous interior-point iterations with replacement of completed optimization problems \citep{viljoen2026jaxipm}. Within OT, POT provides \texttt{solve\_batch}, and OTT-JAX supports vectorized Sinkhorn solves \citep{flamary2021pot,pot2025batch,cuturi2022ott}.
+
+DrainSinkhorn adapts this execution principle to matrix-free EOT. Alternating scaling satisfies the most recently updated marginal in exact arithmetic (\cref{eq:updated-marginal}); the other marginal supplies a one-sided screen for a full two-marginal verifier. Verified completion then triggers aligned selection of support descriptors, marginals, potentials, and scratch state, so the next kernel receives fewer problems. Ginkgo stops per-system work inside a fused solve, and jaxipm replaces completed problems to sustain a batch; DrainSinkhorn drains a finite EOT batch through successively narrower kernels. Its component tests separately measure the OT-specific screen and the physical width reduction.
 
 Initialization also affects batch execution by changing completion iterations. Carried potentials, analytic extensions, and learned proposals reduce the initial residual \citep{amos2023meta,thornton2023initialization}; soft $c$-transforms support changing couplings in flow matching \citep{zhang2025large}. Our experiments include cold-start couplings and a controlled setting with shared initialization. Downstream tasks consume the resulting coupling, for example to select flow-matching training pairs \citep{pooladian2023multisample}. Their total runtime includes both the solver and this consumer work.

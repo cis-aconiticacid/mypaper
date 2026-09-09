@@ -1,20 +1,23 @@
 \begin{table}[!t]
 \centering
-\caption{ImageNet-32 quality after 50,000 updates in PCA500 feature space. Entries are three-seed means; lower values are better. Held-out flow-matching MSE has the same reported value at all three NFE settings.}
+\caption{ImageNet-32 quality after 50,000 updates in PCA500 feature space. Entries are mean $\pm$ sample standard deviation over three paired training seeds; lower values are better. Held-out FM MSE is independent of sampling NFE.}
 \label{tab:imagenet-quality}
 \footnotesize
 \setlength{\tabcolsep}{3pt}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{@{}llrrr@{}}
+\renewcommand{\arraystretch}{1.10}
+\begin{tabular}{@{}llcc@{}}
 \toprule
-Metric & Execution & NFE 4 & NFE 8 & NFE 16 \\
+NFE & Execution & Curvature & Projected Fr\'echet \\
 \midrule
-Curvature & Fixed & 5.4524 & 2.8388 & 1.4546 \\
- & Compacted & 5.4448 & 2.8356 & 1.4528 \\
-\midrule Projected Fr\'echet & Fixed & 1.2967 & 1.5286 & 1.8182 \\
- & Compacted & 1.2886 & 1.5224 & 1.8136 \\
-\midrule Held-out FM MSE & Fixed & \multicolumn{3}{c}{1.07854} \\
- & Compacted & \multicolumn{3}{c}{1.07859} \\
+4 & Fixed & $5.45\pm0.0645$ & $1.30\pm0.348$ \\
+ & Compacted & $5.44\pm0.0504$ & $1.29\pm0.336$ \\
+8 & Fixed & $2.84\pm0.0238$ & $1.53\pm0.306$ \\
+ & Compacted & $2.84\pm0.0211$ & $1.52\pm0.295$ \\
+16 & Fixed & $1.45\pm0.0130$ & $1.82\pm0.264$ \\
+ & Compacted & $1.45\pm0.0121$ & $1.81\pm0.257$ \\
+\midrule
+\multicolumn{2}{@{}l}{FM MSE, fixed} & \multicolumn{2}{c}{$1.08\pm0.0159$} \\
+\multicolumn{2}{@{}l}{FM MSE, compacted} & \multicolumn{2}{c}{$1.08\pm0.0157$} \\
 \bottomrule
 \end{tabular}
 \end{table}

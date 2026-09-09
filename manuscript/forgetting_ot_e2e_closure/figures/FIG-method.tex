@@ -1,0 +1,38 @@
+\begin{figure*}[t]
+\centering
+\begin{tikzpicture}[x=0.96cm,y=0.96cm,>=Latex,font=\small,
+ stage/.style={draw=black!65,rounded corners=2pt,fill=blue!3,align=center,text width=3.8cm,minimum height=0.78cm}]
+\node[anchor=west,font=\bfseries] at (-0.4,5.6) {(a) Execution loop};
+\node[stage] (update) at (2,4.8) {Batched Sinkhorn updates};
+\node[stage] (screen) at (2,3.6) {Screen: row marginal};
+\node[stage] (verify) at (2,2.4) {Verify: both marginals};
+\node[stage] (compact) at (2,1.1) {Compact unfinished state\\same indices for all tensors};
+\draw[->] (update) -- node[right,font=\scriptsize]{at a check} (screen);
+\draw[->] (screen) -- node[right,font=\scriptsize]{screen-positive} (verify);
+\draw[->] (verify) -- node[right,font=\scriptsize]{not released} (compact);
+\node[draw,align=center,text width=1.15cm,minimum height=.65cm] (emit) at (5.75,2.4) {Emit\\outputs};
+\draw[->] (verify) -- node[above,font=\scriptsize]{pass} (emit);
+\draw[->] (screen.west) -- (-.25,3.6) -- (-.25,1.1) -- (compact.west);
+\node[rotate=90,font=\scriptsize,fill=white] at (-.25,2.5) {screen-negative};
+\draw[->] (compact.west) -- (-.95,1.1) -- (-.95,4.8) -- (update.west);
+\node[rotate=90,font=\scriptsize,fill=white] at (-.95,2.9) {next narrower kernel, $A>0$};
+\node[font=\scriptsize,align=center] at (2,.15) {Potentials, marginals, descriptors, scratch, output IDs};
+\begin{scope}[shift={(8,0)}]
+\node[anchor=west,font=\bfseries] at (0,5.8) {(b) Recorded active width};
+\fill[black!8] (0,1) rectangle (6,4.8);
+\fill[blue!15] (0,1) -- (0,4.8) -- (3.23,4.8) -- (3.23,3.85) -- (3.46,3.85) -- (3.46,2.9) -- (4.15,2.9) -- (4.15,1.95) -- (6,1.95) -- (6,1) -- cycle;
+\draw[dashed,black!65] (0,4.8) -- (6,4.8) -- (6,1);
+\draw[very thick,blue!65!black] (0,4.8) -- (3.23,4.8) -- (3.23,3.85) -- (3.46,3.85) -- (3.46,2.9) -- (4.15,2.9) -- (4.15,1.95) -- (6,1.95);
+\draw[->] (0,1) -- (6.35,1) node[right] {$k$};
+\draw[->] (0,1) -- (0,5.15) node[above] {$A_k$};
+\foreach \y/\v in {1/0,1.95/1,2.9/2,3.85/3,4.8/4} {\draw (-.07,\y)--(.07,\y); \node[left] at (-.07,\y) {\v};}
+\foreach \x/\v in {0/0,3.23/70,4.15/90,6/130} {\draw (\x,.94)--(\x,1.06); \node[below,font=\scriptsize] at (\x,.9) {\v};}
+\node[fill=white,inner sep=2pt] at (4.9,4.2) {$R=155$};
+\node at (2.0,2.8) {$\sum_k A_k=365$};
+\node[above,font=\scriptsize] at (3,4.85) {$Wn_{\max}=4\cdot130=520$};
+\node[font=\scriptsize,align=center] at (3,.15) {ImageNet-32 example: $n_t=(130,75,90,70)$};
+\end{scope}
+\end{tikzpicture}
+\caption{Screen, verify, and compact. Left: screening selects verifier candidates at each configured check; completed outputs are emitted and the remaining tensors share one selection before the next update. Right: one recorded ImageNet-32 window from the width study (Appendix~\ref{sec:width-scaling}) illustrates the active-width trajectory. Blue area counts executed problem updates; the remaining rectangle area $R$ counts removed updates. This area describes work, while kernel and control costs determine time.}
+\label{fig:method-loop}
+\end{figure*}

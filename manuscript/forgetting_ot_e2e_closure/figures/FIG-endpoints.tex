@@ -1,6 +1,6 @@
 \begin{table*}[!t]
 \centering
-\caption{Application results grouped by timing level. Ratios are baseline/DC. Ranges in parentheses describe observed seeds or execution orders; brackets denote bootstrap 95\% intervals. Each row retains its own observations and is not pooled with other rows.}
+\caption{Application results grouped by timing level. Ratios are baseline/DC. Ranges in parentheses describe observed seeds or execution orders; conditional timing intervals are reported in Appendix~\ref{sec:timing-uncertainty}. Each row retains its own observations and is not pooled with other rows.}
 \label{tab:main-results}
 \small
 \setlength{\tabcolsep}{5pt}
@@ -9,11 +9,11 @@
 \toprule
 Scope & Task & Baseline & Speedup & Observations \\
 \midrule
-$E_1$ & ImageNet-32 & Fixed & $1.054$ (1.033--1.072) & 3 training seeds \\
-$E_1$ & Packer19 components & LM & $1.540$ [1.5389, 1.5404] & 24 paired units \\
-$E_2$ & MetroPT-3 & Fixed & $1.7455$ (1.7453--1.7460) & 3 orders; 4 workers \\
-$E_2$ & Packer19 components & LM & $1.2243$ [1.2240, 1.2247] & Same 24 paired units \\
-$E_3$ & ImageNet-32 & Fixed & $1.036$ (1.030--1.043) & 3 training seeds \\
+$E_1$ & ImageNet-32 & Fixed & $1.05$ (1.03--1.07) & 3 training seeds \\
+$E_1$ & Packer19 components & LM & $1.54$ & 24 paired units \\
+$E_2$ & MetroPT-3 & Fixed & $1.75$ & 1 workload; 3 orders \\
+$E_2$ & Packer19 components & LM & $1.22$ & Same 24 paired units \\
+$E_3$ & ImageNet-32 & Fixed & $1.04$ (1.03--1.04) & 3 training seeds \\
 \bottomrule
 \end{tabular}
 \end{table*}
