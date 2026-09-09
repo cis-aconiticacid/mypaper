@@ -16,4 +16,6 @@ cd manuscript/forgetting_ot_e2e_closure
 latexmk -pdf -interaction=nonstopmode -halt-on-error -auxdir=support/build main.tex
 ```
 
-Updated: 2026-09-08
+Updated: 2026-09-09. The English manuscript now includes compute-skipping controls,
+conditional runtime reconstruction, actual-output FP64 replay, and matched-check
+PyKeOps results. See the detailed navigator for evidence and remaining scope.

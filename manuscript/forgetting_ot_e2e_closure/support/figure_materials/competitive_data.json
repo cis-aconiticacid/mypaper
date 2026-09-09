@@ -1,0 +1,276 @@
+{
+  "verification": "agent CPU reconciliation; human author review pending",
+  "sources_sha256": {
+    "studies\\code\\analyze_compaction_competitive_controls.py": "492894ece7a6ee3d69fe5bbec42cebbaa58d690457719854adc593fc0e39d1ba",
+    "studies/campaigns/EXP_Compaction_Competitive_Controls_20260908/raw/metro_n16384_w4_offset0.json": "735ad1a0d5e6ec60e39c5d8db2458ba5dda49ce0f60a83469251085aaf756cd9",
+    "studies/campaigns/EXP_Compaction_Competitive_Controls_20260908/raw/metro_n16384_w8_offset0.json": "1f55105fc0ab61b6b83506e936b01bc3184c990b2fb205f48d1cf43004de30e9",
+    "studies/campaigns/EXP_Compaction_Competitive_Controls_20260908/raw/metro_n16384_w4_offset0_analysis.json": "dcff62bc1e07cf6d33ef5eb1abe3e79a729c6f673b41a91cf6c53f716e560f28",
+    "studies/campaigns/EXP_Compaction_Competitive_Controls_20260908/raw/metro_n16384_w4_offset4.json": "7c869a5d7a29f923cc6fedfdbcb36f550fdd14d9a98944e540e348aa2506d072",
+    "studies/campaigns/EXP_Compaction_Competitive_Controls_20260908/raw/metro_n16384_w4_offset4_heldout_analysis.json": "f3a859fc3fe210c7bae8dad52194ecd5eaaea17b44a3c3239405883f93c97449",
+    "studies/campaigns/EXP_Compaction_Competitive_Controls_20260908/raw/metro_n16384_w4_offset8.json": "5de8b7962fba6f05b8855da70317c6e0b3204f765634cc4bde42a30f799b13f8",
+    "studies/campaigns/EXP_Compaction_Competitive_Controls_20260908/raw/metro_n16384_w4_offset8_heldout_analysis.json": "6ffd3d1e08b77708b2e4885bf65cf648a6638f55692927bc42991c6ba9598c04",
+    "studies/campaigns/EXP_Compaction_Competitive_Controls_20260908/raw/metro_n16384_w4_offset12.json": "26db31ad191ad3fbd8fbc425c19e387338ec95cb77b1c0f7499e8f6c968a1398",
+    "studies/campaigns/EXP_Compaction_Competitive_Controls_20260908/raw/metro_n16384_w4_offset12_heldout_analysis.json": "f1c776c801bee63fc2a690e6544259464ab0a4d15af74da704fae674abc85b52",
+    "studies/campaigns/EXP_Compaction_Competitive_Controls_20260908/raw/metro_n16384_w8_offset0_analysis.json": "28f79fbbe870f122f3cd7ec8264a4592506e0bff6af0f5eb5a1d3cacdc33fbdf",
+    "studies/local_results/FLASH_COMPACTION_SCHEDULER_METROPT3_20260908_A100/raw_results.json": "5f548107ba6481bd89d35ef2200a990b15f020036604588244a65e50bde942f8",
+    "studies/campaigns/EXP_KeOps_Check_Interval_20260908/analysis/summary.json": "ff28010321a388d856515119e17a253bd733a94fd8413f9f1cf14fd00dd6ed68"
+  },
+  "cells": [
+    {
+      "width": 4,
+      "offset": 0,
+      "seconds": {
+        "active_index": 4.560928415507078,
+        "entry_skip": 4.564582232385874,
+        "physical_compaction": 4.563815897330642
+      },
+      "error_percent": [
+        0.5742436746810409,
+        0.5976257593348411
+      ],
+      "target_heldout": false,
+      "paired_ratios": {
+        "active_index_over_physical_compaction": {
+          "paired_ratios": [
+            0.9994902466275761,
+            0.999271533526673,
+            0.9993767640988563,
+            0.9993178025428874
+          ],
+          "median": 0.9993472833208719,
+          "interpretation": "greater than one favors physical compaction"
+        },
+        "entry_skip_over_physical_compaction": {
+          "paired_ratios": [
+            1.0001558556775985,
+            1.0000694600009334,
+            1.0001799751295637,
+            1.0002299815578213
+          ],
+          "median": 1.0001679154035812,
+          "interpretation": "greater than one favors physical compaction"
+        }
+      },
+      "source": "studies/campaigns/EXP_Compaction_Competitive_Controls_20260908/raw/metro_n16384_w4_offset0_analysis.json"
+    },
+    {
+      "width": 4,
+      "offset": 4,
+      "seconds": {
+        "active_index": 1.0023608524352312,
+        "entry_skip": 1.003240242600441,
+        "physical_compaction": 1.0028818268328905
+      },
+      "error_percent": [
+        1.0343817932566113,
+        1.082618849353345
+      ],
+      "target_heldout": true,
+      "paired_ratios": {
+        "active_index_over_physical_compaction": {
+          "paired_ratios": [
+            0.9995887137563191,
+            0.9995743712938833,
+            0.9994256542026713,
+            0.9991043968334721
+          ],
+          "median": 0.9995000127482773,
+          "interpretation": "greater than one favors physical compaction"
+        },
+        "entry_skip_over_physical_compaction": {
+          "paired_ratios": [
+            1.0003518353899354,
+            1.000463726191825,
+            1.000332159573816,
+            1.000043800359691
+          ],
+          "median": 1.0003419974818757,
+          "interpretation": "greater than one favors physical compaction"
+        }
+      },
+      "source": "studies/campaigns/EXP_Compaction_Competitive_Controls_20260908/raw/metro_n16384_w4_offset4_heldout_analysis.json"
+    },
+    {
+      "width": 4,
+      "offset": 8,
+      "seconds": {
+        "active_index": 1.321075726300478,
+        "entry_skip": 1.3223970867693424,
+        "physical_compaction": 1.3217635415494442
+      },
+      "error_percent": [
+        0.8891962533225994,
+        1.0080116996212585
+      ],
+      "target_heldout": true,
+      "paired_ratios": {
+        "active_index_over_physical_compaction": {
+          "paired_ratios": [
+            0.9992905853394244,
+            0.999941163946789,
+            0.9993821117368048,
+            0.9995771274528624
+          ],
+          "median": 0.9994796195948337,
+          "interpretation": "greater than one favors physical compaction"
+        },
+        "entry_skip_over_physical_compaction": {
+          "paired_ratios": [
+            1.0003919516281556,
+            1.0005459182250025,
+            1.000138028792583,
+            1.0006507650122418
+          ],
+          "median": 1.000468934926579,
+          "interpretation": "greater than one favors physical compaction"
+        }
+      },
+      "source": "studies/campaigns/EXP_Compaction_Competitive_Controls_20260908/raw/metro_n16384_w4_offset8_heldout_analysis.json"
+    },
+    {
+      "width": 4,
+      "offset": 12,
+      "seconds": {
+        "active_index": 4.67879256606102,
+        "entry_skip": 4.683020742610097,
+        "physical_compaction": 4.682441238313913
+      },
+      "error_percent": [
+        0.4625086804805223,
+        0.5663415468749822
+      ],
+      "target_heldout": true,
+      "paired_ratios": {
+        "active_index_over_physical_compaction": {
+          "paired_ratios": [
+            0.9992625104976884,
+            0.9989140628246183,
+            0.9993160225619728,
+            0.9994438106164419
+          ],
+          "median": 0.9992892665298306,
+          "interpretation": "greater than one favors physical compaction"
+        },
+        "entry_skip_over_physical_compaction": {
+          "paired_ratios": [
+            1.0002430468018044,
+            0.9998810520244031,
+            1.0007533403521225,
+            1.0002701722727532
+          ],
+          "median": 1.0002566095372787,
+          "interpretation": "greater than one favors physical compaction"
+        }
+      },
+      "source": "studies/campaigns/EXP_Compaction_Competitive_Controls_20260908/raw/metro_n16384_w4_offset12_heldout_analysis.json"
+    },
+    {
+      "width": 8,
+      "offset": 0,
+      "seconds": {
+        "active_index": 5.333358475938439,
+        "entry_skip": 5.33864207752049,
+        "physical_compaction": 5.336801003664732
+      },
+      "error_percent": [
+        0.4829193513971264,
+        0.560292072007873
+      ],
+      "target_heldout": false,
+      "paired_ratios": {
+        "active_index_over_physical_compaction": {
+          "paired_ratios": [
+            0.998843594709699,
+            0.9995155960027801,
+            0.9993741842614591,
+            0.9993357052920826
+          ],
+          "median": 0.9993549447767709,
+          "interpretation": "greater than one favors physical compaction"
+        },
+        "entry_skip_over_physical_compaction": {
+          "paired_ratios": [
+            0.9997810803641429,
+            1.0005184220848515,
+            1.000194761081993,
+            1.0008361563725838
+          ],
+          "median": 1.0003565915834223,
+          "interpretation": "greater than one favors physical compaction"
+        }
+      },
+      "source": "studies/campaigns/EXP_Compaction_Competitive_Controls_20260908/raw/metro_n16384_w8_offset0_analysis.json"
+    }
+  ],
+  "fp64_method_problem_checks": 96,
+  "fp64_max_residual": 0.0009476390364203683,
+  "same_prepared_input_as_scheduler": true,
+  "keops_across_seeds": [
+    {
+      "n": 2048,
+      "static_padded_over_active_T_total": {
+        "mean_seed_median": 0.9991409197903568,
+        "min_seed_median": 0.9979201908809118,
+        "max_seed_median": 0.9998689021621188
+      },
+      "static_padded_over_active_wrapper_solve_wall": {
+        "mean_seed_median": 0.9990056168442858,
+        "min_seed_median": 0.9974081692968574,
+        "max_seed_median": 1.0000709747144607
+      },
+      "static_padded_over_active_T_candidate_executor_wall": {
+        "mean_seed_median": 0.999139051816325,
+        "min_seed_median": 0.997713733876934,
+        "max_seed_median": 1.0000887558115192
+      },
+      "masked_batch_over_active_T_total": {
+        "mean_seed_median": 1.0012676202413187,
+        "min_seed_median": 0.9951447252051115,
+        "max_seed_median": 1.0066615935265888
+      },
+      "masked_batch_over_active_wrapper_solve_wall": {
+        "mean_seed_median": 1.001546657232878,
+        "min_seed_median": 0.9942987814829994,
+        "max_seed_median": 1.0079139381390458
+      },
+      "masked_batch_over_active_T_candidate_executor_wall": {
+        "mean_seed_median": 1.001302330179288,
+        "min_seed_median": 0.9941376067921306,
+        "max_seed_median": 1.0077374196320974
+      }
+    },
+    {
+      "n": 16384,
+      "static_padded_over_active_T_total": {
+        "mean_seed_median": 1.0158635858399405,
+        "min_seed_median": 0.9995882861197589,
+        "max_seed_median": 1.032758277135604
+      },
+      "static_padded_over_active_wrapper_solve_wall": {
+        "mean_seed_median": 1.0173254131477556,
+        "min_seed_median": 0.9995469562492003,
+        "max_seed_median": 1.0357962761789414
+      },
+      "static_padded_over_active_T_candidate_executor_wall": {
+        "mean_seed_median": 1.0186895932892228,
+        "min_seed_median": 0.9995214672044975,
+        "max_seed_median": 1.0386736425295817
+      },
+      "masked_batch_over_active_T_total": {
+        "mean_seed_median": 1.0159528394353183,
+        "min_seed_median": 0.9997262349999618,
+        "max_seed_median": 1.032885019933785
+      },
+      "masked_batch_over_active_wrapper_solve_wall": {
+        "mean_seed_median": 1.0174216624815724,
+        "min_seed_median": 0.9996981972853596,
+        "max_seed_median": 1.0359358121360966
+      },
+      "masked_batch_over_active_T_candidate_executor_wall": {
+        "mean_seed_median": 1.018817304041959,
+        "min_seed_median": 0.9996275455357114,
+        "max_seed_median": 1.038915915711071
+      }
+    }
+  ]
+}

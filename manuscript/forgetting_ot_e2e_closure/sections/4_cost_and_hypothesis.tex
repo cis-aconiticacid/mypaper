@@ -1,7 +1,7 @@
 \section{Hardware-Aware Performance Model}
 \label{sec:cost-hypothesis}
 
-The model connects completion iterations to executed work and runtime. Its inputs are the observed completion iteration of each problem, the measured update cost at each batch width, and the control overhead. This use of workload shape and device cost follows accelerator performance modeling \citep{yu2021habitat,nvidia2022gpuperformance}. We use the model to organize the width, component, and grouping measurements in \cref{sec:experiments}. The scheduling relation is a hardware cost approximation, and the work-count identities provide its workload inputs.
+The model connects completion iterations to executed work and runtime. Its inputs are the observed completion iteration of each problem, independently measured update costs, and calibrated control overhead. This use of workload shape and device cost follows accelerator performance modeling \citep{yu2021habitat,nvidia2022gpuperformance}. Work-count identities supply the workload inputs; device measurements supply the costs. \Cref{sec:execution-controls} tests the resulting time estimates against separate application runs.
 
 \subsection{Completion iterations determine active width}
 
@@ -23,7 +23,7 @@ The identity follows by counting each problem once at every iteration before its
 R=Wn_{\max}-\sum_t n_t.
 \label{eq:removable-updates}
 \end{equation}
-As illustrated in \cref{fig:method-loop}, $R$ is the area between the fixed-width rectangle and the active-width trajectory. In the matched logical-mask control, completed states are frozen while the launched width remains $W$.
+As illustrated in \cref{fig:method-loop}, $R$ is the area between the fixed-width rectangle and the active-width trajectory. In the full-width logical-mask control, completed states are frozen while their update computations remain. Indexed execution and in-place skipping can also attain $\sum_t n_t$ expensive problem updates while preserving the original state layout.
 
 A batch has removable work when completed and unfinished problems coexist before an update. Thus variation within a batch matters: identical completion iterations yield $R=0$, even if completion iterations differ across batches. The grouping experiment changes this within-batch variation using a fixed set of problems.
 
@@ -65,7 +65,19 @@ A runtime estimate for a new batch uses independently calibrated costs $\widehat
 {\sum_k\widehat c(A_k,\xi)+\widehat H_{\mathrm{active}}}.
 \label{eq:conditional-prediction}
 \end{equation}
-Calibration fixes the device, precision, support shape, tile configuration, and tail path. Application prediction also requires screening, verification, compaction, and consumer costs under that configuration. Holding the measured batch out of calibration distinguishes prediction from fitting its runtime. Our measurements characterize the primitive width response and application costs in separate experiments; the corresponding configuration differences are given in \cref{sec:backend-details}.
+Calibration fixes the device, precision, support shape, tile configuration, state layout, and tail path. Costs are specific to the execution strategy: indexed access, entry skipping, and physical compaction can have different update and control costs even for the same active width.
+
+For solver-time validation, we measure update and screen costs at every active width and profile initialization, verification, and release processing in separate calibration runs. The estimate is
+\begin{equation}
+\begin{split}
+\widehat T={}&\widehat H_{\mathrm{init}}+\sum_k\widehat c_{\mathrm{update}}(A_k,\xi)\\
+&+\sum_{j\in\mathcal J}\left[\widehat c_{\mathrm{screen}}(A_j,\xi)
++\widehat h_{\mathrm{verify}}(v_j)
++\widehat h_{\mathrm{release}}(d_j)\right],
+\end{split}
+\label{eq:calibrated-runtime}
+\end{equation}
+where $\mathcal J$ indexes checks, $v_j$ counts verifier candidates, and $d_j$ counts released problems. Verification uses a calibrated per-candidate cost; release processing uses a calibrated event cost, with separate costs for empty checks. The observed trajectory and event counts determine the estimate, while the target run's total time is reserved for evaluation. We report signed error $100(\widehat T/T-1)$ in \cref{sec:execution-controls}. Target-group transfer holds the evaluated targets out of calibration and retains the shared source input. Pipeline estimates additionally require consumer costs under the same configuration.
 
 \subsection{GPU scheduling makes width cost stepwise}
 

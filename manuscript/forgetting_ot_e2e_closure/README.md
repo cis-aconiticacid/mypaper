@@ -7,8 +7,8 @@
 1. [Introduction](sections/1_introduction.tex)：问题、关键观察与三项贡献。
 2. [Background and Motivation](sections/2_setting_related.tex)：EOT、实测完成项开销与相关系统。
 3. [DrainSinkhorn](sections/3_method.tex)：screen、verify、compact 与状态一致性。
-4. [Hardware-Aware Performance Model](sections/4_cost_and_hypothesis.tex)：更新数、运行时间与 GPU wave。
-5. [Experiments](sections/5_experiments.tex)：设置、应用、宽度、组件、grouping、正确性。
+4. [Hardware-Aware Performance Model](sections/4_cost_and_hypothesis.tex)：更新数、独立校准的条件时间重构与 GPU wave。
+5. [Experiments](sections/5_experiments.tex)：设置、应用、宽度、组件、grouping、实际输出精度、无状态搬移对照及模型验证。
 6. [Discussion](sections/6_scope.tex)：适用条件与运行成本。
 7. [Conclusion](sections/7_conclusion.tex)。
 8. [Measurement Details](sections/A_appendix.tex)：计时与统计单位、训练输出、后端补充结果、worker 扩展、W 扫描、独立精度压力测试与复现信息。
@@ -29,18 +29,22 @@
 | Table 4 | [FIG-quality.tex](figures/FIG-quality.tex)：三 seed 的 mean ± sample SD |
 | Table 5 / Section 5.4 | [FIG-components.tex](figures/FIG-components.tex) |
 | Table 6 / Section 5.5 | [FIG-grouping.tex](figures/FIG-grouping.tex) |
-| Table 7 | [FIG-seeds.tex](figures/FIG-seeds.tex) |
-| Table 8 | [FIG-phases.tex](figures/FIG-phases.tex) |
-| Table 9 | [FIG-additional.tex](figures/FIG-additional.tex) |
+| Table 7 / Section 5.7 | [FIG-controls.tex](figures/FIG-controls.tex)：无状态搬移对照的绝对 solver 时间与独立校准误差 |
+| Table 8 | [FIG-seeds.tex](figures/FIG-seeds.tex) |
+| Table 9 | [FIG-phases.tex](figures/FIG-phases.tex) |
+| Table 10 | [FIG-additional.tex](figures/FIG-additional.tex) |
 
 图表来源、设计与检查记录见 [visual review](support/audits/VISUAL_REVIEW.md)；可复现图形脚本见 [render_figures.py](support/figure_materials/render_figures.py)。其他原始图表数据与历史支持材料在 support/figure_materials/，不是论文真源。
 
-新版审稿意见的逐条核验、处理及未完成实验见 [review disposition](support/audits/REVIEW_DISPOSITION.md)。应用级预测验证、PyKeOps 每更新检查的配对实验尚未完成；不要把文字修改或已有 W 扫描图视为这些实验已闭合。[reviewer_reanalysis.py](support/figure_materials/reviewer_reanalysis.py) 从证据仓库重算质量统计与宽度数据，[review_data.json](support/figure_materials/review_data.json) 保存本次派生结果。
+新版审稿意见的逐条核验及当前状态见 [review disposition](support/audits/REVIEW_DISPOSITION.md)。MetroPT-3 无状态搬移对照、条件时间重构、实际计时输出 FP64 回放和 PyKeOps 每更新检查结果已经并入英文正文；新增分组复用旧调度实验输入，不计作新增窗口覆盖。Packer19 直接无搬移对照、广泛输入分布和更强底层内核的匹配性能比较仍未闭合。
+
+[competitive_reanalysis.py](support/figure_materials/competitive_reanalysis.py) 从证据仓库重算五组条件时间分析，核对 FP64 记录、旧输入身份和 PyKeOps 汇总，并生成 Table 7；[competitive_data.json](support/figure_materials/competitive_data.json) 保存来源、数值和原始文件身份。来源与正文位置映射见 review disposition 的 2026-09-09 更新。此核验为本地 CPU 重算，不是新 GPU 测量或作者最终审批。[reviewer_reanalysis.py](support/figure_materials/reviewer_reanalysis.py) 和 [review_data.json](support/figure_materials/review_data.json) 保留既有质量与宽度数据的复现入口。
 
 ## 构建
 
 ```powershell
 python support/figure_materials/render_figures.py
+python support/figure_materials/competitive_reanalysis.py --evidence-root <evidence-repository> --check
 latexmk -pdf -interaction=nonstopmode -halt-on-error -auxdir=support/build main.tex
 ```
 

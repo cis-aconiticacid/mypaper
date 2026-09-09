@@ -27,7 +27,7 @@ v^{k+1}\odot(K^\top u^{k+1})=b.
 \end{equation}
 This alternating-scaling identity supplies the OT-specific screen: the updated column marginal satisfies its target, while the row marginal $u^{k+1}\odot(Kv^{k+1})$ may still have a residual. The screen batches this row-residual calculation and selects a problem when $\widehat r^{\mathrm{row}}_{t,k}\leq\tau_{\mathrm{screen}}$, where $\tau_{\mathrm{screen}}$ is the screening threshold.
 
-The full verifier recomputes both marginals of each selected coupling $\pi_{t,k}$ and tests
+The full verifier recomputes both marginals of each selected coupling $\pi_{t,k}$. The stopping criterion is
 \begin{equation}
 r_{t,k}=\max\left\{
 \|\pi_{t,k}\ones-a_t\|_1,\,
@@ -35,7 +35,7 @@ r_{t,k}=\max\left\{
 \right\}\leq\tau_{\mathrm{stop}},
 \label{eq:release-contract}
 \end{equation}
-where $\tau_{\mathrm{stop}}$ is the stopping tolerance. Passing problems are emitted; rejected candidates remain active. A screen false positive adds a verifier call, and a false negative postpones compaction. The component experiment measures these effects by replaying screening decisions with the full verifier.
+where $\tau_{\mathrm{stop}}$ is the stopping tolerance. The timed implementation applies this test to backend-computed residuals. Passing problems are emitted; rejected candidates remain active. A screen false positive adds a verifier call, and a false negative postpones compaction. Independent higher-precision evaluation of the emitted potentials checks the numerical accuracy of this decision in \cref{sec:numerical-results}.
 
 \subsection{Compacting independent state}
 
@@ -47,10 +47,12 @@ Let $F_t$ be one Sinkhorn cycle on the complete state $z_t$ of problem $t$. Beca
 =\operatorname{pack}\!\left(F_1(z_1),\ldots,F_W(z_W)\right).
 \label{eq:pack-commutes}
 \end{equation}
-Selecting a subset of the packed problems therefore preserves the update of each remaining problem. The output verifier enforces the stopping rule after finite-precision execution; \cref{sec:numerical-results} reports residuals and output checks.
+Selecting a subset of the packed problems therefore preserves the update of each remaining problem in exact arithmetic. In floating-point execution, the output verifier applies the backend residual test; \cref{sec:numerical-results} separates these checks from independent FP64 replay.
+
+Two alternatives preserve the original state layout. Indexed execution compacts only the active problem IDs and launches a smaller grid whose blocks address the original tensors through those IDs. In-place skipping keeps the original grid and tests activity before performing the dot products and LogSumExp reductions. Both avoid the expensive updates of completed problems. By contrast, the full-width logical-mask control computes updates before restoring completed states. \Cref{sec:execution-controls} compares the three compute-skipping implementations with common in-place update buffers.
 
 \subsection{Backend execution}
 
-The packed Triton implementation applies screening and verification at the configured interval and compacts all matrix-free solver state. A tail threshold controls handoff to its single-problem solver; MetroPT-3 and Packer19 set this threshold to one. Iteration limits and non-finite states terminate with failure. Runtime includes the configured control and handoff operations.
+The packed Triton implementation applies screening and verification at the configured interval and compacts all matrix-free solver state. A tail threshold controls handoff to its single-problem solver; the primary MetroPT-3 and Packer19 applications set this threshold to one. The competitive execution study keeps the packed kernel through width one for every compared implementation. Iteration limits and non-finite states terminate with failure. Runtime includes the configured control and handoff operations.
 
 The OTT-JAX implementation verifies at fixed phase boundaries, removes completed problems, and rebuckets the remaining batch. PyKeOps uses a batched independent-problem operator with a fixed checking interval and removal of completed state. When a problem fits on one GPU, independent workers process different windows. The scale-out experiments use one worker per GPU.

@@ -1,7 +1,7 @@
 \section{Experiments}
 \label{sec:experiments}
 
-The evaluation asks how much DrainSinkhorn reduces application runtime, which execution components produce the gain, and how completion variation and GPU scheduling determine its operating regime. We first define the tasks and comparisons, then report application results, kernel measurements, component tests, grouping effects, and output checks.
+The evaluation asks how much DrainSinkhorn reduces application runtime, how the implementation of completed-problem removal affects that gain, and how accurately calibrated costs reconstruct runtime. We report application results, width measurements, component and grouping tests, numerical checks, and competitive execution controls.
 
 \subsection{Experimental setup}
 
@@ -11,7 +11,9 @@ We evaluate four tasks: MetroPT-3 for industrial sensor streams, ImageNet-32 for
 
 We measure $E_1$ (Sinkhorn time) through the verified coupling or dual potentials, $E_2$ (pipeline time) through the downstream consumer, and $E_3$ (total time) through the full training, generation, or task-evaluation interval. Speedup is baseline time divided by DrainSinkhorn time. In the two-host MetroPT-3 and Packer19 component tests, $E_1$ is obtained by subtracting paired consumer time within each observation before computing ratios and uncertainty.
 
-Fixed-width execution keeps the original batch through the final verification. Logical masking (LM) freezes completed states at the original width. Dynamic compaction (DC) removes completed state and narrows the batch. Fixed/DC measures the complete execution change; LM/DC isolates compaction under the same observed release decisions. Component tests fix inputs, initialization, tolerance, verification schedule, verifier, backend, and consumer. Repeats characterize timing variability; training seeds, clips, and host/order/GPU combinations provide the statistical units specified with each result.
+Fixed-width execution keeps the original batch through the final verification. Logical masking (LM) computes full-width updates and freezes completed states. Dynamic compaction (DC) removes completed state and narrows the batch. Fixed/DC measures the complete execution change; LM/DC measures removal relative to full-width computation under matched release decisions. Indexed execution and in-place skipping provide the compute-skipping controls in \cref{sec:execution-controls}. Component tests fix inputs, initialization, tolerance, verification schedule, verifier, backend, and consumer. Timing repeats and host/order/GPU placements characterize measurement variability; the number and identity of input workloads are reported separately.
+
+The competitive MetroPT-3 study uses FP32 with TF32 disabled, $\tau_{\mathrm{screen}}=\tau_{\mathrm{stop}}=9.5\times10^{-4}$, and a backend two-marginal verifier every four cycles. An external tolerance of $10^{-3}$ is used for post-run FP64 replay. The timed path uses the backend verifier without the outward-bound guard or FP64 escalation. \Cref{sec:competitive-settings} gives its kernel configuration, shared inputs, and calibration procedure.
 
 \subsection{Application runtime and backend transfer}
 \label{sec:application-results}
@@ -27,7 +29,7 @@ Packer19 shows how solver savings translate to the pipeline. In the same 24 pair
 
 Backend results separate the contribution of compaction from the benefit of a complete execution configuration (\cref{tab:ot-cross-backend}). In OTT-JAX, compaction gives $1.37$--$1.58\times$ over fixed-phase execution at tolerances from $10^{-3}$ to $5\times10^{-3}$. At $10^{-2}$, every problem completes in the first phase and the ratio is $0.995\times$. The native-reference ratio remains $1.73\times$ there because it also includes the change to fixed-phase execution.
 
-On PyKeOps, static batching and logical masking outperform the tested compacted configurations on ImageNet-32. Checking every four updates reaches 16 update rounds, compared with 13 for the static batch, and achieves $1.42\times$ over sequential execution versus $1.55\times$ for static batching. Thus checking frequency and batch removal jointly determine the runtime of these configurations. An every-update compacted configuration would isolate compaction at the static schedule; the current runner supports that interval, while the reported records cover intervals two and four. Supplementary backend and deployment results appear in \cref{sec:backend-details,sec:worker-details}.
+On PyKeOps, the earlier configuration comparison favors static batching over compaction with less frequent checking. Checking every four updates reaches 16 rounds, compared with 13 for the static batch, and achieves $1.42\times$ over sequential execution versus $1.55\times$ for static batching. A separate comparison now fixes every method's checking interval to one (\cref{tab:ot-cross-backend}). Across three inputs per size, static/compacted coupling-preparation time is $0.999\times$ at $n=2048$ and $1.02\times$ at $n=16384$. At the larger size, all methods take 13 batch rounds; compaction executes 50, 51, and 52 problem updates against 52 for static batching. The third input completes simultaneously and has a ratio of $1.00\times$ after rounding. Thus the matched comparison shows a small input-dependent benefit. Supplementary settings and deployment results appear in \cref{sec:backend-details,sec:worker-details}.
 
 \subsection{Kernel time by active batch width}
 \label{sec:width-results}
@@ -37,7 +39,7 @@ The width experiment tests the update-cost term in \cref{eq:time-difference}. It
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{figures/FIG-width.pdf}
-\caption{A100 packed-update time versus active batch width on synthetic tensors. Points show medians and whiskers show interquartile ranges from 30 repeats. Each panel uses its own vertical scale in milliseconds. Vertical guides locate initial widths $W=8$ and $W=16$. ImageNet-32 training uses $n=1024,W=8$, with $\varepsilon=0.03$, verification interval 4, and tolerance $10^{-3}$; these training settings provide application context for the primitive measurement.}
+\caption{A100 packed-update time versus active batch width on synthetic tensors with feature dimension 500, column tile 64, and cost scale 1. Points show medians and interquartile ranges from 30 repeats, with panel-specific millisecond scales. Vertical guides locate $W=8$ and $W=16$. The sweep characterizes the width response of this configuration; the application-time reconstruction in \cref{sec:execution-controls} uses its own matched calibration.}
 \label{fig:width-cost}
 \end{figure*}
 
@@ -52,9 +54,9 @@ The Packer19 study asks which parts of the execution layer reduce time. It uses 
 
 \input{figures/FIG-components.tex}
 
-Batched verification and the one-marginal screen reduce OT-stage time by factors of $1.13$ and $1.11$, respectively. Screening lowers the cost of finding completed problems; physical compaction produces the larger timing effect by removing their later updates. All 24 paired observations favor each change. The screen's replay checks are reported in \cref{sec:numerical-results}.
+Batched verification and the one-marginal screen reduce OT-stage time by factors of $1.13$ and $1.11$, respectively. Screening lowers the cost of finding completed problems; removal of their later updates produces the larger timing effect relative to full-width computation. All 24 paired observations favor each change. The screen's replay checks are reported in \cref{sec:numerical-results}.
 
-Logical masking leaves the packed width at eight and yields a ratio near one. Compaction reduces problem updates from 256 to 156 and gives \CPackerCompactionOTSpeedup{} speedup, with timing uncertainty summarized in \cref{sec:timing-uncertainty}. Across paired-observation medians, GPU energy falls from 880 to 688 J, while peak allocated memory increases from 80.8 to 107 MiB. \Cref{tab:phase-costs} gives the separately summarized phase times.
+Logical masking leaves the packed width at eight and yields a ratio near one. Compaction reduces problem updates from 256 to 156 and gives \CPackerCompactionOTSpeedup{} speedup over this full-width control, with timing uncertainty summarized in \cref{sec:timing-uncertainty}. The comparison with compute-skipping implementations is measured separately on MetroPT-3 in \cref{sec:execution-controls}. Across paired-observation medians, GPU energy falls from 880 to 688 J, while peak allocated memory increases from 80.8 to 107 MiB. \Cref{tab:phase-costs} gives the separately summarized phase times.
 
 A separate stopping-tolerance sweep tests the same LM/DC comparison over five tolerances. \Cref{fig:stopping-results} shows speedup alongside achieved residual and consumer total-variation distance (TV) from the tight reference. Compaction gives \CPackerCompactionRange{} from $10^{-4}$ through $3\times10^{-3}$. At $10^{-2}$, all eight problems first pass at update 8; the ratio is \CPackerNeutralCompaction{} with a timing interval spanning equal runtime (\cref{sec:timing-uncertainty}). This equal-completion case exercises the $R=0$ condition in the model.
 
@@ -77,8 +79,23 @@ As shown in Table~\ref{tab:metropt-grouping}, the fixed/DC ratio is \CMThreeHomo
 \subsection{Numerical accuracy and application outputs}
 \label{sec:numerical-results}
 
-The timed packed Triton applications use the backend precision and the two-marginal verifier. All emitted plans meet the recorded marginal-residual bounds, and all reported consumer and training-quality checks pass. On primary MetroPT-3, maximum row and column residuals are $9.5\times10^{-4}$ and $1.3\times10^{-6}$; both execution modes attain failure-window ROC AUC $1.0$. ImageNet-32 quality is evaluated in PCA500 feature space at NFE 4, 8, and 16 (\cref{tab:imagenet-quality}).
+The timed packed Triton applications use backend-computed two-marginal residuals for release. On primary MetroPT-3, maximum recorded row and column residuals are $9.5\times10^{-4}$ and $1.3\times10^{-6}$; both execution modes attain failure-window ROC AUC $1.0$. ImageNet-32 quality measurements are close across the three paired seeds in PCA500 feature space at NFE 4, 8, and 16 (\cref{tab:imagenet-quality}). These measurements describe the reported feature-space metrics.
 
 Screening and release are checked separately. The full-verifier replay of 1488 screen-negative events finds zero completed problems missed in this component workload; this measures screening delay at its configured tolerance. In the matched Packer19 LM/DC comparison, release decisions agree and the consumer TV difference is zero. The tolerance sweep in \cref{fig:stopping-results} reports achieved residuals and consumer deviations from a tighter reference.
 
-Finite-precision checks also exercise cases near the acceptance threshold. An independent stress test covers 84 near-threshold problems and 16 runtime cases. Raw FP32 and TF32 each disagree with FP64 replay on three acceptance decisions; an outward-bound guard with FP64 escalation has zero disagreements. \Cref{sec:precision-stress} specifies this separate guarded configuration.
+The competitive MetroPT-3 study additionally saves the potentials emitted by the first timed run of every method and batch. Blocked FP64 direct-dot reconstruction evaluates both marginals of these actual outputs after timing. All 96 method--problem checks satisfy the external $10^{-3}$ tolerance, with maximum residual $9.5\times10^{-4}$. They cover 16 distinct target problems sharing one source; the larger batch and method copies reuse those inputs. Saved potentials agree bitwise across methods within each batch.
+
+Finite-precision checks also exercise cases near the acceptance threshold. An independent stress test covers 84 near-threshold problems and 16 runtime cases. Raw FP32 and TF32 each disagree with FP64 replay on three acceptance decisions; an outward-bound guard with FP64 escalation has zero disagreements. The available summary reports total disagreements without separating false acceptance from false rejection. \Cref{sec:precision-stress} specifies this separately evaluated guarded configuration.
+
+\subsection{Execution alternatives and calibrated runtime}
+\label{sec:execution-controls}
+
+We compare physical compaction with indexed execution and in-place skipping on one A100 using the existing MetroPT-3 failure-window input. Its 16 targets form four non-overlapping groups of four; a width-eight batch reuses the first eight targets. Each batch uses four cyclic method orders. The three primary implementations share in-place Gauss--Seidel buffers, screening, verification, and a packed width-one tail. Indexed execution changes only the active IDs and launch grid; in-place skipping retains the original grid and bypasses expensive updates for inactive problems. Both preserve the original state storage. A legacy logical-mask implementation is a secondary reference because it allocates new update outputs before restoring inactive state.
+
+\Cref{tab:execution-controls} reports absolute solver times. Paired index/DC ratios correspond to a $0.0500$--$0.0711\%$ timing disadvantage for DC; entry-skip/DC favors DC by $0.0168$--$0.0469\%$. All differences are below $0.1\%$; skipping completed computation gives similar measured runtime across these three state-management choices.
+
+The same runs test \cref{eq:calibrated-runtime}. Independent calibration measures every active width with five primitive repeats and obtains control costs from a separate instrumented solve. Calibration on the first width-four group is transferred to the other three groups. Across the three primary methods and their four timing repeats, signed reconstruction errors are $+0.463\%$ to $+1.08\%$. These estimates use the observed completion and verification traces and shared-source inputs. Prefix-ID calibration approximates the noncontiguous survivor IDs used during indexed execution.
+
+\input{figures/FIG-controls.tex}
+
+An earlier scheduling study uses the same source and targets together at width 16. It compares immediate exact compaction with graph replay, periodic compaction, and bucketed capacities. Immediate compaction takes 8.43~s; four-cycle graph replay also takes 8.42~s, while bucketed execution takes 9.24~s. Its independently measured width and movement costs explain why saving a small amount of movement can add more padded update work. That study tests when and how far to compact. The present comparison tests whether full-state movement is needed to avoid completed updates; its regrouped inputs add execution contrasts to the existing workload evidence.
