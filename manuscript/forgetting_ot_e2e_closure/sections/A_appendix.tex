@@ -13,6 +13,11 @@ Ratios are displayed to three significant digits. For narrow timing intervals, w
 GPU energy is the change in the A100 NVML cumulative energy counter between the start of the method call and the final CUDA synchronization. The counter reports millijoules, converted to joules. This interval starts with prepared arrays and includes solver, initialization, and consumer work; compilation, warm-up, and prepared-input transfer occur before it. Unsupported counters are recorded as unavailable.
 
 \subsection{Training and output measurements}
+\label{sec:training-output-details}
+
+For MetroPT-3 and Packer19, the cost scale is the median over pairwise squared distances between the first 2048 points of each support in the first source--target pair, or all points for smaller supports. ImageNet-32 uses the first 512 points per support in the first pair of its pre-training calibration batch. Distances for these scale estimates are computed in FP64. The resulting scale is shared by the compared methods within a run.
+
+The ImageNet-32 training and evaluation sets select disjoint rows from a frozen PCA500 feature cache, preserving the same coordinates in both sets. The split operation selects rows without fitting another projection. Couplings match Gaussian samples to training features; the held-out feature rows provide the evaluation reference.
 
 ImageNet-32 uses paired seeds 20260891, 20260892, and 20260893 throughout training and NFE evaluation. \Cref{tab:imagenet-solver-pairs} reports each seed's solver time. The full-training ratio uses the complete 50,000-update interval. The separate coupling-preparation diagnostic gives paired ratios $1.16$, $1.08$, and $1.08$, with fixed/DC update counts $64/52$, $64/56$, and $64/56$.
 

@@ -50,4 +50,6 @@ latexmk -pdf -interaction=nonstopmode -halt-on-error -auxdir=support/build main.
 
 编号以编译 PDF 和 support/build/main.aux 为准。
 
+实验复现补充：Section 5.1 定义 cost 与边缘分布；Appendix A.2 给出距离缩放取样和共享 PCA 特征坐标。Section 5.7 的执行顺序比较明确为 post-hoc 分析。剩余证据项与原始包定位状态见 review disposition 的 Resumed workflow 小节。
+
 最新行文修订：Section 2.3 在具体系统先例后明确执行层适配可构成独立系统贡献；Section 3 补充 host 同步、buffer、tail 路径和 OTT 编译缓存；Section 5 补全训练与残差配置，并报告条件模型的执行选择方向重算。Appendix A.6 更正精度压力测试为三次误接收及 guarded 路径零误接收，不再将其表述为零决策分歧。原始来源及未闭合项见 review disposition 最后一节；grouping 的既有绝对时间原始包仍待定位。

@@ -9,6 +9,8 @@ We evaluate four tasks: MetroPT-3 for industrial sensor streams, ImageNet-32 for
 
 MetroPT-3 couples sensor supports and applies the resulting plan to target features to obtain transport cost and barycentric sensor shift. Packer19 applies the plan to target cell-type indicators and aggregates by source cell type to form transition matrices. ImageNet-32 couples Gaussian samples with image features in a common 500-dimensional PCA coordinate system. Sampled coupling pairs train a time-conditioned velocity MLP with two 256-unit SiLU hidden layers and a 500-dimensional output. Training uses batches of 256, AdamW at learning rate $10^{-3}$, and the flow-matching target $x_1-x_0$ at interpolated points $(1-t)x_0+tx_1$. These are feature-space training and generation measurements.
 
+The primary MetroPT-3, Packer19, and ImageNet-32 couplings use uniform marginals and scaled squared-Euclidean costs, $C_{ij}=\lVert x_i-y_j\rVert_2^2/s$. The positive scale $s$ is a sampled squared-distance median, fixed before the compared solves. Appendix~\ref{sec:training-output-details} specifies the samples and the feature split.
+
 \input{figures/FIG-setup.tex}
 
 We measure $E_1$ (Sinkhorn time) through the verified coupling or dual potentials, $E_2$ (pipeline time) through the downstream consumer, and $E_3$ (total time) through the full training, generation, or task-evaluation interval. Speedup is baseline time divided by DrainSinkhorn time. In the two-host MetroPT-3 and Packer19 component tests, $E_1$ is obtained by subtracting paired consumer time within each observation before computing ratios and uncertainty.
@@ -100,7 +102,7 @@ We compare physical compaction with indexed execution and in-place skipping on o
 
 The same runs test \cref{eq:calibrated-runtime}. Independent calibration measures every active width with five primitive repeats and obtains control costs from a separate instrumented solve. Calibration on the first width-four group is transferred to the other three groups. Across the three primary methods and their four timing repeats, signed reconstruction errors are $+0.463\%$ to $+1.08\%$. These estimates use the observed completion and verification traces and shared-source inputs. Prefix-ID calibration approximates the noncontiguous survivor IDs used during indexed execution.
 
-Taking ratios of the independently estimated times also predicts the ordering of the execution choices. For both indexed/DC and entry-skip/DC, the predicted direction agrees with the measured paired median on each of the three transferred target groups. At the individual-repeat level, 23 of the 24 paired directions agree. These comparisons concern sub-$0.1\%$ differences between compute-skipping implementations, so the practical result is their similar cost on this input pool.
+A post-hoc comparison uses ratios of the independently estimated times to predict the ordering of the execution choices. For both indexed/DC and entry-skip/DC, the predicted direction agrees with the measured paired median on each of the three transferred target groups. At the individual-repeat level, 23 of the 24 paired directions agree. These comparisons concern sub-$0.1\%$ differences between compute-skipping implementations, so the practical result is their similar cost on this input pool.
 
 \input{figures/FIG-controls.tex}
 
