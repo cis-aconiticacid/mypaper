@@ -24,6 +24,8 @@ The Packer19 tolerance study uses two hosts, four GPUs per host, three method or
 
 \input{figures/FIG-phases.tex}
 
+In \cref{tab:phase-costs}, ``Batched verification'' is the batched marginal audit, implemented as the row-only screen in these two arms. ``Verifier'' is the separate upstream two-marginal plan-apply check on selected candidates. ``Correction'' covers Sinkhorn updates, and the last column records state freezing or physical selection. Each column is summarized independently; their medians are not substituted for the paired whole-path timing ratio.
+
 \subsection{Width measurements and backend settings}
 \label{sec:backend-details}
 
@@ -63,7 +65,9 @@ The ImageNet-32 width study uses $n=4096$, $\varepsilon=0.1$, $\tau=10^{-3}$, an
 \subsection{Finite-precision stress test}
 \label{sec:precision-stress}
 
-An independent test covers 84 near-threshold problems and 16 runtime stress cases over 1/2/4/8 GPUs. Against FP64 replay, raw FP32 and TF32 each disagree on three acceptance decisions. An outward-bound guard followed by FP64 escalation has zero disagreements in these 100 cases. This guarded configuration is evaluated separately from the timed applications.
+An independent test covers 84 near-threshold problems and 16 runtime stress cases over 1/2/4/8 GPUs. Against independent FP64 replay, raw FP32 and TF32 each produce three false accepts. The guarded path has zero false accepts. Its analytic residual upper bound uses explicit dot-product and reduction operation counts, FP64 scalar reductions, and outward rounding with \texttt{nextafter} toward positive infinity; TF32 is disabled. For a supported arithmetic contract, release requires this upper bound to meet the tolerance. An unsupported contract invokes independent FP64 residual replay; non-finite inputs that cannot be replayed require stabilized correction.
+
+The guard is conservative: it releases three of the 21 near-threshold candidates at each GPU count, whereas FP64 replay accepts 11, 9, 12, and 11. Supported bounds above tolerance remain rejected. Thus zero false accepts measures guarded release safety, while accepted-set agreement is a different property. This stress configuration is separate from the timed application paths and the post-run MetroPT-3 output replay.
 
 \subsection{Competitive execution and calibration settings}
 \label{sec:competitive-settings}

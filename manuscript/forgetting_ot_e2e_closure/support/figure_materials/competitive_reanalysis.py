@@ -28,6 +28,7 @@ def build(root):
     calibrations = {w: read(prefix + f"metro_n16384_w{w}_offset0.json") for w in (4, 8)}
     cells = []
     residuals = []
+    decisions = []
     for width, offset in ((4, 0), (4, 4), (4, 8), (4, 12), (8, 0)):
         name = f"metro_n16384_w{width}_offset{offset}"
         packet = read(prefix + name + ".json")
@@ -36,6 +37,18 @@ def build(root):
         assert result == read(prefix + name + suffix), name
         assert result["evidence_eligible"]
         errors = [100 * p["relative_error"] for m in METHODS for p in result["model"]["methods"][m]]
+        if result["model"]["input_heldout"]:
+            pc = {r["repeat"]: r for r in result["model"]["methods"]["physical_compaction"]}
+            for method in METHODS[:2]:
+                estimated, measured = [], []
+                for row in result["model"]["methods"][method]:
+                    reference = pc[row["repeat"]]
+                    estimated.append(row["estimated_seconds"] / reference["estimated_seconds"])
+                    measured.append(row["actual_seconds"] / reference["actual_seconds"])
+                decisions.append({"offset": offset, "control": method,
+                                  "estimated_ratios": estimated, "measured_ratios": measured,
+                                  "median_direction_agrees": (statistics.median(estimated) > 1) == (statistics.median(measured) > 1),
+                                  "repeat_directions_agree": sum((a > 1) == (b > 1) for a, b in zip(estimated, measured))})
         for method in result["methods"].values():
             for row in method["fp64"]:
                 assert row["passes_external_tolerance"]
@@ -55,8 +68,14 @@ def build(root):
         for key in ("static_padded_over_active_T_total", "masked_batch_over_active_T_total"):
             values = [r[key] for r in keops["seed_medians"] if r["n"] == group["n"]]
             assert statistics.mean(values) == group[key]["mean_seed_median"]
+    stress = read("studies/raw_results/server_runs/20260808_p4_finite_precision_8gpu_multinode/analysis.json")
+    assert stress["aggregate"]["raw_fp32_false_accepts"] == 3
+    assert stress["aggregate"]["raw_tf32_false_accepts"] == 3
+    assert stress["aggregate"]["production_false_accepts"] == 0
     return {"verification": "agent CPU reconciliation; human author review pending",
             "sources_sha256": sources, "cells": cells,
+            "heldout_ordering": decisions,
+            "guarded_stress": {"aggregate": stress["aggregate"], "by_world_size": stress["by_world_size"]},
             "fp64_method_problem_checks": len(residuals) // 2,
             "fp64_max_residual": max(residuals),
             "same_prepared_input_as_scheduler": True,
