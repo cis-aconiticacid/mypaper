@@ -1,0 +1,297 @@
+{
+  "schema": "forgetot.geomloss_completion.summary.v1",
+  "research_campaign_commit": "7203c51a78f9f3f359109a7dc93dc9ea7c6d34f7",
+  "research_campaign_path": "studies/campaigns/EXP-NATIVE-BATCH-SOLVERS-20260909",
+  "contrast": "same residual-refined GeomLoss 0.2.6: full-width freezing / physical compaction",
+  "method_extension": "Both arms add fixed-epsilon refinement to the official fixed-schedule solver.",
+  "statistical_unit": "five alternating-order timing pairs on each of two fixed real input batches",
+  "all_formal_outputs_pass": true,
+  "runtime_source_paths": {
+    "benchmark_native_batch.py": "provenance/geomloss_runtime_benchmark_native_batch.py",
+    "benchmark_geomloss_completion.py": "code/benchmark_geomloss_completion.py",
+    "geomloss_completion_aware.py": "code/geomloss_completion_aware.py"
+  },
+  "reused_data_and_audit_helpers_ast_equal": true,
+  "cells": {
+    "n1024_w8": {
+      "n": 1024,
+      "width": 8,
+      "pairs": 5,
+      "input_sha256": "82bbc7c21b6a975207c7fdc8c6f5b69dca24d79282e6f124120c3b75b3184282",
+      "configuration": {
+        "epsilon": 0.1,
+        "scaling": 0.99,
+        "dtype": "float32",
+        "tf32": false,
+        "backend": "tensorized",
+        "debias": false,
+        "potentials": true,
+        "internal_tolerance": 0.0005,
+        "external_tolerance": 0.001,
+        "check_every": 10,
+        "refinement_cap": 2000,
+        "threads": 1
+      },
+      "raw_environment": "raw/geomloss_completion/formal_n1024_w8_environment.json",
+      "raw_pair_audit": "raw/geomloss_completion/formal_n1024_w8_pairs.json",
+      "paired_full_over_compact_geomean": 1.1594747200464277,
+      "paired_range": [
+        1.1284907779547386,
+        1.2213551484685905
+      ],
+      "paired_ratios": [
+        1.150851096448722,
+        1.2213551484685905,
+        1.1483301116444182,
+        1.1504839124303612,
+        1.1284907779547386
+      ],
+      "wins": 5,
+      "paired_solver_geomean": 1.1603465084081555,
+      "paired_refinement_geomean": 1.2815271653569966,
+      "bitwise_equal_returned_potentials": true,
+      "annealing_steps": 380,
+      "annealing_slots": 3040,
+      "completion_depths_after_annealing": [
+        270,
+        470,
+        340,
+        330,
+        260,
+        430,
+        260,
+        390
+      ],
+      "refine_full_width": {
+        "median_ot_stage_seconds": 0.5127982571721077,
+        "ot_stage_range": [
+          0.5094516389071941,
+          0.5535016432404518
+        ],
+        "median_solver_seconds": 0.5105377770960331,
+        "median_refinement_seconds": 0.30409201607108116,
+        "max_marginal_l1": 0.0005022779534480557,
+        "peak_allocated_bytes": 274876928,
+        "peak_reserved_bytes": 369098752,
+        "refinement_slots": 3760,
+        "annealing_plus_refinement_slots": 6800,
+        "compaction_events": 0
+      },
+      "refine_compact": {
+        "median_ot_stage_seconds": 0.4505077004432678,
+        "ot_stage_range": [
+          0.4428150914609432,
+          0.4544106759130955
+        ],
+        "median_solver_seconds": 0.4482635520398617,
+        "median_refinement_seconds": 0.23733855783939362,
+        "max_marginal_l1": 0.0005022779534480557,
+        "peak_allocated_bytes": 274876928,
+        "peak_reserved_bytes": 369098752,
+        "refinement_slots": 2750,
+        "annealing_plus_refinement_slots": 5790,
+        "compaction_events": 6
+      },
+      "refinement_slot_reduction": 0.2686170212765957,
+      "annealing_plus_refinement_slot_reduction": 0.1485294117647059
+    },
+    "n4096_w16": {
+      "n": 4096,
+      "width": 16,
+      "pairs": 5,
+      "input_sha256": "2cff3934bb2121ac74488b8f622766aca904eb84df136ecd285f90e7e4f8ef90",
+      "configuration": {
+        "epsilon": 0.1,
+        "scaling": 0.99,
+        "dtype": "float32",
+        "tf32": false,
+        "backend": "tensorized",
+        "debias": false,
+        "potentials": true,
+        "internal_tolerance": 0.0005,
+        "external_tolerance": 0.001,
+        "check_every": 10,
+        "refinement_cap": 2000,
+        "threads": 1
+      },
+      "raw_environment": "raw/geomloss_completion/formal_n4096_w16_environment.json",
+      "raw_pair_audit": "raw/geomloss_completion/formal_n4096_w16_pairs.json",
+      "paired_full_over_compact_geomean": 1.2145529832318398,
+      "paired_range": [
+        1.213263558013529,
+        1.2169131627142478
+      ],
+      "paired_ratios": [
+        1.2153802822591289,
+        1.2135405872438387,
+        1.2136713250797735,
+        1.213263558013529,
+        1.2169131627142478
+      ],
+      "wins": 5,
+      "paired_solver_geomean": 1.2154362937053667,
+      "paired_refinement_geomean": 1.5367631002967344,
+      "bitwise_equal_returned_potentials": true,
+      "annealing_steps": 392,
+      "annealing_slots": 6272,
+      "completion_depths_after_annealing": [
+        210,
+        280,
+        240,
+        140,
+        180,
+        210,
+        200,
+        160,
+        280,
+        260,
+        220,
+        220,
+        180,
+        210,
+        340,
+        150
+      ],
+      "refine_full_width": {
+        "median_ot_stage_seconds": 10.542256586253643,
+        "ot_stage_range": [
+          10.539725430309772,
+          10.551691640168428
+        ],
+        "median_solver_seconds": 10.506437614560127,
+        "median_refinement_seconds": 5.338212192058563,
+        "max_marginal_l1": 0.0004999708847907659,
+        "peak_allocated_bytes": 4836199424,
+        "peak_reserved_bytes": 5093982208,
+        "refinement_slots": 5440,
+        "annealing_plus_refinement_slots": 11712,
+        "compaction_events": 0
+      },
+      "refine_compact": {
+        "median_ot_stage_seconds": 8.684167791157961,
+        "ot_stage_range": [
+          8.670866552740335,
+          8.689172700047493
+        ],
+        "median_solver_seconds": 8.648342452943325,
+        "median_refinement_seconds": 3.4753189235925674,
+        "max_marginal_l1": 0.0004999708847907659,
+        "peak_allocated_bytes": 6715608064,
+        "peak_reserved_bytes": 7107248128,
+        "refinement_slots": 3480,
+        "annealing_plus_refinement_slots": 9752,
+        "compaction_events": 10
+      },
+      "refinement_slot_reduction": 0.3602941176470589,
+      "annealing_plus_refinement_slot_reduction": 0.16734972677595628
+    }
+  },
+  "retained_failures": [
+    {
+      "path": "raw/geomloss_completion/probe_n1024_w8_source_equivalence_official.json",
+      "status": "residual_fail",
+      "mode": "official",
+      "max_marginal_l1": 0.006945842234729894,
+      "reason": []
+    },
+    {
+      "path": "raw/geomloss_completion/probe_n1024_w8_source_equivalence_source_noop.json",
+      "status": "exception",
+      "mode": "source_noop",
+      "max_marginal_l1": null,
+      "reason": [
+        "NameError: name 'torch' is not defined"
+      ]
+    },
+    {
+      "path": "raw/geomloss_completion/probe_n4096_w16_source_equivalence_official.json",
+      "status": "residual_fail",
+      "mode": "official",
+      "max_marginal_l1": 0.004727489374009311,
+      "reason": []
+    },
+    {
+      "path": "raw/geomloss_completion/probe_n4096_w16_source_equivalence_source_noop.json",
+      "status": "residual_fail",
+      "mode": "source_noop",
+      "max_marginal_l1": 0.004727489374009311,
+      "reason": []
+    },
+    {
+      "path": "raw/geomloss_completion/probe_sourcefix_n1024_w8_source_equivalence_official.json",
+      "status": "residual_fail",
+      "mode": "official",
+      "max_marginal_l1": 0.006945842234729894,
+      "reason": []
+    },
+    {
+      "path": "raw/geomloss_completion/probe_sourcefix_n1024_w8_source_equivalence_source_noop.json",
+      "status": "residual_fail",
+      "mode": "source_noop",
+      "max_marginal_l1": 0.006945842234729894,
+      "reason": []
+    }
+  ],
+  "raw_file_count": 51,
+  "source_equivalence": {
+    "probe_n4096_w16_source_equivalence.json": {
+      "official_noop_bitwise_equal": true,
+      "max_abs_potential_difference": 0.0
+    },
+    "probe_sourcefix_n1024_w8_source_equivalence.json": {
+      "official_noop_bitwise_equal": true,
+      "max_abs_potential_difference": 0.0
+    }
+  },
+  "raw_record_hashes": {
+    "formal_n1024_w8_disjoint_warmup_refine_compact.json": "31809ea15b84b18a83b95adf01e00e53cd9d21fcfac411bb28f6365d82dc5d2e",
+    "formal_n1024_w8_disjoint_warmup_refine_full_width.json": "031b04b18e5c82547fd094b0e0f97850b31f1d3a969a2c7fe7a0998a036609e3",
+    "formal_n1024_w8_environment.json": "9f3f66c8967a27c1d65438ebbc83d279f464a1e22146f4b2c7f25381e3176574",
+    "formal_n1024_w8_pair0_refine_compact.json": "f8a8c629b6e25bc0985cf1ae43d76620b7e8e96b1f5001deb98003ce425cdcd3",
+    "formal_n1024_w8_pair0_refine_full_width.json": "f17e6f87a1390908412a090a19dd6315ad1d795ceb6cc16842e36194e6a8022b",
+    "formal_n1024_w8_pair1_refine_compact.json": "8fac444fee10e557ac6ffb502b15848c5912d047f374c37d6a10f32660f15bc0",
+    "formal_n1024_w8_pair1_refine_full_width.json": "f5eb499449cd7e5cf92e1feb2515ba2971418c63ff72d856abe6e011864500f2",
+    "formal_n1024_w8_pair2_refine_compact.json": "0e1d2fce9b00d594504da4cf60c0fbd1d503b90217553e93dc226c48f09b19ef",
+    "formal_n1024_w8_pair2_refine_full_width.json": "6d01e2347536ed43ed9a2dbfe94bd1b88fc2f93616d5946a9318ce801a6645c1",
+    "formal_n1024_w8_pair3_refine_compact.json": "fb4fd1b18f883c9f21150a1d320a9b43a931080f8ebf527d79e850556a476a44",
+    "formal_n1024_w8_pair3_refine_full_width.json": "8bdd990076e7f4788043ed8e9d4cab974eaa6f0ab7f087b2fab59649284d11b0",
+    "formal_n1024_w8_pair4_refine_compact.json": "0451794edd433f09b59b9a2c144ece302e48b4268fcdda4662d3332c6cb285bb",
+    "formal_n1024_w8_pair4_refine_full_width.json": "73073c3dfddb3d6addb4fca472853bf01bd5bf9962057aa965e5aa5b92e85c4f",
+    "formal_n1024_w8_pairs.json": "b325ea24b77f1beb5277acaeb284f80185cc37b0eced38bca0a80420f37c9816",
+    "formal_n4096_w16_disjoint_warmup_refine_compact.json": "2fbdd1bc7fa1cc3190b70ee90f6847030725e59393d1b2e8ac5d3ab8e301680b",
+    "formal_n4096_w16_disjoint_warmup_refine_full_width.json": "f2021785358100776eafd24a32840174571d388d667cece25506f4b9d7dcbc60",
+    "formal_n4096_w16_environment.json": "eff6a394b50efc80c45b724d65cf61eac1105b2004921627e65715fe10e096ce",
+    "formal_n4096_w16_pair0_refine_compact.json": "beb7125f17d9d8bdabfdad660634ae01a3732abb2cea0e9dc6bc23dc67685d53",
+    "formal_n4096_w16_pair0_refine_full_width.json": "5bd6c0a1416b390b410b5e7e0df7b07385468c6e1c1deef3b0074fd2730a8a12",
+    "formal_n4096_w16_pair1_refine_compact.json": "4928601669ecb44ca743a87dcfefff014c62d77b8b55a743f1003cd6390e66be",
+    "formal_n4096_w16_pair1_refine_full_width.json": "d4d86f4b819ec5b488ba282854ba8a78275815176788915a673455ae632f25f7",
+    "formal_n4096_w16_pair2_refine_compact.json": "ca5502d8ec74f39aa397a3984e23244c3467bd7c7090ca052af0fe3af65d2729",
+    "formal_n4096_w16_pair2_refine_full_width.json": "3b992a9bba2c33c2b2fe11a915b73c03c617b70458bd308eebc5a6699be43687",
+    "formal_n4096_w16_pair3_refine_compact.json": "7de87cbad367400251e7fe42749c96796e945776cf854d8cad240b1cb050ecf0",
+    "formal_n4096_w16_pair3_refine_full_width.json": "c4bdc5c2475496e9bc5307853e20754917dd8711d6d7f6d569b60bbd3ef88c93",
+    "formal_n4096_w16_pair4_refine_compact.json": "b07436071335334d94cf5f1a1424f7b46ab6113f745624147b4c6b8009cdbf0c",
+    "formal_n4096_w16_pair4_refine_full_width.json": "fac9acc691624a484275f3a917c38a1ed312f44bae244167b4b533e6b1566b9a",
+    "formal_n4096_w16_pairs.json": "e66333ef204f890e7365962b5777325bf6c99083d9eac3aacc3ebf4e4619bb6a",
+    "probe_n1024_w8_environment.json": "fc3544d291c464edbd778a50c7d16d86cf2cad2f9778ab24464cd2ea4736be8f",
+    "probe_n1024_w8_source_equivalence_official.json": "6ba08f09640fb5bd213c7adf9474d4b09b0882ec20edda9ded2806ccc8b4cec9",
+    "probe_n1024_w8_source_equivalence_source_noop.json": "bd3241141c178785eb4f7c5045563bd75a2f5e53a351b18080a6f5f1a6674e3d",
+    "probe_n4096_w16_disjoint_warmup_refine_compact.json": "94c5d24729c7a81ecb7f70f839fb129634221093593d7e0305f651fe274b856a",
+    "probe_n4096_w16_disjoint_warmup_refine_full_width.json": "013596afba2048b12a13efc3cd77dc8c5105f3877718bae32c75797586e9b69f",
+    "probe_n4096_w16_environment.json": "fbd20f54d165d10874f580dab19fbf3ea5f1777491e2c4be7bb8d0d1ca2d5d49",
+    "probe_n4096_w16_pair0_refine_compact.json": "8c8882252cc2d4b36c692869c9594b3f7fa8f35e3f260e88ed5be4be9b23387e",
+    "probe_n4096_w16_pair0_refine_full_width.json": "172bba88392d1053160b5865bd4b7799e29fe75a10d4048bc02acbf05b1ff79d",
+    "probe_n4096_w16_pairs.json": "c2aa3fe7b6b8144f3c97c69aa621b7ac3119d96364e41af6e8845602a03f4fb2",
+    "probe_n4096_w16_source_equivalence.json": "bcad5fdc645ff22cdd89969307dc330151339c604eae4422b6aed97972ddb698",
+    "probe_n4096_w16_source_equivalence_official.json": "469c744d76e2586a586e923846973764393608e8a52b4acc1855622ff0f1f4c5",
+    "probe_n4096_w16_source_equivalence_source_noop.json": "46100883ea459c4518d0a8ad18fd2dcec7d2ea6146d3c156d4b23b4cdc065017",
+    "probe_sourcefix_n1024_w8_disjoint_warmup_refine_compact.json": "2e1c655981cfdf6be48486940b02ddda99e8a06cadb61a72c6eec8dfe6f64fa5",
+    "probe_sourcefix_n1024_w8_disjoint_warmup_refine_full_width.json": "360946da324f9731560e29570091445d2ba1341128af7f4032eacb543c5de2e5",
+    "probe_sourcefix_n1024_w8_environment.json": "a8f6677ceb2638da14ea906e5678eb131ea07e050148f0fbf0bb8bad9cb873eb",
+    "probe_sourcefix_n1024_w8_pair0_refine_compact.json": "d400602c6642fb2b6f63fbf06f5e1ddb35ae90a26e131c2d5a1b0c7884768871",
+    "probe_sourcefix_n1024_w8_pair0_refine_full_width.json": "2f451b96af04c942163f63e455333b4f46e243d72c8edd0aafb360c1cc156051",
+    "probe_sourcefix_n1024_w8_pairs.json": "f95e6d937a1de6cdccf5aa9f12321348fce0e1f66efbb0823d2ecb117cdc61cf",
+    "probe_sourcefix_n1024_w8_source_equivalence.json": "bcad5fdc645ff22cdd89969307dc330151339c604eae4422b6aed97972ddb698",
+    "probe_sourcefix_n1024_w8_source_equivalence_official.json": "458c0c9f282f9c643e1ca6898d99ff059c9d58b71d074afba9adc97a27dff302",
+    "probe_sourcefix_n1024_w8_source_equivalence_source_noop.json": "e622614c8241e51dc32161287e079915d5a83d2a4af76544b53491eb5510d396"
+  }
+}

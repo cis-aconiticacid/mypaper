@@ -1,5 +1,39 @@
 # Manuscript restructuring and visual review
 
+## Latest review: direct GeomLoss modification, 2026-09-10
+
+Table 3 now presents within-backend comparisons. Its former cross-backend A
+block remains intact in the standalone inventory and native-batch data packet;
+POT's own unmodified/modified comparison remains, and a new GeomLoss block
+compares full-width freezing with compaction after the same residual extension.
+The section text states the new stopping semantics, inference scope, identical
+outputs, unchanged tolerance and extra large-input memory cost.
+
+Source binding: research campaign `EXP-NATIVE-BATCH-SOLVERS-20260909`,
+`provenance/geomloss_completion_aware_plan.json`,
+`code/geomloss_completion_aware.py`, and
+`analysis/geomloss_completion_summary.json`; paper transcription
+`support/figure_materials/geomloss_completion_results.json` preserves raw paths
+and hashes. The analyzer checks all twenty formal arm residuals, ten bitwise
+output comparisons, completion depths, identical epsilon schedules and
+physical-width slot identities. Ratios are five-pair geometric means per
+fixed input batch, with min/max ranges, not population confidence intervals.
+
+Anti-defensive-writing review: the new prose leads with solver-local changes
+and observed effects. Removed the repeated absolute-ranking argument from
+results, discussion and conclusion. Retained the GeomLoss method extension,
+POT's near-neutral small cell, retained original residual failures, and memory
+costs where they affect interpretation. No existing numerical result was
+changed to improve the narrative; cross-backend rows remain in ALL_RESULTS.
+
+Validation: deterministic inventory regeneration passes. The current PDF has
+19 pages; the build has no undefined references/citations or overfull boxes.
+All pages were rendered for layout review, and page 8's revised table and
+results were inspected at 150 dpi. The table is legible with no clipped text,
+overlap or broken glyphs. Table 3, Tables 1--12 and Figures 1--4 retain their
+identities and numbering. This is an agent source and visual check, separate
+from author scientific approval.
+
 ## Latest review: definitions and table clarity (base dbf7e73)
 
 Updated editable LaTeX tables, using the user-supplied figure skill. Its companion workflow/source-map/audit files remain unavailable; the local source-bound checks below cover this revision.

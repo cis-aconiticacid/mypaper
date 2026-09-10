@@ -6,7 +6,7 @@
 
 ## 章节导航
 
-当前标题为 DrainSinkhorn: Completion-Aware Execution for Batched Entropic Optimal Transport。当前叙事主线为“批处理的联合执行价值 → 已核查固定宽度／共同停止机制中的已完成问题继续更新 → completion-aware execution”。仓库根目录的 `BATCHING_IMPLEMENTATION_AUDIT.md` 逐项记录 POT、GeomLoss、OTT-JAX、LogSinkhornGPU、FlashSinkhorn 与 PyKeOps 的批量输入、执行、停止和状态语义，并区分 A 组完整配置与 B 组直接 POT 本体改造；`BATCHING_COMPLETION_AWARE_TODO.md` 记录本轮已执行项与证据缺口。新实验的论文侧冻结摘录为 `support/figure_materials/native_batch_results.json`。已完成 anti-defensive-writing 审计；必要的统计与精度边界保留。完整精度结果在 competitive_data.json 的 endpoint_times_seconds/linear_model_comparison/training_times。处理状态见 review disposition 顶部 Latest review。
+当前标题为 DrainSinkhorn: Completion-Aware Execution for Batched Entropic Optimal Transport。当前叙事主线为“批处理的联合执行价值 → 已核查固定宽度／共同停止机制中的已完成问题继续更新 → completion-aware execution”。仓库根目录的 `BATCHING_IMPLEMENTATION_AUDIT.md` 记录官方机制、B 组直接 POT 改造，以及 C 组 GeomLoss 官方循环内的同残差扩展全宽/压缩对照。A 组跨后端历史记录保留在 `ALL_RESULTS.md`，当前 Table 3 使用同后端对照。`BATCHING_COMPLETION_AWARE_TODO.md` 记录执行状态。数据分别为 `support/figure_materials/native_batch_results.json` 与 `geomloss_completion_results.json`；后者保留原始文件映射和完整精度。其他结果在 competitive_data.json 的 endpoint_times_seconds/linear_model_comparison/training_times。处理状态见 review disposition 顶部 Latest review。
 
 1. [Introduction](sections/1_introduction.tex)：问题、关键观察与三项贡献。
 2. [Background and Motivation](sections/2_setting_related.tex)：EOT、实测完成项开销与相关系统；明确 logical mask 等是本文在 OT 后端中构建的实验对照，相关文献提供执行思想而非外部 OT 基线。
@@ -29,7 +29,7 @@
 | Figure 4 / Appendix A.5 | [FIG-scaling.pdf](figures/FIG-scaling.pdf)：已有 W=1/2/4/8/16 的 padding 与完整配置时间比 |
 | Table 1 | [FIG-setup.tex](figures/FIG-setup.tex) |
 | Table 2 | [FIG-endpoints.tex](figures/FIG-endpoints.tex)：E1/E2/E3，同组比值与绝对时间；聚合方式见 caption |
-| Table 3 | [FIG-backends.tex](figures/FIG-backends.tex)：OTT、PyKeOps、官方 POT/GeomLoss 加 Drain 的完整配置，以及直接改造 POT 本体的同后端对照 |
+| Table 3 | [FIG-backends.tex](figures/FIG-backends.tex)：OTT、PyKeOps、官方 POT/直接改造 POT，以及同一残差扩展 GeomLoss 内的全宽/压缩对照 |
 | Table 4 | [FIG-quality.tex](figures/FIG-quality.tex)：三 seed 的 mean ± sample SD |
 | Table 5 / Section 5.4 | [FIG-components.tex](figures/FIG-components.tex) |
 | Table 6 / Section 5.5 | [FIG-grouping.tex](figures/FIG-grouping.tex) |
@@ -58,4 +58,4 @@ latexmk -pdf -interaction=nonstopmode -halt-on-error -auxdir=support/build main.
 
 实验复现补充：Section 5.1 定义 cost 与边缘分布；Appendix A.2 给出距离缩放取样和共享 PCA 特征坐标。Section 5.7 的执行顺序比较明确为 post-hoc 分析。剩余证据项与原始包定位状态见 review disposition 的 Resumed workflow 小节。
 
-最新行文修订：Section 2 区分 GeomLoss 0.2.6 发布面与开发分支接口；Section 5 报告真实 ImageNet-32 上官方 POT/GeomLoss/Drain 的完整配置端点，并把直接修改 POT native batch 循环的 B 组与 Drain 分离。Table 3 同时保留跨后端描述性结果、matched 控制和直接 POT 因果对照。Appendix A.6 的精度压力测试仍为三次误接收及 guarded 路径零误接收。原始来源及未闭合项见 review disposition 最后一节；grouping 的既有绝对时间原始包仍待定位。
+最新行文修订：Section 2 区分 GeomLoss 0.2.6 发布面与开发分支接口；Section 5 报告直接改造 POT 与 GeomLoss 的同后端结果，并明确 GeomLoss 增加残差收敛阶段的语义改变。Table 3 的 C 组两规模配对比值为 1.159x/1.215x；大规模显存上升与原版残差失败均保留，见数据摘录和报告。原跨后端 A 组完整保留在独立结果库存。Appendix A.6 的精度压力测试不变。其他原始来源及未闭合项见 review disposition；grouping 的既有绝对时间原始包仍待定位。

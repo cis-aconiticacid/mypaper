@@ -1,60 +1,64 @@
 # Batching to completion-aware execution revision
 
-Status date: 2026-09-10. Scope: English manuscript plus the dedicated research
-campaign `EXP-NATIVE-BATCH-SOLVERS-20260909`. Authorized GPU execution used
-`gpumachine`; all campaign processes exited and the pre-existing `fwd` screen
-was left untouched.
+Status date: 2026-09-10. Scope: the English manuscript and research campaign
+`studies/campaigns/EXP-NATIVE-BATCH-SOLVERS-20260909` (research paths below).
+The central comparison applies completion-aware execution directly inside a
+third-party solver, with that solver's corresponding full-width control.
 
-- [x] 1. Establish the value of batched EOT before describing its limitation.
-  Reworked the abstract, introduction, background, and conclusion around joint
-  execution of independent couplings.
-- [x] 2. Audit concrete batching mechanisms rather than treating batching as a
-  single baseline. Recorded the audited interfaces, stopping behavior, and
-  output/state implications for POT, GeomLoss, OTT-JAX, LogSinkhornGPU,
-  FlashSinkhorn, and PyKeOps in `BATCHING_IMPLEMENTATION_AUDIT.md`.
-- [x] 3. State the central systems question explicitly. The introduction now
-  asks how joint execution can be retained while further expensive updates to
-  completed problems are avoided.
-- [x] 4. Keep official implementations separate from study-built controls.
-  Section 5.1 identifies the native OTT `jit(vmap(single solve))` reference and
-  labels fixed-phase, logical-mask, active, and PyKeOps variants as study
-  implementations.
-- [x] 5. Run actual official-release native batch configurations. POT
-  0.9.6.post1 `ot.solve_batch` and GeomLoss 0.2.6 `SamplesLoss` were run on
-  frozen real ImageNet-32 PCA500 inputs under a common external output audit.
-  Cross-backend values are labeled complete-configuration endpoints, including
-  the result that unmodified POT is fastest in the measured cells.
-- [x] 6. Directly modify the other solver rather than DrainSinkhorn. POT's own
-  batched log-Sinkhorn loop now detects completion per problem and physically
-  compacts its live cost, marginals, and dual state. Five paired unmodified /
-  modified POT rounds were run at both sizes; DrainSinkhorn is excluded from
-  this causal comparison.
-- [x] 7. Preserve failures and costs. GeomLoss interface and residual failures,
-  its one-run 508 s representative feasibility result, the nearly neutral
-  small-POT modification result, and the modified path's higher peak memory
-  all remain in the campaign, results inventory, and manuscript.
-- [x] 8. Audit the manuscript for defensive/rebuttal language and internal
-  evidence codes. Necessary numerical, timing, hardware, and statistical
-  boundaries are retained; implementation-context prose is stated directly.
-- [x] 9. Regenerate/check derived material, compile, inspect the rendered PDF,
-  and deliver through the English-paper repository. `ALL_RESULTS.md` and Table
-  3 now include the official-native and direct-POT-modification results.
+- [x] Establish batching's value and explain the audited common-stop or
+  fixed-schedule mechanisms. Source: `sections/0_abstract.tex`,
+  `sections/1_introduction.tex`, `sections/2_setting_related.tex` and
+  `BATCHING_IMPLEMENTATION_AUDIT.md`.
+- [x] Audit upstream inputs, actual update loops, stopping, state and outputs.
+  Source: pinned links in `BATCHING_IMPLEMENTATION_AUDIT.md`.
+- [x] Run the original official-release feasibility and accuracy tests;
+  preserve all cross-backend A results in `ALL_RESULTS.md` and
+  `support/figure_materials/native_batch_results.json`. Their absolute times
+  no longer occupy the main within-backend comparison table or contribution
+  argument. Source: campaign `analysis/summary.json` and `REPORT_ZH.md`, A.
+- [x] B: modify POT 0.9.6.post1's native loop directly and compare with
+  unmodified POT. Five pairs at each size; retain the nearly neutral small
+  case and increased peak allocation. Source: campaign
+  `code/pot_batch_completion_aware.py` and `analysis/summary.json`.
+- [x] C: inspect the GeomLoss release and development paths before choosing
+  a modification. Both audited paths use a schedule, and the development
+  argument check rejects a non-null tolerance. Source: audit source links and
+  campaign `provenance/upstream_geomloss_0.2.6/`.
+- [x] C: insert residual refinement directly inside official GeomLoss 0.2.6
+  after unchanged annealing, with the same refinement in both full-width and
+  compacted controls. This is explicitly a method extension relative to
+  official GeomLoss. Source: campaign
+  `provenance/geomloss_completion_aware_plan.json`,
+  `code/geomloss_completion_aware.py` and
+  `raw/geomloss_completion/geomloss_executed_loop.py`.
+- [x] Verify official/no-op bitwise equivalence, then run five matched pairs
+  at both sizes. All twenty formal arm outputs pass the unchanged external
+  residual gate; all ten pairs return identical potentials and completion
+  depths. Source: campaign `analysis/geomloss_completion_summary.json`,
+  including raw paths and hashes. Source-insertion failure, original `.99`
+  residual failures, and large-input memory increase are retained.
+- [x] Update the evidence ledger and navigation, this TODO, the English
+  all-results inventory, Table 3, and evidence-supported prose. Source:
+  campaign `REPORT_ZH.md`, paper-side `geomloss_completion_results.json`,
+  `FIG-backends.tex`, and `sections/5_experiments.tex`.
+- [x] Run anti-defensive-writing review, compile and inspect the PDF, and
+  commit/push the related paper changes. Source: current-turn entry in
+  `support/audits/VISUAL_REVIEW.md` and the corresponding Git commit.
 
-Open evidence gaps after this revision:
+Remaining scope, not unfinished promised measurements:
 
-- A matched same-backend POT timing is now available for a direct modification
-  of POT 0.9.6.post1. The two measured input cells do not estimate a workload
-  population or other POT versions.
-- GeomLoss 0.2.6 does not expose resumable iteration state or a tolerance
-  through the released `SamplesLoss` surface. A direct GeomLoss source
-  modification remains unmeasured; the development `geomloss.ot.solve_batch`
-  interface is not represented as a released feature.
-- LogSinkhornGPU and the upstream FlashSinkhorn kernel remain unmeasured in the
-  new common-endpoint campaign.
-- The paper's native OTT comparison bundles the official solver interface with
-  a phase-control change; the fixed-phase/active comparison is therefore the
-  narrower completion-removal contrast.
-- PyKeOps supplies the batched operator; static, masking, and active retirement
-  are study-built solver/executor variants.
-- The existing real-workload experiments do not estimate the population
-  frequency of favorable completion heterogeneity.
+- A pure scheduling-only GeomLoss original/modified residual-stop contrast
+  does not exist for the audited fixed-schedule path. C identifies the
+  incremental benefit inside the common residual extension. No original/C
+  ratio is called compaction-only acceleration.
+- C covers balanced, non-debiased, tensorized FP32 inference on two fixed
+  batches, not autograd, online/KeOps, multiscale or a workload population.
+  Original caller cost tensors remain resident for final extrapolation.
+- LogSinkhornGPU and the upstream FlashSinkhorn wrapper remain source-audited
+  but unmeasured in this campaign. They were optional, and no missing timing
+  claim is imputed to them.
+- Native OTT/active includes a phase-control change; matched fixed-phase/active
+  is the narrower contrast. PyKeOps variants are study-built solver controls.
+
+Sources for these scope statements: `BATCHING_IMPLEMENTATION_AUDIT.md`,
+campaign `REPORT_ZH.md`, C, and `analysis/geomloss_completion_summary.json`.

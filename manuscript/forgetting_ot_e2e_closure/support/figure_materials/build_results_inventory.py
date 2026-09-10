@@ -43,10 +43,10 @@ Matched PyKeOps|ImageNet-32, n=2048, W=4, check=1|Static / DC; Mask / DC|Couplin
 Matched PyKeOps|ImageNet-32, n=16384, W=4, check=1|Static / DC; Mask / DC|Coupling-preparation time ratios|1.02×; 1.02×|3 inputs × 3 orders; all methods take 13 batch rounds|T3+S5:5.2
 Matched PyKeOps|Three inputs at n=16384|Static → DC|Problem updates|52 → 50, 51, 52; third-input time ratio approximately 1.00×|Values correspond to the three inputs; includes simultaneous completion without a gain|S5:5.2
 Matched PyKeOps|All timed runs at both support sizes|Backend residual against τ=1e−3|Output checks|54/54 runs pass; Static/Mask require an extra strict fallback in one small-input order|18 paired rounds × 3 methods; summaries include the fallback|A:A.3
-Official native batch|ImageNet-32 PCA500, n=1024, W=8|POT / DrainSinkhorn / GeomLoss release|Verified OT-stage median time|0.113 / 1.274 / 19.443 s|5 cyclic formal rounds; cross-backend complete configurations, not a compaction-only contrast|N+T3+S5:5.2
-Official native batch|ImageNet-32 PCA500, n=4096, W=16|POT / DrainSinkhorn|Verified OT-stage median time|2.120 / 14.592 s|5 cyclic formal rounds; POT is faster in this complete-configuration cell|N+T3+S5:5.2
-Official native batch|Same n=4096, W=16 input|GeomLoss release, scaling=0.9999|Verified OT-stage time|508.239 s|One valid feasibility run; not a five-repeat ranking|N+T3+S5:5.2
-Official native batch failures|GeomLoss release, n=1024/4096|Scaling schedules against external τ=1e−3|Maximum marginal L1|n1024: .99=6.95e−3, .999=1.53e−3; n4096: .99=4.73e−3|Retained residual failures; .9999 is the passing configuration|N+S5:5.2
+Historical complete configurations|ImageNet-32 PCA500, n=1024, W=8|POT / DrainSinkhorn / GeomLoss release|Verified OT-stage median time|0.113 / 1.274 / 19.443 s|5 cyclic formal rounds; archived cross-backend measurements, excluded from the current main table and acceleration argument|N
+Historical complete configurations|ImageNet-32 PCA500, n=4096, W=16|POT / DrainSinkhorn|Verified OT-stage median time|2.120 / 14.592 s|5 cyclic formal rounds; different kernels, output forms and stopping schedules|N
+Historical release feasibility|Same n=4096, W=16 input|GeomLoss release, scaling=0.9999|Verified OT-stage time|508.239 s|One valid feasibility run; no scheduling-only ratio against the new residual extension|N
+Historical release failures|GeomLoss release, n=1024/4096|Scaling schedules against external τ=1e−3|Maximum marginal L1|n1024: .99=6.95e−3, .999=1.53e−3; n4096: .99=4.73e−3|All residual failures retained; .9999 passes; tolerance unchanged in the new source extension|N
 Direct POT modification|ImageNet-32 PCA500, n=1024, W=8|Unmodified POT / completion-aware POT|Paired time ratio; logical work|1.023×; 2008 → 1688 problem-iterations|5 paired rounds; one round favors unmodified; peak allocation 300.4 → 332.5 MiB|N+T3+S5:5.2
 Direct POT modification|ImageNet-32 PCA500, n=4096, W=16|Unmodified POT / completion-aware POT|Paired time ratio; logical work|1.292×; 3056 → 2276 problem-iterations|5 paired rounds; ratio range 1.291–1.293×; peak allocation 7.270 → 7.397 GiB|N+T3+S5:5.2
 Earlier PyKeOps|ImageNet-32, n=16384, W=4, Static check=1|Sequential / Static batch|Time ratio; maximum marginal L1|1.55×, range 1.45–1.69×; 8.80e−4|3 inputs; complete-configuration comparison|T12
@@ -81,7 +81,8 @@ FILES = {f"T{k}": f"figures/FIG-{name}.tex" for k, name in {
     10: "additional", 12: "backend-history"}.items()}
 FILES.update(S5="sections/5_experiments.tex", S6="sections/6_scope.tex",
              A="sections/A_appendix.tex", F1="figures/FIG-method.tex",
-             N="support/figure_materials/native_batch_results.json")
+             N="support/figure_materials/native_batch_results.json",
+             G="support/figure_materials/geomloss_completion_results.json")
 
 
 def link(path, label):
@@ -102,8 +103,26 @@ def build():
     for line in STATIC.strip().splitlines():
         fields = line.split('|')
         assert len(fields) == 7, line
-        fields[-1] = "Current manuscript: " + source(fields[-1])
+        prefix = "Historical campaign record: " if fields[0].startswith('Historical ') else "Current manuscript: "
+        fields[-1] = prefix + source(fields[-1])
         rows.append(fields)
+    geom = json.loads((HERE / 'geomloss_completion_results.json').read_text(encoding='utf-8'))
+    for cell in geom['cells'].values():
+        full, compact = cell['refine_full_width'], cell['refine_compact']
+        setting = f"ImageNet-32 PCA500, n={cell['n']}, W={cell['width']}"
+        common_scope = '5 alternating-order pairs; both arms add identical fixed-epsilon residual refinement to official GeomLoss 0.2.6'
+        rows.append(['Direct GeomLoss source extension', setting, 'Residual-refined full-width / compacted',
+                     'Verified OT-stage medians; paired geometric-mean ratio',
+                     f"{full['median_ot_stage_seconds']:.6f} / {compact['median_ot_stage_seconds']:.6f} s; {cell['paired_full_over_compact_geomean']:.6f}x",
+                     common_scope + f"; pair range {cell['paired_range'][0]:.6f}-{cell['paired_range'][1]:.6f}x", source('G+T3+S5:5.2')])
+        rows.append(['Direct GeomLoss source extension', setting, 'Same two controls',
+                     'Refinement slots; annealing plus refinement slots',
+                     f"{full['refinement_slots']} -> {compact['refinement_slots']}; {full['annealing_plus_refinement_slots']} -> {compact['annealing_plus_refinement_slots']}",
+                     'Physical symmetric-update slots; initialization, checking and final extrapolation included in time but not slot counts', source('G+S5:5.2')])
+        rows.append(['Direct GeomLoss source extension', setting, 'Same two controls',
+                     'Peak allocation; maximum external marginal L1; output agreement',
+                     f"{full['peak_allocated_bytes']} / {compact['peak_allocated_bytes']} bytes; {compact['max_marginal_l1']:.9g}; bitwise-identical potentials",
+                     'All 10 arm outputs per size pass external 1e-3; original caller cost tensors retained; inference only', source('G+T3+S5:5.2')])
     review = json.loads((HERE / 'review_data.json').read_text(encoding='utf-8'))
     comp = json.loads((HERE / 'competitive_data.json').read_text(encoding='utf-8'))
     spec = json.loads((HERE / 'figure_spec.json').read_text(encoding='utf-8'))
@@ -195,7 +214,7 @@ The **{len(rows)} rows** consolidate results from the main text, appendix and re
 
 Definitions: Fixed retains the original batch width; LM is this study's control that freezes completed state after full-width updates; DC physically compacts state; Indexed narrows the active-ID launch grid; entry skip bypasses inactive computation in the original layout. Each time ratio specifies its numerator and denominator: **a ratio above 1 means the denominator is faster**. `A → B` lists the two measured values and does not by itself establish single-component attribution. E1=solver, E2=solver plus consumer, E3=full training or task. Campaigns, initializations, allocation policies and statistical units remain separate.
 
-Rows marked “Current manuscript” transcribe the cited source text. Rows marked “Frozen data” or “Reanalysis” read the repository's existing JSON/CSV records. The [review disposition](support/audits/REVIEW_DISPOSITION.md) and source fields in those records provide the evidence chain. Missing absolute times remain unreported. Displayed values generally use three significant digits, with scientific notation for small quantities; source files retain full precision. Narrow confidence intervals use 100(S−1)% to retain their resolution. Null results, slowdowns, additional memory costs and false accepts are included.
+Rows marked “Current manuscript” transcribe the cited source text. Rows marked “Frozen data” or “Reanalysis” read the repository's existing JSON/CSV records. Historical campaign rows retain cross-backend endpoints excluded from the current main table. The direct GeomLoss rows are regenerated from the source-bound result packet; both controls include the same added residual refinement. The [review disposition](support/audits/REVIEW_DISPOSITION.md) and source fields in those records provide the evidence chain. Missing absolute times remain unreported. Displayed values generally use three significant digits, with scientific notation for small quantities; source files retain full precision. Narrow confidence intervals use 100(S−1)% to retain their resolution. Null results, slowdowns, additional memory costs and false accepts are included.
 
 Local regeneration and consistency check: `python support/figure_materials/build_results_inventory.py --check`. This inventory organizes existing results; it adds no experiments and does not constitute final scientific approval by the authors.
 

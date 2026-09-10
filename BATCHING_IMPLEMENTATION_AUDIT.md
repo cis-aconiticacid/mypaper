@@ -1,6 +1,6 @@
 # Source-backed batching implementation audit
 
-Audited 2026-09-09 for the DrainSinkhorn manuscript. This record distinguishes
+Audited 2026-09-09 and extended 2026-09-10 for the DrainSinkhorn manuscript. This record distinguishes
 an API that accepts a batch, the mechanism that executes that batch, its
 stopping rule, and whether completed problems stop receiving expensive work.
 Claims are scoped to the pinned revisions below.
@@ -35,15 +35,24 @@ Claims are scoped to the pinned revisions below.
 - The native OTT ratio is retained as a complete-configuration reference. It
   changes the solver interface and phase control in addition to active
   retirement, so it is not the compaction-only estimate.
-- The new POT/GeomLoss/Drain experiment uses frozen real inputs, a common
-  verified endpoint, FP32 with TF32 disabled, and separately recorded H2D and
-  warmup. Its cross-backend seconds rank complete configurations only: POT is
-  fastest in the measured cells. They are not a compaction-only estimate.
+- The earlier POT/GeomLoss/Drain experiment is retained in the complete
+  results inventory. Its different kernels, stopping schedules and outputs
+  make it unsuitable for attributing completion-aware acceleration. The main
+  table now uses the third-party solvers' own within-backend controls.
 - The direct POT modification imports no DrainSinkhorn implementation. At
   `n=4096,W=16` it reduces logical problem-iterations by 25.5% and yields a
   five-pair unmodified/modified geometric mean of 1.292x. At `n=1024,W=8`,
   15.9% fewer logical slots yield only 1.023x and the paired range crosses one.
   Peak allocated memory rises at both sizes.
+- The direct GeomLoss experiment inserts fixed-epsilon residual refinement
+  inside its released loop after the unchanged annealing schedule. Full-width
+  freezing and compaction share the extension, updates and output decisions.
+  Their five-pair ratios are 1.159x and 1.215x at the two sizes, with
+  bitwise-identical returned potentials in every pair. Adding refinement
+  changes the official method; the reported ratios isolate the incremental
+  removal of completed work within that extension. Large-input peak allocated
+  rises from 4.504 to 6.254 GiB. Source:
+  `manuscript/forgetting_ot_e2e_closure/support/figure_materials/geomloss_completion_results.json`.
 - LogSinkhornGPU, upstream FlashSinkhorn, and an official PyKeOps solver remain
   unmeasured in the new common-endpoint campaign.
 
@@ -57,3 +66,30 @@ direct POT modification with SHA-256 identity, package RECORD hashes, commands,
 H2D/warmup separation, per-problem residuals, memory measurements, and the
 analysis summary. The paper-side transcription is
 `manuscript/forgetting_ot_e2e_closure/support/figure_materials/native_batch_results.json`.
+
+## Direct GeomLoss source extension, 2026-09-10
+
+The released `sinkhorn_samples.sinkhorn_loop` binding is temporarily replaced
+with the same installed function source plus one insertion after annealing and
+before final extrapolation. The original package files remain untouched. The
+inserted refinement uses the official softmin callable and symmetric update
+formula. This modifies the official solver loop rather than substituting a
+DrainSinkhorn solver. The no-op insertion returns bitwise-identical outputs to
+the original release at both sizes.
+
+The release follows its fixed epsilon schedule, and the pinned development
+`_arguments.py` explicitly rejects a non-null `tol` (source above). Both
+modified arms therefore add the same fixed-epsilon convergence phase. The
+full-width arm updates all lanes and freezes completed states; the compact arm
+physically selects live costs, log-weights and potentials. The caller retains
+the original full cost matrices for the unchanged final extrapolation. This
+is an inference-only extension; no differentiation or other GeomLoss backend
+has been measured.
+
+Research campaign sources: `provenance/geomloss_completion_aware_plan.json`,
+`code/geomloss_completion_aware.py`, `code/benchmark_geomloss_completion.py`,
+`provenance/upstream_geomloss_0.2.6/`, and
+`raw/geomloss_completion/geomloss_executed_loop.py`. The paper-side result
+packet preserves raw-record paths and hashes, all twenty formal arm records'
+aggregate results, source equivalence and failures. The original A/B files
+and analysis remain unchanged.
