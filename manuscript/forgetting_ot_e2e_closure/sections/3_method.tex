@@ -5,7 +5,7 @@
 
 \subsection{Problem and execution state}
 
-Consider a batch of $W$ independent EOT problems from \cref{eq:eot}. A lane contains one problem's marginals, support descriptors, dual potentials, and temporary state. An active problem is one that has yet to pass the configured stopping rule. DrainSinkhorn maintains a packed array of active problems and their output destinations.
+Consider a batch of $W$ independent EOT problems from \cref{eq:eot}. A lane contains one problem's marginals, support descriptors, dual potentials, and temporary state. An active problem is one that has yet to pass the configured stopping rule. DrainSinkhorn preserves joint execution by maintaining a packed array of active problems and their output destinations; only verified-complete lanes leave the next batched update.
 
 The executor advances this array until every problem has completed or the configured iteration limit is reached. Its central invariant is that all tensors at an active lane refer to the same problem. Each emitted output must also pass the two-marginal verifier. These two conditions govern screening, output release, and compaction.
 

@@ -7,7 +7,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 PAPER = HERE.parents[1]
 
-# Curated prose/table results, transcribed from manuscript e5222fa.
+# Curated prose/table results, transcribed from the 2026-09-10 revision.
 # Seven fields: group, setting, contrast, metric, result, unit/scope, source.
 STATIC = r"""
 Main application|MetroPT-3, n=16384, W=16, 4 workers|Fixed → DC|E2 time; Fixed/DC|14.9 → 8.56 s; 1.75×|One failure-window workload; geometric mean of median makespans across 3 orders|T2
@@ -43,6 +43,12 @@ Matched PyKeOps|ImageNet-32, n=2048, W=4, check=1|Static / DC; Mask / DC|Couplin
 Matched PyKeOps|ImageNet-32, n=16384, W=4, check=1|Static / DC; Mask / DC|Coupling-preparation time ratios|1.02×; 1.02×|3 inputs × 3 orders; all methods take 13 batch rounds|T3+S5:5.2
 Matched PyKeOps|Three inputs at n=16384|Static → DC|Problem updates|52 → 50, 51, 52; third-input time ratio approximately 1.00×|Values correspond to the three inputs; includes simultaneous completion without a gain|S5:5.2
 Matched PyKeOps|All timed runs at both support sizes|Backend residual against τ=1e−3|Output checks|54/54 runs pass; Static/Mask require an extra strict fallback in one small-input order|18 paired rounds × 3 methods; summaries include the fallback|A:A.3
+Official native batch|ImageNet-32 PCA500, n=1024, W=8|POT / DrainSinkhorn / GeomLoss release|Verified OT-stage median time|0.113 / 1.274 / 19.443 s|5 cyclic formal rounds; cross-backend complete configurations, not a compaction-only contrast|N+T3+S5:5.2
+Official native batch|ImageNet-32 PCA500, n=4096, W=16|POT / DrainSinkhorn|Verified OT-stage median time|2.120 / 14.592 s|5 cyclic formal rounds; POT is faster in this complete-configuration cell|N+T3+S5:5.2
+Official native batch|Same n=4096, W=16 input|GeomLoss release, scaling=0.9999|Verified OT-stage time|508.239 s|One valid feasibility run; not a five-repeat ranking|N+T3+S5:5.2
+Official native batch failures|GeomLoss release, n=1024/4096|Scaling schedules against external τ=1e−3|Maximum marginal L1|n1024: .99=6.95e−3, .999=1.53e−3; n4096: .99=4.73e−3|Retained residual failures; .9999 is the passing configuration|N+S5:5.2
+Direct POT modification|ImageNet-32 PCA500, n=1024, W=8|Unmodified POT / completion-aware POT|Paired time ratio; logical work|1.023×; 2008 → 1688 problem-iterations|5 paired rounds; one round favors unmodified; peak allocation 300.4 → 332.5 MiB|N+T3+S5:5.2
+Direct POT modification|ImageNet-32 PCA500, n=4096, W=16|Unmodified POT / completion-aware POT|Paired time ratio; logical work|1.292×; 3056 → 2276 problem-iterations|5 paired rounds; ratio range 1.291–1.293×; peak allocation 7.270 → 7.397 GiB|N+T3+S5:5.2
 Earlier PyKeOps|ImageNet-32, n=16384, W=4, Static check=1|Sequential / Static batch|Time ratio; maximum marginal L1|1.55×, range 1.45–1.69×; 8.80e−4|3 inputs; complete-configuration comparison|T12
 Earlier PyKeOps|Same setting, LM check=1|Sequential / LM|Time ratio; maximum marginal L1|1.55×, range 1.45–1.69×; 8.93e−4|3 inputs; LM is the control implemented in this study|T12
 Earlier PyKeOps|Same setting, DC check=2|Sequential / DC|Time ratio; maximum marginal L1|1.51×, range 1.43–1.59×; 8.93e−4|Mean 14 rounds versus 13 for Static; checking frequency and compaction both change|T12+A:A.3
@@ -74,7 +80,8 @@ FILES = {f"T{k}": f"figures/FIG-{name}.tex" for k, name in {
     2: "endpoints", 3: "backends", 5: "components", 6: "grouping", 9: "phases",
     10: "additional", 12: "backend-history"}.items()}
 FILES.update(S5="sections/5_experiments.tex", S6="sections/6_scope.tex",
-             A="sections/A_appendix.tex", F1="figures/FIG-method.tex")
+             A="sections/A_appendix.tex", F1="figures/FIG-method.tex",
+             N="support/figure_materials/native_batch_results.json")
 
 
 def link(path, label):
@@ -182,7 +189,7 @@ def build():
     assert all(len(row) == 7 for row in rows)
     intro = f'''# Complete Experimental Results Comparison Table (Standalone)
 
-Based on English manuscript commit **e5222fa** (2026-09-09). This table is a standalone companion: it is not referenced by `main.tex` and does not enter the manuscript or appendix PDF.
+Based on the English manuscript revision dated **2026-09-10**. This table is a standalone companion: it is not referenced by `main.tex` and does not enter the manuscript or appendix PDF.
 
 The **{len(rows)} rows** consolidate results from the main text, appendix and result tables, including all {width_count} statistical points in Figure 2, all 5 tolerance points in Figure 3, and the 5 summary groups and 200 scatter points in Figure 4. The recorded trajectory in Figure 1 is also listed. Tables 1 and 11 specify configurations; their settings accompany the relevant results rather than adding result rows. Theory equations, hyperparameters, external literature results and unused historical macros are outside this experimental inventory.
 

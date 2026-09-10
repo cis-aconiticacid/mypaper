@@ -1,0 +1,48 @@
+{
+  "schema": "forgetot.paper.native_batch_results.v1",
+  "campaign": "EXP-NATIVE-BATCH-SOLVERS-20260909",
+  "research_campaign_commit": "9d5f506ff08c9ccbf145fe1cb181d2c34d1232e1",
+  "remote_source_commit": "73aec2941bfa1a5caa6a6bddf7aa83b734f9bb8b",
+  "environment": {
+    "gpu": "NVIDIA A100-SXM4-80GB",
+    "torch": "2.5.1+cu124",
+    "cuda": "12.4",
+    "pot": "0.9.6.post1",
+    "geomloss": "0.2.6",
+    "flash_sinkhorn": "0.3.3.post1",
+    "dtype": "float32",
+    "tf32": false
+  },
+  "contract": {
+    "dataset": "ImageNet-32 PCA-500",
+    "epsilon": 0.1,
+    "external_release": "per-problem max(row_l1,column_l1) <= 1e-3",
+    "endpoint": "device-resident input through returned plan or potentials and external audit",
+    "h2d_and_warmup_excluded": true
+  },
+  "complete_configurations": {
+    "n1024_w8": {
+      "formal_repeats": 5,
+      "pot_batch": {"median_seconds": 0.11275511234998703, "range_seconds": [0.10927083343267441, 0.11600685492157936], "max_marginal_l1": 0.0005466890870593488, "peak_allocated_bytes": 315013120},
+      "drain_flash": {"median_seconds": 1.2740053161978722, "range_seconds": [1.2732503563165665, 1.274574339389801], "max_marginal_l1": 0.0004998738295398653, "peak_allocated_bytes": 64755712},
+      "geomloss_release_scaling_0.9999": {"median_seconds": 19.442658588290215, "range_seconds": [19.430336613208055, 19.521176729351282], "max_marginal_l1": 0.00022710348137766178, "peak_allocated_bytes": 274942464}
+    },
+    "n4096_w16": {
+      "formal_repeats_pot_and_drain": 5,
+      "pot_batch": {"median_seconds": 2.1201186515390873, "range_seconds": [2.119724612683058, 2.1202330701053143], "max_marginal_l1": 0.0004706981126219034, "peak_allocated_bytes": 7806436864},
+      "drain_flash": {"median_seconds": 14.59168941900134, "range_seconds": [14.590533223003149, 14.598654758185148], "max_marginal_l1": 0.0004948737332597375, "peak_allocated_bytes": 513525760},
+      "geomloss_release_scaling_0.9999_feasibility": {"repeats": 1, "seconds": 508.2386285997927, "max_marginal_l1": 0.00021217625758966142, "peak_allocated_bytes": 4835147776}
+    }
+  },
+  "direct_pot_modification": {
+    "uses_drainsinkhorn": false,
+    "formal_pairs_per_size": 5,
+    "n1024_w8": {"unmodified_median_seconds": 0.1093292161822319, "modified_median_seconds": 0.10905863344669342, "paired_unmodified_over_modified_geomean": 1.0228864100189663, "logical_work_reduction": 0.15936254980079678, "modified_max_marginal_l1": 0.0005467712180688977, "peak_unmodified_bytes": 315013120, "peak_modified_bytes": 348666368},
+    "n4096_w16": {"unmodified_median_seconds": 2.1192536018788815, "modified_median_seconds": 1.640465121716261, "paired_unmodified_over_modified_geomean": 1.2920613174843505, "logical_work_reduction": 0.2552356020942408, "modified_max_marginal_l1": 0.0004879339539911598, "peak_unmodified_bytes": 7806436864, "peak_modified_bytes": 7942754304}
+  },
+  "retained_failures": [
+    {"method": "GeomLoss 0.2.6 SamplesLoss", "n": 1024, "scaling": 0.99, "max_marginal_l1": 0.006945842234729894},
+    {"method": "GeomLoss 0.2.6 SamplesLoss", "n": 1024, "scaling": 0.999, "max_marginal_l1": 0.0015275214779119771},
+    {"method": "GeomLoss 0.2.6 SamplesLoss", "n": 4096, "scaling": 0.99, "max_marginal_l1": 0.004727489374009311}
+  ]
+}

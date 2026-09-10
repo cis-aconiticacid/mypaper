@@ -1,10 +1,10 @@
 \begin{table*}[!t]
 \centering
-\caption{Backend comparisons on ImageNet-32. Top: OTT-JAX ($n=4096,W=16$), ten repeats per tolerance; fixed-phase and compacted execution share phase length $q$. Bottom: PyKeOps with every-update checking and $W=4$; entries are means of three per-input median paired coupling-preparation ratios over three cyclic orders. Earlier PyKeOps configurations appear in Table~\ref{tab:backend-history}.}
+\caption{Backend and native-batch comparisons on ImageNet-32. OTT-JAX uses ten repeats per tolerance; PyKeOps entries are means of three per-input paired medians. The complete-configuration block uses official release interfaces for POT and GeomLoss alongside DrainSinkhorn under one external output audit; five formal runs are reported except the labeled GeomLoss feasibility run. The final block directly modifies POT's own native batch loop and reports five paired rounds. Cross-backend rows are descriptive; the modified-POT block is the same-backend retirement comparison.}
 \label{tab:ot-cross-backend}
-\small
-\setlength{\tabcolsep}{5pt}
-\renewcommand{\arraystretch}{1.15}
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.05}
 \begin{tabular}{@{}llll@{}}
 \toprule
 \multicolumn{4}{@{}l}{OTT-JAX: matched-phase compaction and native-reference comparisons} \\
@@ -20,6 +20,22 @@ Support size $n$ & Static / DC & Mask / DC & Inputs $\times$ orders \\
 \midrule
 2048 & $0.999$ & $1.00$ & $3\times3$ \\
 16384 & $1.02$ & $1.02$ & $3\times3$ \\
+\midrule
+\multicolumn{4}{@{}l}{Complete configurations (official POT/GeomLoss releases): verified OT-stage endpoint} \\
+Configuration & $(n,W)$ & Median time & Max marginal $\ell_1$; peak allocation \\
+\midrule
+POT 0.9.6.post1 & $(1024,8)$ & 0.113 s & $5.47\times10^{-4}$; 300.4 MiB \\
+DrainSinkhorn & $(1024,8)$ & 1.274 s & $5.00\times10^{-4}$; 61.8 MiB \\
+GeomLoss 0.2.6 & $(1024,8)$ & 19.443 s & $2.27\times10^{-4}$; 262.2 MiB \\
+POT 0.9.6.post1 & $(4096,16)$ & 2.120 s & $4.71\times10^{-4}$; 7.270 GiB \\
+DrainSinkhorn & $(4096,16)$ & 14.592 s & $4.95\times10^{-4}$; 489.7 MiB \\
+GeomLoss 0.2.6 & $(4096,16)$ & 508.239 s (1 run) & $2.12\times10^{-4}$; 4.503 GiB \\
+\midrule
+\multicolumn{4}{@{}l}{Direct source modification of POT 0.9.6.post1} \\
+$(n,W)$ & Unmodified / modified & Paired unmodified / modified & Slot reduction; peak allocation \\
+\midrule
+$(1024,8)$ & 0.109 / 0.109 s & $1.023\times$ & 15.9\%; 300.4 / 332.5 MiB \\
+$(4096,16)$ & 2.119 / 1.640 s & $1.292\times$ & 25.5\%; 7.270 / 7.397 GiB \\
 \bottomrule
 \end{tabular}
 \end{table*}
